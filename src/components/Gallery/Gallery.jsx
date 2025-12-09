@@ -49,7 +49,7 @@ const Gallery = () => {
   return (
     <>
       {/* Gallery grid */}
-      <div className="gallery-grid" style={{ 
+      <div className="gallery-grid" style={{
         display: "grid",
         gridTemplateColumns: "repeat(auto-fill, minmax(250px, 1fr))",
         gap: "10px"

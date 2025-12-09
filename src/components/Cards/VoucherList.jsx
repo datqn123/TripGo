@@ -1,22 +1,24 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { fetchVouchers } from '../../utils/voucherdata';
 import VoucherCard from './VoucherCard';
+import './card.css';
 
 const VoucherList = () => {
   const [vouchers, setVouchers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const sliderRef = useRef(null);
 
   useEffect(() => {
     const loadVouchers = async () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Fetch vouchers from API
         const response = await fetchVouchers();
         console.log(response);
-        
+
         if (response.code) {
           // Success - use the result array
           setVouchers(response.result);
@@ -35,58 +37,80 @@ const VoucherList = () => {
     loadVouchers();
   }, []);
 
+  const scrollLeft = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({ left: -336, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (sliderRef.current) {
+      sliderRef.current.scrollBy({ left: 336, behavior: 'smooth' });
+    }
+  };
+
   if (loading) {
     return (
-      <div className="container">
-        <div className="text-center py-5">
-          <div className="spinner-border text-primary" role="status">
-            <span className="visually-hidden">Đang tải...</span>
+      <section className="voucher-section">
+        <div className="container">
+          <div className="text-center py-4">
+            <div className="spinner-border text-primary" role="status">
+              <span className="visually-hidden">Đang tải...</span>
+            </div>
           </div>
-          <p className="mt-3">Đang tải vouchers...</p>
         </div>
-      </div>
+      </section>
     );
   }
 
   if (error) {
     return (
-      <div className="container">
-        <div className="alert alert-danger my-4" role="alert">
-          <i className="bi bi-exclamation-triangle-fill me-2"></i>
-          {error}
+      <section className="voucher-section">
+        <div className="container">
+          <div className="alert alert-danger my-4" role="alert">
+            <i className="bi bi-exclamation-triangle-fill me-2"></i>
+            {error}
+          </div>
         </div>
-      </div>
+      </section>
     );
   }
 
   if (vouchers.length === 0) {
-    return (
-      <div className="container">
-        <div className="text-center py-5">
-          <i className="bi bi-inbox" style={{ fontSize: '48px', color: '#ccc' }}></i>
-          <p className="mt-3 text-muted">Không có vouchers nào</p>
-        </div>
-      </div>
-    );
+    return null;
   }
 
   return (
-    <div className="container">
-      <div className="row">
-        {vouchers.map((voucher) => (
-          <div key={voucher.id} className="col-md-6 col-lg-4">
-            <VoucherCard 
-              voucher={{
-                ...voucher,
-                // Add isExpiringSoon based on isActive
-                isExpiringSoon: voucher.isActive
-              }} 
-            />
+    <section className="voucher-section">
+      <div className="container">
+        <h2 className="section-title">Ưu đãi dành cho bạn</h2>
+        <div className="voucher-slider-wrapper">
+          {/* Navigation buttons */}
+          <button className="voucher-nav-btn prev" onClick={scrollLeft}>
+            <i className="bi bi-chevron-left"></i>
+          </button>
+
+          <div className="voucher-slider" ref={sliderRef}>
+            {vouchers.map((voucher) => (
+              <div key={voucher.id} className="voucher-card-wrapper">
+                <VoucherCard
+                  voucher={{
+                    ...voucher,
+                    isExpiringSoon: voucher.isActive
+                  }}
+                />
+              </div>
+            ))}
           </div>
-        ))}
+
+          <button className="voucher-nav-btn next" onClick={scrollRight}>
+            <i className="bi bi-chevron-right"></i>
+          </button>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 
 export default VoucherList;
+

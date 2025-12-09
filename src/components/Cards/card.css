@@ -16,6 +16,10 @@
 .img-box .card img {
     transition: all 0.5s ease 0s;
     filter: brightness(0.8);
+    height: 180px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 12px;
 }
 
 .img-box .card .card-title {
@@ -177,9 +181,77 @@
 
 
 /* Voucher Card Styles */
+.voucher-section {
+    padding: 24px 0;
+    background: #f5f7fa;
+}
+
+.voucher-section .section-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 20px;
+}
+
+.voucher-slider-wrapper {
+    position: relative;
+    overflow: hidden;
+    padding: 0 20px;
+}
+
+.voucher-slider {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    padding: 8px 4px 16px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.voucher-slider::-webkit-scrollbar {
+    display: none;
+}
+
+.voucher-nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    background: white;
+    border: none;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    cursor: pointer;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.voucher-nav-btn:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.voucher-nav-btn.prev {
+    left: 0;
+}
+
+.voucher-nav-btn.next {
+    right: 0;
+}
+
+.voucher-nav-btn i {
+    font-size: 16px;
+    color: #333;
+}
+
 .voucher-card-wrapper {
+    flex: 0 0 320px;
+    min-width: 320px;
     padding: 8px;
-    margin-bottom: 16px;
 }
 
 .voucher-card {

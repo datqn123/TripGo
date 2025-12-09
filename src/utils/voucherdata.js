@@ -1,4 +1,4 @@
-import homeApi from "../api/homeApi";
+// Voucher data utilities
 
 /**
  * Fetch vouchers from API and return the JSON shape:
@@ -20,10 +20,10 @@ import homeApi from "../api/homeApi";
  *
  * On error, the function returns a fallback response with empty result array.
  */
-export async function fetchVouchers(params) {
+export async function fetchVouchers() {
   try {
-    const res = await homeApi.getVouchers(params);
-    const api = res?.data || {};
+    const res = await fetch("https://tripgo-api.onrender.com/api/public/vouchers/hotel-page");
+    const api = await res.json();
     const apiResult = Array.isArray(api.result) ? api.result : [];
 
     // Map the API result to ensure all fields are present

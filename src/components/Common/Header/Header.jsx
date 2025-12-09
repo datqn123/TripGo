@@ -22,9 +22,9 @@ const Header = () => {
     setOpen(!open);
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     window.addEventListener("scroll", isSticky);
-    return ()=>{
+    return () => {
       window.removeEventListener("scroll", isSticky)
     }
   })
@@ -47,105 +47,115 @@ const Header = () => {
   }, []);
 
   // sticky Header 
-  const isSticky=(e)=>{
+  const isSticky = (e) => {
     const header = document.querySelector('.header-section');
     const scrollTop = window.scrollY;
     scrollTop >= 120 ? header.classList.add('is-sticky') :
-    header.classList.remove('is-sticky')
+      header.classList.remove('is-sticky')
   }
 
 
- 
+
 
   return (
-    
+
     <header className="header-section">
       <Container>
-       
-          <Navbar expand="lg" className="p-0">
-            {/* Logo Section  */}
-            <Navbar.Brand>
-              <img 
-                src={Logo} 
-                alt="Trip Go Logo" />
-              <NavLink to="/"> Trip Go</NavLink>
-            </Navbar.Brand>
-            {/* End Logo Section  */}
 
-            <Navbar.Offcanvas
-              id={`offcanvasNavbar-expand-lg`}
-              aria-labelledby={`offcanvasNavbarLabel-expand-lg`}
-              placement="start"
-              show={open}
-            >
-              {/*mobile Logo Section  */}
-              <Offcanvas.Header>
-                <h1 className="logo">Weekendmonks</h1>
-                <span className="navbar-toggler ms-auto"  onClick={toggleMenu}>
-                  <i className="bi bi-x-lg"></i>
-                </span>
-              </Offcanvas.Header>
-              {/*end mobile Logo Section  */}
+        <Navbar expand="lg" className="p-0">
+          {/* Logo Section  */}
+          <Navbar.Brand>
+            <img
+              src={Logo}
+              alt="Trip Go Logo" />
+            <NavLink to="/"> Trip Go</NavLink>
+          </Navbar.Brand>
+          {/* End Logo Section  */}
 
-              <Offcanvas.Body>
-                <Nav className="justify-content-end flex-grow-1 pe-3">
-                  <NavLink className="nav-link" to="/" >
-                    Trang chủ
-                  </NavLink>
-                  <NavLink className="nav-link" to="/" >
-                    ABOUT US
-                  </NavLink>
-                  <NavLink className="nav-link" to="/" >
-                    Khám phá
-                  </NavLink>
+          <Navbar.Offcanvas
+            id={`offcanvasNavbar-expand-lg`}
+            aria-labelledby={`offcanvasNavbarLabel-expand-lg`}
+            placement="start"
+            show={open}
+          >
+            {/*mobile Logo Section  */}
+            <Offcanvas.Header>
+              <h1 className="logo">Weekendmonks</h1>
+              <span className="navbar-toggler ms-auto" onClick={toggleMenu}>
+                <i className="bi bi-x-lg"></i>
+              </span>
+            </Offcanvas.Header>
+            {/*end mobile Logo Section  */}
 
-                  <NavLink className="nav-link" to="/" >
-                    Đặt chỗ của tôi
-                  </NavLink>
-                  <div className="ms-md-4 ms-2 d-flex">
-              {!isLogged ? (
-                <>
-                  <NavLink className="primaryBtn d-none d-sm-inline-block" to="/login">
-                    Đăng nhập
-                  </NavLink>
-                  <NavLink className="primaryBtn1 d-none d-sm-inline-block" to="/register">
-                    Đăng ký
-                  </NavLink>
-                </>
-              ) : (
-                <>
-                  <span className="greeting nav-link d-none d-sm-inline-block mt-1">Xin chào {user?.fullName ? user.fullName.split(" ")[0] : ""}</span>
-                  <NavDropdown
-                    title={<span className="avatar-circle ms-2"><i className="bi bi-person-circle"></i></span>}
-                    id="user-nav-dropdown"
-                    align="end"
-                  >
-                    <NavDropdown.Item onClick={() => navigate('/profile')}>Hồ sơ</NavDropdown.Item>
-                    <NavDropdown.Divider />
-                    <NavDropdown.Item onClick={() => {
-                      localStorage.removeItem('user');
-                      localStorage.removeItem('accessToken');
-                      localStorage.removeItem('refreshToken');
-                      localStorage.removeItem('token');
-                      setUser(null);
-                      setIsLogged(false);
-                      navigate('/');
-                    }}>Đăng xuất</NavDropdown.Item>
-                  </NavDropdown>
-                </>
-              )}
-              <li className="d-inline-block d-lg-none ms-3 toggle_btn">
-                <i className={open ? "bi bi-x-lg" : "bi bi-list"}  onClick={toggleMenu}></i>
-              </li>
-            </div>
-                </Nav>
-              </Offcanvas.Body>
-            </Navbar.Offcanvas>
-            
-          </Navbar>
-    
+            <Offcanvas.Body>
+              <Nav className="justify-content-center flex-grow-1">
+                <NavLink className="nav-link" to="/">
+                  Trang chủ
+                </NavLink>
+                <NavLink className="nav-link" to="/explore">
+                  Khám phá
+                </NavLink>
+                <NavLink className="nav-link" to="/promotions">
+                  Khuyến mãi
+                </NavLink>
+                <NavLink className="nav-link" to="/my-bookings">
+                  Đặt chỗ của tôi
+                </NavLink>
+              </Nav>
+
+              <div className="d-flex align-items-center user-section">
+                {!isLogged ? (
+                  <>
+                    <NavLink className="primaryBtn d-none d-sm-inline-block" to="/login">
+                      Đăng nhập
+                    </NavLink>
+                    <NavLink className="primaryBtn1 d-none d-sm-inline-block" to="/register">
+                      Đăng ký
+                    </NavLink>
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-bell me-3" style={{ fontSize: '18px', color: 'white', cursor: 'pointer' }}></i>
+                    <NavDropdown
+                      className="user-dropdown"
+                      title={
+                        <span className="d-flex align-items-center">
+                          <span className="greeting-text me-2">Xin chào {user?.fullName || "User"}</span>
+                          <img
+                            src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.fullName || "U") + "&background=random&size=32"}
+                            alt="avatar"
+                            className="user-avatar"
+                          />
+                        </span>
+                      }
+                      id="user-nav-dropdown"
+                      align="end"
+                    >
+                      <NavDropdown.Item onClick={() => navigate('/profile')}>Hồ sơ</NavDropdown.Item>
+                      <NavDropdown.Divider />
+                      <NavDropdown.Item onClick={() => {
+                        localStorage.removeItem('user');
+                        localStorage.removeItem('accessToken');
+                        localStorage.removeItem('refreshToken');
+                        localStorage.removeItem('token');
+                        setUser(null);
+                        setIsLogged(false);
+                        navigate('/');
+                      }}>Đăng xuất</NavDropdown.Item>
+                    </NavDropdown>
+                  </>
+                )}
+                <li className="d-inline-block d-lg-none ms-3 toggle_btn">
+                  <i className={open ? "bi bi-x-lg" : "bi bi-list"} onClick={toggleMenu}></i>
+                </li>
+              </div>
+            </Offcanvas.Body>
+          </Navbar.Offcanvas>
+
+        </Navbar>
+
       </Container>
-    </header>
+    </header >
   );
 };
 

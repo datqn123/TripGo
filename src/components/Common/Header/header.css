@@ -11,34 +11,58 @@
 }
 
 /* avatar circle for logged-in user */
-.avatar-circle{
-  display:inline-flex;
-  width:38px;
-  height:38px;
-  border-radius:50%;
-  background:#eef7fe;
-  align-items:center;
-  justify-content:center;
-  color:#0d6efd;
-  font-size:20px;
+.avatar-circle {
+  display: inline-flex;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: #eef7fe;
+  align-items: center;
+  justify-content: center;
+  color: #0d6efd;
+  font-size: 20px;
 }
+
 /* greeting text next to avatar */
-.greeting{
+.greeting,
+.greeting-text {
   color: #ffffff;
   display: inline-flex;
   align-items: center;
   margin-right: 8px;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+/* user avatar image */
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+/* user section container */
+.user-section {
+  margin-left: auto;
+}
+
+/* hide dropdown arrow for user menu */
+.user-dropdown .dropdown-toggle::after {
+  display: none;
 }
 
 /* when header becomes sticky (light background), make greeting dark */
-.is-sticky .greeting{
+.is-sticky .greeting {
   color: var(--primaryClr) !important;
 }
+
 @keyframes smothScroll {
   0% {
     transform: translateY(-40px);
   }
+
   100% {
     transform: translateY(0px);
   }
@@ -81,7 +105,7 @@ header .navbar .offcanvas-body a {
 }
 
 header .navbar .offcanvas-body .dropdown-menu a {
-  color:black !important
+  color: black !important
 }
 
 header .navbar .offcanvas-body a:hover {
@@ -112,7 +136,7 @@ header .navbar .offcanvas-body .dropdown-menu .dropdown-item {
     border: 1px solid gainsboro;
   }
 
-  .offcanvas-header .logo{
+  .offcanvas-header .logo {
     font-size: 26px;
     color: var(--black) !important;
     font-family: var(--fontFamily1);
@@ -122,12 +146,12 @@ header .navbar .offcanvas-body .dropdown-menu .dropdown-item {
 
   .offcanvas-body .nav-link {
     padding: 12px 0px;
-    color:var(--black);
+    color: var(--black);
   }
 
-  .offcanvas-body .dropdown-item{
+  .offcanvas-body .dropdown-item {
     padding: 12px 10px;
-    color:var(--black);
+    color: var(--black);
   }
 
 

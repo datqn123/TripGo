@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
+import { Spinner } from "react-bootstrap";
 import authApi from "../../api/authApi";
 import "./login.css";
 import Banner from "../../assets/images/login_register/Frame 55.png";
@@ -8,6 +9,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const validate = () => {
@@ -23,6 +25,7 @@ const Login = () => {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
+    setLoading(true);
     try {
       const res = await authApi.login({ email, password });
       const user = res.data.result;
@@ -39,17 +42,17 @@ const Login = () => {
         localStorage.setItem("accessToken", user.accesToken);
         localStorage.setItem("refreshToken", user.refreshToken);
       }
-      alert("Đăng nhập thành công!");
-      // Clear fields on success
+      // Clear fields and redirect to home page
       setEmail("");
       setPassword("");
       setErrors({});
-      // Redirect to home page
       navigate("/", { replace: true });
     } catch (err) {
       const message =
         err?.response?.data?.message || "Sai số điện thoại hoặc mật khẩu!";
       alert(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -81,8 +84,22 @@ const Login = () => {
           {errors.password && <p className="error-text">{errors.password}</p>}
         </div>
 
-        <button type="submit" className="primaryBtn">
-          Đăng nhập
+        <button type="submit" className="primaryBtn" disabled={loading}>
+          {loading ? (
+            <>
+              <Spinner
+                as="span"
+                animation="border"
+                size="sm"
+                role="status"
+                aria-hidden="true"
+                className="me-2"
+              />
+              Đang đăng nhập...
+            </>
+          ) : (
+            "Đăng nhập"
+          )}
         </button>
         <div className="login-register-text">
           <span>Bạn chưa có tài khoản? </span>

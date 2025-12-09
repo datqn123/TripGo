@@ -23,11 +23,7 @@ const VoucherCard = ({ voucher }) => {
           <div className="voucher-content">
             {/* Left icon */}
             <div className="voucher-icon">
-              {voucher.image ? (
-                <img src={voucher.image} alt={voucher.name} />
-              ) : (
-                <i className="bi bi-building"></i>
-              )}
+              <i className="bi bi-building"></i>
             </div>
 
             {/* Voucher details */}
