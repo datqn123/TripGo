@@ -1,17 +1,18 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import authApi from "../../api/authApi";
 import "./login.css";
 import Banner from "../../assets/images/login_register/Frame 55.png";
 
 const Login = () => {
-  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   const validate = () => {
     const e = {};
-    if (!phone) e.phone = "Số điện thoại không được bỏ trống";
+    if (!email) e.email = "Số điện thoại không được bỏ trống";
     if (!password) e.password = "Mật khẩu không được bỏ trống";
     return e;
   };
@@ -23,15 +24,31 @@ const Login = () => {
     if (Object.keys(newErrors).length > 0) return;
 
     try {
-      const res = await authApi.login({ phone, password });
-      if (res && res.data && res.data.token) localStorage.setItem("token", res.data.token);
+      const res = await authApi.login({ email, password });
+      const user = res.data.result;
+      if (res && user) {
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            id: user.id,
+            email: user.email,
+            fullName: user.fullName,
+            roles: user.roles,
+          })
+        );
+        localStorage.setItem("accessToken", user.accesToken);
+        localStorage.setItem("refreshToken", user.refreshToken);
+      }
       alert("Đăng nhập thành công!");
       // Clear fields on success
-      setPhone("");
+      setEmail("");
       setPassword("");
       setErrors({});
+      // Redirect to home page
+      navigate("/", { replace: true });
     } catch (err) {
-      const message = err?.response?.data?.message || "Sai số điện thoại hoặc mật khẩu!";
+      const message =
+        err?.response?.data?.message || "Sai số điện thoại hoặc mật khẩu!";
       alert(message);
     }
   };
@@ -44,13 +61,13 @@ const Login = () => {
       <form onSubmit={handleLogin}>
         <div className="input-group">
           <input
-            type="tel"
+            type="text"
             placeholder="Nhập số điện thoại..."
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className={errors.phone ? "error" : ""}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className={errors.email ? "error" : ""}
           />
-          {errors.phone && <p className="error-text">{errors.phone}</p>}
+          {errors.email && <p className="error-text">{errors.email}</p>}
         </div>
 
         <div className="input-group">

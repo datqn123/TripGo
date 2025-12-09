@@ -11,16 +11,16 @@ const Cards = ({destination}) => {
         <Card>
           <Card.Img
             variant="top"
-            src={destination.image}
+            src={destination.thumbnail}
             className="img-fluid"
-            alt={destination.name}
+            alt={destination.slug}
           />
           <Card.Title>
 
           {destination.name}
           </Card.Title>
 
-          <span className="tours">{destination.tours}</span>
+          <span className="tours">{destination.id}</span>
         </Card>
         </NavLink>
       </div>

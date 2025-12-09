@@ -1,24 +1,24 @@
 .tours_section .img-box {
     padding: 0px 12px;
-  }
-  
- .img-box .card {
+}
+
+.img-box .card {
     border: none;
     width: 100%;
     overflow: hidden;
     position: relative;
-  }
-  
- .img-box .card a {
+}
+
+.img-box .card a {
     border: none;
-  }
-  
- .img-box .card img {
+}
+
+.img-box .card img {
     transition: all 0.5s ease 0s;
     filter: brightness(0.8);
-  }
-  
- .img-box .card .card-title {
+}
+
+.img-box .card .card-title {
     position: absolute;
     top: 5%;
     left: 3%;
@@ -27,9 +27,9 @@
     line-height: 150%;
     font-weight: bold;
     width: 100%;
-  }
-  
- .img-box .card .tours {
+}
+
+.img-box .card .tours {
     position: absolute;
     right: 5%;
     bottom: 5%;
@@ -42,42 +42,42 @@
     border-radius: 15px;
     transform: translateX(120%);
     transition: 0.2s ease-in;
-  }
-  
- .img-box .card:hover {
+}
+
+.img-box .card:hover {
     transition: 0.2 ease-in;
-  }
-  
- .img-box .card:hover img {
+}
+
+.img-box .card:hover img {
     filter: brightness(1);
     transform: scale(1.1);
-  }
-  
- .img-box .card:hover .tours {
+}
+
+.img-box .card:hover .tours {
     transform: translateX(0);
-  }
-  
+}
 
 
 
 
 
-.popular  {
+
+.popular {
     padding: 5px;
     border: none;
     transition: all 0.5s ease 0s;
     overflow: hidden;
 }
 
-.popular:hover{
+.popular:hover {
     transform: translateY(-10px);
     transition: 0.2s ease-in;
-    
+
 }
 
 
 .popular:hover .card-title {
-    color:var(--primaryClr)
+    color: var(--primaryClr)
 }
 
 .popular img {
@@ -88,7 +88,7 @@
     transform: scale(1.1);
 }
 
-.popular  .card-body .badge {
+.popular .card-body .badge {
     padding: 4px 8px;
     border-radius: 4px;
     margin-right: 8px;
@@ -97,86 +97,266 @@
 
 
 
-.popular  .card-body .River{
+.popular .card-body .River {
     background-color: #ffebf5 !important;
-    color:#cf3881 !important;
+    color: #cf3881 !important;
 }
 
-.popular  .card-body .Wildlife{
+.popular .card-body .Wildlife {
     background-color: #4ba7fc !important;
-    color:#e6f7f4 !important;
+    color: #e6f7f4 !important;
 }
 
-.popular  .card-body .Escorted{
+.popular .card-body .Escorted {
     background-color: #e8edf1 !important;
-    color:#4f5e71 !important;
+    color: #4f5e71 !important;
 }
 
-.popular  .card-body .Rail{
+.popular .card-body .Rail {
     background-color: #fc961b !important;
-    color:#ffffff !important;
+    color: #ffffff !important;
 }
 
-.popular  .card-body .Tour{
+.popular .card-body .Tour {
     background-color: #6088c4 !important;
-    color:#ffffff !important;
+    color: #ffffff !important;
 }
 
-.popular  .card-body .card-title{
+.popular .card-body .card-title {
     font-size: var(--bodyText);
     font-weight: bold;
     transition: all 0.5s ease 0s;
     margin-bottom: 10px;
 
-    
+
 }
 
-.popular  .card-body .card-text {
+.popular .card-body .card-text {
     font-size: 13px;
     padding: 10px 0px;
     line-height: 1.3em;
     position: relative;
-    color:#4f5e71;
+    color: #4f5e71;
 }
 
- 
-.popular  .card-body .card-text i {
+
+.popular .card-body .card-text i {
     position: absolute;
     top: 15px;
 }
 
 
-.popular  .card-body .text {
+.popular .card-body .text {
     margin-left: 16px;
     display: block;
     font-size: 13px;
 }
 
-.popular  .card-body .reviwe {
+.popular .card-body .reviwe {
     margin-bottom: 12px;
 }
-.popular  .card-body .reviwe i {
-    color:var(--primaryClr)
+
+.popular .card-body .reviwe i {
+    color: var(--primaryClr)
 }
 
-.popular  .card-footer  {
+.popular .card-footer {
     background: none;
 }
 
-.popular  .card-footer p  {
+.popular .card-footer p {
     font-size: var(--bodyText);
-    color:#4f5e71
+    color: #4f5e71
 }
 
-.popular  .card-footer p strong {
+.popular .card-footer p strong {
     font-size: var(--bodyText);
-    color:black;
+    color: black;
     font-weight: bold;
 }
 
 
+/* Voucher Card Styles */
+.voucher-card-wrapper {
+    padding: 8px;
+    margin-bottom: 16px;
+}
 
+.voucher-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: visible;
+    position: relative;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
 
+.voucher-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
+}
 
+.voucher-badge {
+    position: absolute;
+    top: -8px;
+    left: 12px;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+    z-index: 10;
+    box-shadow: 0 2px 6px rgba(255, 107, 107, 0.4);
+}
 
-  
+.voucher-body {
+    padding: 20px 16px 16px;
+}
+
+.voucher-content {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.voucher-icon {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.voucher-icon i {
+    font-size: 24px;
+    color: white;
+}
+
+.voucher-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.voucher-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.voucher-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 6px 0;
+    line-height: 1.4;
+}
+
+.voucher-description {
+    font-size: 13px;
+    color: #666;
+    margin: 0;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    overflow: hidden;
+}
+
+.voucher-info {
+    flex-shrink: 0;
+}
+
+.voucher-info i {
+    font-size: 18px;
+    color: #999;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.voucher-info i:hover {
+    color: #666;
+}
+
+.voucher-footer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.voucher-code {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.voucher-code i {
+    font-size: 16px;
+    color: #667eea;
+}
+
+.voucher-code span {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.5px;
+}
+
+.voucher-copy-btn {
+    background: linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(54, 209, 220, 0.3);
+}
+
+.voucher-copy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(54, 209, 220, 0.4);
+}
+
+.voucher-copy-btn:active {
+    transform: translateY(0);
+}
+
+.voucher-copy-btn.copied {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    box-shadow: 0 2px 8px rgba(56, 239, 125, 0.3);
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .voucher-content {
+        grid-template-columns: auto 1fr;
+    }
+
+    .voucher-info {
+        grid-column: 2;
+        text-align: right;
+    }
+
+    .voucher-footer {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+
+    .voucher-copy-btn {
+        width: 100%;
+    }
+}

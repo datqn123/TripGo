@@ -15,6 +15,7 @@ import "../Header/header.css";
 const Header = () => {
   const [open, setOpen] = useState(false);
   const [isLogged, setIsLogged] = useState(false);
+  const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   const toggleMenu = () => {
@@ -29,11 +30,17 @@ const Header = () => {
   })
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLogged(!!token);
+    const storedUser = localStorage.getItem("user");
+    const accessToken = localStorage.getItem("accessToken") || localStorage.getItem("token");
+    setUser(storedUser ? JSON.parse(storedUser) : null);
+    setIsLogged(!!(storedUser || accessToken));
 
     const onStorage = (e) => {
-      if (e.key === "token") setIsLogged(!!e.newValue);
+      if (e.key === "user" || e.key === "accessToken" || e.key === "token") {
+        const su = localStorage.getItem("user");
+        setUser(su ? JSON.parse(su) : null);
+        setIsLogged(!!(localStorage.getItem("user") || localStorage.getItem("accessToken") || localStorage.getItem("token")));
+      }
     };
     window.addEventListener("storage", onStorage);
     return () => window.removeEventListener("storage", onStorage);
@@ -95,10 +102,7 @@ const Header = () => {
                   <NavLink className="nav-link" to="/" >
                     Đặt chỗ của tôi
                   </NavLink>
-                </Nav>
-              </Offcanvas.Body>
-            </Navbar.Offcanvas>
-            <div className="ms-md-4 ms-2">
+                  <div className="ms-md-4 ms-2 d-flex">
               {!isLogged ? (
                 <>
                   <NavLink className="primaryBtn d-none d-sm-inline-block" to="/login">
@@ -109,20 +113,35 @@ const Header = () => {
                   </NavLink>
                 </>
               ) : (
-                <NavDropdown
-                  title={<span className="avatar-circle"><i className="bi bi-person-circle"></i></span>}
-                  id="user-nav-dropdown"
-                  align="end"
-                >
-                  <NavDropdown.Item onClick={() => navigate('/profile')}>Hồ sơ</NavDropdown.Item>
-                  <NavDropdown.Divider />
-                  <NavDropdown.Item onClick={() => { localStorage.removeItem('token'); setIsLogged(false); navigate('/'); }}>Đăng xuất</NavDropdown.Item>
-                </NavDropdown>
+                <>
+                  <span className="greeting nav-link d-none d-sm-inline-block mt-1">Xin chào {user?.fullName ? user.fullName.split(" ")[0] : ""}</span>
+                  <NavDropdown
+                    title={<span className="avatar-circle ms-2"><i className="bi bi-person-circle"></i></span>}
+                    id="user-nav-dropdown"
+                    align="end"
+                  >
+                    <NavDropdown.Item onClick={() => navigate('/profile')}>Hồ sơ</NavDropdown.Item>
+                    <NavDropdown.Divider />
+                    <NavDropdown.Item onClick={() => {
+                      localStorage.removeItem('user');
+                      localStorage.removeItem('accessToken');
+                      localStorage.removeItem('refreshToken');
+                      localStorage.removeItem('token');
+                      setUser(null);
+                      setIsLogged(false);
+                      navigate('/');
+                    }}>Đăng xuất</NavDropdown.Item>
+                  </NavDropdown>
+                </>
               )}
               <li className="d-inline-block d-lg-none ms-3 toggle_btn">
                 <i className={open ? "bi bi-x-lg" : "bi bi-list"}  onClick={toggleMenu}></i>
               </li>
             </div>
+                </Nav>
+              </Offcanvas.Body>
+            </Navbar.Offcanvas>
+            
           </Navbar>
     
       </Container>

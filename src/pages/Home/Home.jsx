@@ -1,8 +1,8 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Banner from "../../components/Banner/Banner";
 import AdvanceSearch from "../../components/AdvanceSearch/AdvanceSearch";
 import Features from "../../components/Features/Features";
-import { Container, Row, Col,  } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
@@ -10,12 +10,12 @@ import "slick-carousel/slick/slick-theme.css";
 
 import "./home.css";
 
-
 import Gallery from "../../components/Gallery/Gallery";
 import Cards from "../../components/Cards/Cards";
 import { destinationsData, popularsData } from "../../utils/data";
+import { fetchLocations } from "../../utils/locationdata";
+import VoucherList from "../../components/Cards/VoucherList";
 import PopularCard from "../../components/Cards/PopularCard";
-
 
 const Home = () => {
   var settings = {
@@ -66,13 +66,22 @@ const Home = () => {
       },
     ],
   };
+  const [locations, setLocations] = useState([]);
 
-
+  useEffect(() => {
+    async function loadData() {
+      const res = await fetchLocations();
+      setLocations(res.result);
+      console.log(res.result);
+    }
+    loadData();
+  }, []);
 
   return (
     <>
       <Banner />
       <AdvanceSearch />
+      <VoucherList />
       <Features />
 
       {/* tour seciton start */}
@@ -90,10 +99,8 @@ const Home = () => {
           <Row>
             <Col md="12">
               <Slider {...settings}>
-                {destinationsData.map((destination, inx) => {
-                  return (
-                    <Cards destination={destination} key={inx} />
-                  );
+                {locations.map((destination, inx) => {
+                  return <Cards destination={destination} key={inx} />;
                 })}
               </Slider>
             </Col>
@@ -104,25 +111,25 @@ const Home = () => {
       {/* tour seciton start */}
 
       <section className="popular py-5">
-      <Container>
-        <Row>
-          <Col md="12">
-            <div className="main_heading">
-              <h1> Popular Activities </h1>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-        {popularsData.map((val, inx)=>{
-          return(
-          <Col  md={3} sm={6} xs={12} className="mb-5" key={inx}>
-            <PopularCard val={val} />
-          </Col>
-        )
-        })}
-        </Row>
-      </Container>
-    </section>
+        <Container>
+          <Row>
+            <Col md="12">
+              <div className="main_heading">
+                <h1> Popular Activities </h1>
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            {popularsData.map((val, inx) => {
+              return (
+                <Col md={3} sm={6} xs={12} className="mb-5" key={inx}>
+                  <PopularCard val={val} />
+                </Col>
+              );
+            })}
+          </Row>
+        </Container>
+      </section>
 
       <section className="call_us">
         <Container>
