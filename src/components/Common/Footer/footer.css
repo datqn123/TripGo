@@ -1,81 +1,50 @@
-footer {
-  background: black;
-
+/* Footer responsive */
+@media (max-width: 991px) {
+  footer .footer-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
 
-footer h4 {
-  font-size: var(--subTitle);
-  color: whitesmoke;
-  line-height: 150%;
-  font-weight: bold;
-  padding: 0 0 18px 0;
-  margin: 0;
+@media (max-width: 576px) {
+  footer .footer-grid {
+    grid-template-columns: 1fr !important;
+  }
 }
 
-footer p,
-footer a,
-footer i,
-footer span,
-footer .copyright  {
-  margin: 0;
-  font-size: var(--bodyText);
-  color: whitesmoke;
-  line-height: 150%;
-  font-weight: bold;
-  text-decoration: none;
+/* Social link hover */
+footer a:hover {
+  opacity: 0.8;
 }
 
-footer .quick_link .list-group .list-group-item {
-  background: none;
-  padding: 0;
-  margin-bottom: 5px;
-  font-size: var(--bodyText);
-  line-height: 150%;
-  color: #b4b4b4;
-  font-weight: bold;
-  border: none;
-}
-
-footer .quick_link .list-group .list-group-item:hover a {
-  color: var(--white);
-}
-
-footer .quick_link .list-group .list-group-item:first-child {
-  padding-top: 0;
-}
-
-footer .location .d-flex {
-  margin-bottom: 5px;
-}
-
-footer .bdr {
-    border-top: 1px solid #f5f5f578;
+/* NavLink hover in footer */
+footer ul li a:hover {
+  color: #fff !important;
 }
 
 
-#back-top{
-    opacity: 0;
-    z-index: 99999;
-    font-size: 26px;
-    color:white;
-    line-height: 47px;
-    text-align: center;
-    position: fixed;
-    right: 20px;
-    bottom: 50px;
-    width: 45px;
-    height: 45px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: all 0.6s ease;
-    transform: translateY(40px);
-    background: var(--primaryClr);
+#back-top {
+  opacity: 0;
+  z-index: 99999;
+  font-size: 26px;
+  color: white;
+  line-height: 47px;
+  text-align: center;
+  position: fixed;
+  right: 20px;
+  bottom: 50px;
+  width: 45px;
+  height: 45px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: all 0.6s ease;
+  transform: translateY(40px);
+  background: var(--primaryClr);
 
 
 }
 
-#back-top.active{
-    opacity: 1;
-    transition: all 0.6s ease;
-    transform: translateY(-20px);
+#back-top.active {
+  opacity: 1;
+  transition: all 0.6s ease;
+  transform: translateY(-20px);
 }

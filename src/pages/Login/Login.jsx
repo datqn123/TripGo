@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { Spinner } from "react-bootstrap";
+import { toast } from "react-toastify";
 import authApi from "../../api/authApi";
 import { useAuth } from "../../context/AuthContext";
 import "./login.css";
@@ -57,11 +58,12 @@ const Login = () => {
       setEmail("");
       setPassword("");
       setErrors({});
+      toast.success("Đăng nhập thành công!");
       navigate("/", { replace: true });
     } catch (err) {
       const message =
-        err?.response?.data?.message || "Sai số điện thoại hoặc mật khẩu!";
-      alert(message);
+        err?.response?.data?.message || "Sai email hoặc mật khẩu!";
+      toast.error(message);
     } finally {
       setLoading(false);
     }

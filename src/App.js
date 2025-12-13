@@ -1,4 +1,6 @@
 import { Route, Routes, useLocation } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
 import Home from "./pages/Home/Home";
 import Header from "./components/Common/Header/Header";
@@ -12,13 +14,25 @@ import Classification from "./pages/Payment/Classification";
 
 function App() {
   const location = useLocation();
-  
+
   // Những route không cần hiện header & footer
   const hideLayoutRoutes = ["/login", "/register"];
   const isHideLayout = hideLayoutRoutes.includes(location.pathname);
 
   return (
     <>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       {!isHideLayout && <Header />}
 
       <Routes>

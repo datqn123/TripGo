@@ -4,6 +4,13 @@
 
 .slider .carousel {
   position: relative;
+  max-height: 500px;
+  overflow: hidden;
+}
+
+.slider .carousel .carousel-item img {
+  height: 500px;
+  object-fit: cover;
 }
 
 .slider .carousel .carousel-item .carousel-caption {
@@ -120,6 +127,7 @@
   .slider .carousel .carousel-item .carousel-caption h5 {
     font-size: 35px;
   }
+
   .slider .carousel .carousel-item .carousel-caption .slider_des p {
     font-size: 16px;
   }
@@ -171,8 +179,8 @@
   .slider .carousel .carousel-control-prev {
     width: 30px;
     height: 30px;
-   
-    
+
+
   }
 
 }

@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import authApi from "../../api/authApi";
 import "./register.css";
 import Banner from "../../assets/images/login_register/Frame 55.png";
 
 const Register = () => {
+  const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState("");
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const [errors, setErrors] = useState({});
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -35,23 +38,18 @@ const Register = () => {
     setErrors(newErrors);
     if (Object.keys(newErrors).length > 0) return;
 
+    setIsLoading(true);
     try {
       const payload = { phoneNumber, fullName, password, confirmPassword, email };
-      const res = await authApi.register(payload);
-      if (res && res.data && res.data.token) {
-        localStorage.setItem("token", res.data.token);
-      }
-      // Xóa các dòng đã nhập sau khi đăng ký thành công
-      setPhoneNumber("");
-      setFullName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
-      setErrors({});
-      alert("Đăng ký thành công!");
+      await authApi.register(payload);
+      // Hiển thị toast thành công và redirect về trang đăng nhập
+      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+      navigate("/login");
     } catch (err) {
       const message = err?.response?.data?.message || "Đăng ký thất bại";
-      alert(message);
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -64,9 +62,9 @@ const Register = () => {
 
       <form onSubmit={handleRegister}>
         <div className="input-group phone-group">
-          <input 
+          <input
             type="text"
-            placeholder="Số điện thoại của bạn" 
+            placeholder="Số điện thoại của bạn"
             onChange={(e) => setPhoneNumber(e.target.value)}
             value={phoneNumber} />
         </div>
@@ -118,9 +116,21 @@ const Register = () => {
           )}
         </div>
 
+        {errors.general && (
+          <p className="error-text" style={{ textAlign: 'center', marginBottom: '16px' }}>
+            {errors.general}
+          </p>
+        )}
 
-        <button type="submit" className="primaryBtn">
-          Đăng ký
+        <button type="submit" className="primaryBtn" disabled={isLoading}>
+          {isLoading ? (
+            <span style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+              <span className="loading-spinner"></span>
+              Đang xử lý...
+            </span>
+          ) : (
+            "Đăng ký"
+          )}
         </button>
 
         <div className="login-register-text">
