@@ -1,0 +1,487 @@
+/* Payment Page Styles */
+.payment-page {
+    background-color: #f8fcfd;
+    padding-bottom: 60px;
+    position: relative;
+}
+
+.payment-header-bg {
+    height: 20px;
+    background: white;
+}
+
+/* Section Box Common Styles */
+.section-box {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    border: 1px solid #eef2f5;
+}
+
+.section-title {
+    color: #009abb;
+    font-weight: 700;
+    margin-bottom: 20px;
+    font-size: 18px;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 600;
+    color: #1a202c;
+    font-size: 14px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 8px;
+    border: 1px solid #dce4e8;
+    padding: 10px 14px;
+    font-size: 15px;
+    background-color: #fafdff;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #009abb;
+    box-shadow: 0 0 0 0.2rem rgba(0, 154, 187, 0.15);
+    background-color: white;
+}
+
+/* Baggage Section */
+.baggage-box {
+    background: #f0f9fc;
+    border: none;
+}
+
+.baggage-icon {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #009abb;
+    font-size: 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.baggage-select-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 16px;
+    border-radius: 10px;
+    border: 1px solid #eef2f5;
+}
+
+.baggage-dropdown .form-select {
+    border: 1px solid #3c9fbb;
+    border-radius: 8px;
+    padding: 10px 16px;
+    color: #4a5568;
+    background-color: white;
+    min-width: 200px;
+    font-weight: 500;
+    cursor: pointer;
+    font-size: 16px;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%233c9fbb' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.baggage-dropdown .form-select:focus {
+    box-shadow: 0 0 0 0.2rem rgba(0, 154, 187, 0.15);
+    border-color: #3c9fbb;
+}
+
+/* Insurance Section */
+.insurance-card {
+    background: white;
+    border: 1px solid #eef2f5;
+    border-radius: 24px;
+    padding: 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: all 0.2s;
+}
+
+.insurance-card:hover {
+    border-color: #bce3ee;
+    box-shadow: 0 4px 15px rgba(0, 154, 187, 0.08);
+}
+
+.insurance-icon {
+    font-size: 28px;
+    color: #009abb;
+    line-height: 1;
+}
+
+.price-tag-large {
+    font-weight: 700;
+    color: #009abb;
+    font-size: 18px;
+}
+
+.price-tag-large span {
+    font-size: 14px;
+    color: #1a202c;
+    font-weight: 500;
+    margin-left: 2px;
+}
+
+.insurance-benefits {
+    margin: 8px 0 0 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+.insurance-benefits li {
+    font-size: 13px;
+    color: #334155;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+}
+
+.insurance-benefits li::before {
+    content: "•";
+    margin-right: 8px;
+    color: #64748b;
+    font-weight: bold;
+}
+
+.insurance-desc {
+    font-size: 13px;
+    color: #334155;
+    margin-top: 4px;
+}
+
+.add-btn-link {
+    color: #009abb;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 4px;
+}
+
+.add-btn-link:hover {
+    text-decoration: underline;
+    color: #007a95;
+}
+
+/* Payment Section */
+/* Payment Section */
+.apply-btn {
+    background-color: #009abb;
+    border: none;
+    font-weight: 600;
+    padding: 10px 32px;
+    border-radius: 8px;
+    height: 100%;
+}
+
+.voucher-tags {
+    display: flex;
+    gap: 12px;
+}
+
+.voucher-tag {
+    background: #e8f5e9;
+    color: #1b5e20;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.payment-methods-tabs {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.pm-tab {
+    background: white;
+    border: 1px solid #009abb;
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-weight: 600;
+    color: #1a202c;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 120px;
+}
+
+.pm-tab:hover {
+    background-color: #f0f9fc;
+}
+
+.pm-tab.active {
+    background: #e1f5fe;
+    border-color: #009abb;
+    color: #009abb;
+    box-shadow: 0 2px 5px rgba(0, 154, 187, 0.1);
+}
+
+.bank-list {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+}
+
+.bank-item {
+    width: 100px;
+    height: 60px;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: white;
+}
+
+.bank-item:hover {
+    border-color: #009abb;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.bank-item img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.wallet-content {
+    display: flex;
+    gap: 32px;
+}
+
+.wallet-option {
+    width: 80px;
+    height: 80px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s;
+}
+
+.wallet-option.selected {
+    border-color: #009abb;
+    background-color: #e1f5fe;
+    box-shadow: 0 0 0 2px rgba(0, 154, 187, 0.2);
+}
+
+.wallet-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.wallet-guide {
+    flex: 1;
+}
+
+.wallet-guide h6 {
+    font-weight: 600;
+    font-size: 14px;
+    color: #334155;
+}
+
+.wallet-guide ol {
+    font-size: 13px;
+    color: #64748b;
+    padding-left: 20px;
+    margin-bottom: 0;
+    line-height: 1.6;
+}
+
+.pay-btn {
+    background-color: #009abb;
+    border: none;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 14px;
+    border-radius: 10px;
+}
+
+.pay-btn:hover {
+    background-color: #0088a5;
+}
+
+/* Sidebar Summary */
+.sidebar-summary {
+    background: white;
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid #eef2f5;
+    position: sticky;
+    top: 24px;
+}
+
+.summary-title {
+    font-weight: 700;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #000;
+}
+
+.airline-info-block {
+    margin-bottom: 20px;
+}
+
+.airline-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+}
+
+.airline-logo-sm {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+.airline-name {
+    font-weight: 600;
+    color: #0088a5;
+    font-size: 15px;
+}
+
+.flight-class {
+    color: #94a3b8;
+    font-size: 14px;
+    margin-left: 32px;
+    /* Align with text start */
+}
+
+.flight-route-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 24px 0;
+}
+
+.time-col {
+    text-align: center;
+}
+
+.time-col .time {
+    font-weight: 700;
+    font-size: 20px;
+    color: #000;
+    line-height: 1.2;
+}
+
+.time-col .code {
+    font-size: 14px;
+    color: #94a3b8;
+    font-weight: 500;
+}
+
+.duration-col {
+    flex: 1;
+    text-align: center;
+    margin: 0 16px;
+    position: relative;
+}
+
+.duration-val {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 4px;
+}
+
+.dur-arrow {
+    height: 1px;
+    background: #cbd5e1;
+    width: 100%;
+    position: relative;
+    margin: 4px 0;
+}
+
+.dur-arrow::before,
+.dur-arrow::after {
+    content: '';
+    position: absolute;
+    top: -3px;
+    width: 6px;
+    height: 6px;
+    border-top: 1px solid #cbd5e1;
+    border-right: 1px solid #cbd5e1;
+    transform: rotate(45deg);
+}
+
+.dur-arrow::after {
+    right: 0;
+}
+
+.dur-arrow::before {
+    left: 0;
+    transform: rotate(-135deg);
+}
+
+.flight-type-text {
+    font-size: 12px;
+    color: #0ea5e9;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.flight-date {
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #f1f5f9;
+    padding-bottom: 20px;
+}
+
+.price-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: #64748b;
+    margin-bottom: 12px;
+}
+
+.price-row span:last-child {
+    color: #334155;
+    font-weight: 500;
+}
+
+.total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.total-label {
+    font-weight: 700;
+    color: #334155;
+    font-size: 16px;
+}
+
+.total-price {
+    color: #0ea5e9;
+    font-size: 24px;
+    font-weight: 700;
+}
