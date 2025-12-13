@@ -7,6 +7,9 @@ import Login from "./pages/Login/Login";
 import Register from "./pages/Register/Register";
 import Filter from "./pages/Filter/Filter";
 
+import Payment from "./pages/Payment/Payment";
+import Classification from "./pages/Payment/Classification";
+
 function App() {
   const location = useLocation();
   
@@ -24,6 +27,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/filter" element={<Filter />} />
         <Route path="/filter/:slug" element={<Filter />} />
+        <Route path="/payment" element={<Payment />} />
+        <Route path="/classification" element={<Classification />} />
       </Routes>
 
       {!isHideLayout && <Footer />}

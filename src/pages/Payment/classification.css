@@ -1,0 +1,149 @@
+/* Classification Page Styles */
+.classification-page {
+    background-color: #f8fbff;
+    padding-bottom: 60px;
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+.class-header-banner {
+    background-image: url('../../assets/images/slider/2.png');
+    background-size: cover;
+    background-position: center;
+    padding: 60px 0;
+    position: relative;
+    margin-bottom: -50px;
+    height: 300px;
+    /* Ensure sufficient height */
+}
+
+.class-header-banner::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0));
+}
+
+.class-header-banner h2 {
+    position: relative;
+    z-index: 1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Flight Summary Card */
+.flight-summary-card {
+    background: #f0f9fc;
+    /* Light blue background matching screenshot */
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    margin-bottom: 40px;
+    border: 1px solid #e1e8ed;
+    position: relative;
+    z-index: 2;
+}
+
+.bg-light-blue {
+    background-color: #dbeafe !important;
+    /* Very light blue for badge */
+    color: #1e40af;
+}
+
+/* Tabs */
+.class-tabs-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.class-tabs {
+    display: flex;
+    background: transparent;
+    /* Removed border-bottom wrapper to style individual tabs like screenshot */
+    gap: 40px;
+}
+
+.class-tab {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    font-weight: 600;
+    color: #64748b;
+    font-size: 16px;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s;
+    min-width: 120px;
+}
+
+.class-tab:hover {
+    color: #009abb;
+}
+
+.class-tab.active {
+    color: #009abb;
+    font-weight: 700;
+}
+
+.class-tab.active::after {
+    content: "";
+    position: absolute;
+    bottom: -10px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #22c55e;
+    /* Green underline as seen in screenshot */
+}
+
+/* Ticket Cards */
+.ticket-card {
+    border: 1px solid #f1f5f9;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s, box-shadow 0.3s;
+    background: white;
+}
+
+.ticket-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 154, 187, 0.08);
+    /* Blue tinted shadow */
+    border-color: #009abb;
+}
+
+.ticket-card .card-body {
+    padding: 30px;
+}
+
+.feature-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    font-size: 15px;
+    /* Slightly larger text */
+}
+
+.feature-item i {
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+.select-btn {
+    background-color: #009abb;
+    border: none;
+    font-weight: 600;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+.select-btn:hover {
+    background-color: #0088a5;
+}
+
+.text-info {
+    color: #009abb !important;
+    /* Override standard info color to match theme */
+}
