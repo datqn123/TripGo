@@ -14,6 +14,7 @@ import Gallery from "../../components/Gallery/Gallery";
 import Cards from "../../components/Cards/Cards";
 import { destinationsData, popularsData } from "../../utils/data";
 import { fetchLocations } from "../../utils/locationdata";
+import { fetchHotels } from "../../utils/hoteldata";
 import VoucherList from "../../components/Cards/VoucherList";
 import PopularCard from "../../components/Cards/PopularCard";
 
@@ -67,12 +68,21 @@ const Home = () => {
     ],
   };
   const [locations, setLocations] = useState([]);
+  const [hotels, setHotels] = useState([]);
 
   useEffect(() => {
     async function loadData() {
-      const res = await fetchLocations();
-      setLocations(res.result);
-      console.log(res.result);
+      // Fetch both locations and hotels in parallel
+      const [locationsRes, hotelsRes] = await Promise.all([
+        fetchLocations(),
+        fetchHotels()
+      ]);
+      
+      setLocations(locationsRes.result);
+      setHotels(hotelsRes.result);
+      
+      console.log('Locations:', locationsRes.result);
+      console.log('Hotels:', hotelsRes.result);
     }
     loadData();
   }, []);
@@ -115,12 +125,12 @@ const Home = () => {
           <Row>
             <Col md="12">
               <div className="main_heading">
-                <h1> Popular Activities </h1>
+                <h1> Khách sạn giá ưu đãi </h1>
               </div>
             </Col>
           </Row>
           <Row>
-            {popularsData.map((val, inx) => {
+            {hotels.map((val, inx) => {
               return (
                 <Col md={3} sm={6} xs={12} className="mb-5" key={inx}>
                   <PopularCard val={val} />

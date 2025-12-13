@@ -1,6 +1,6 @@
 import React from 'react'
 import "../Cards/card.css";
-import { Card ,Stack} from 'react-bootstrap';
+import { Card } from 'react-bootstrap';
 import { NavLink } from 'react-router-dom';
 
 const PopularCard = ({val}) => {
@@ -9,51 +9,42 @@ const PopularCard = ({val}) => {
         <Card className="rounded-2 shadow-sm popular">
               <Card.Img
                 variant="top"
-                src={val.image}
+                src={val.thumbnail}
                 className="img-fluid"
-                alt={"image"}
+                alt={val.name || "hotel"}
               />
               <Card.Body>
               
                 <Card.Text>
                   <i className="bi bi-geo-alt"></i>
-                  <span className="text">{val.location}</span>
+                  <span className="text">{val.locationName}</span>
                 </Card.Text>
 
-                <Card.Title><NavLink className="body-text text-dark text-decoration-none" to="/tour-details"> {val.title} </NavLink></Card.Title>
+                <Card.Title>
+                  <NavLink className="body-text text-dark text-decoration-none" to="/tour-details">
+                    {val.name}
+                  </NavLink>
+                </Card.Title>
+
                 <p className="reviwe">
                   <span>
                     <i className="bi bi-star-fill me-1"></i>
                   </span>
-                  <span>{val.rating} </span>
-                  <span>( {val.reviews} reviews )</span>
+                  <span>{val.starRating} sao</span>
                 </p>
-                {val.category.map((cat, index)=>{
-                  return(
-                    <span key={index} 
-                    className={cat.replace(/ .*/, "") + " badge"}>{cat}</span>
-                  )
-                })}
+
+                {val.hotelType && (
+                  <span className={val.hotelType.replace(/ .*/, "") + " badge"}>
+                    {val.hotelType}
+                  </span>
+                )}
                 
               </Card.Body>
 
               <Card.Footer className="py-4">
-                {val.afterDiscount ? (
-                  <p className="text-decoration-line-through"> ${val.price.toFixed(2)}</p>
-                ): ""}
-               
-                <Stack
-                  direction="horizontal"
-                  className="justify-content-between  mt-3"
-                >
-                  <p>
-                    From <b>{val.afterDiscount ? val.afterDiscount.toFixed(2) : val.price.toFixed(2)}</b>
-                  </p>
-                  <p>
-                  
-                    <i className="bi bi-clock"></i> {val.days}
-                  </p>
-                </Stack>
+                <p className="mb-0">
+                  Từ <b>{val.minPrice?.toLocaleString('vi-VN')} đ</b> / đêm
+                </p>
               </Card.Footer>
             </Card>
     </>

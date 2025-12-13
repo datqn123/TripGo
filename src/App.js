@@ -23,6 +23,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/filter" element={<Filter />} />
+        <Route path="/filter/:slug" element={<Filter />} />
       </Routes>
 
       {!isHideLayout && <Footer />}

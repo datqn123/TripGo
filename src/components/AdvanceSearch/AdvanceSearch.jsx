@@ -32,17 +32,17 @@ const AdvanceSearch = () => {
             <Col md={12} xs={12}>
               <div className="box-search shadow-sm">
                 <Tabs
-                  defaultActiveKey="profile"
+                  defaultActiveKey="hotel"
                   id="uncontrolled-tab-example"
                   className="mb-3"
                 >
-                  <Tab eventKey="home" title="Khách sạn"> 
+                  <Tab eventKey="hotel" title="Khách sạn"> 
                     <HotelSearch />
                   </Tab>
-                  <Tab eventKey="profile" title="Vé máy bay">
+                  <Tab eventKey="plane" title="Vé máy bay">
                     <PlaneSearch />
                   </Tab>
-                  <Tab eventKey="contact" title="Tour du lịch">
+                  <Tab eventKey="tour" title="Tour du lịch">
                     <TourSearch />
                   </Tab>
                 </Tabs>

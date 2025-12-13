@@ -1,52 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
+import hotelApi from "../../api/hotelApi";
 import "./filter-hotel.css";
-
-const hotels = [
-  {
-    id: 1,
-    name: "Glamour Hotel Da Nang",
-    category: "Khách sạn",
-    rating: 3,
-    location: "An Hải Bắc, Sơn Trà",
-    tags: ["Đưa đón sân bay", "Nhà hàng"],
-    oldPrice: 660000,
-    price: 575000,
-    images: ["/static/media/feature-1.jpg","/static/media/feature-2.jpg","/static/media/feature-3.jpg"]
-  },
-  {
-    id: 2,
-    name: "Muong Thanh Grand Da Nang",
-    category: "Khách sạn",
-    rating: 4,
-    location: "An Hải Tây, Sơn Trà",
-    tags: ["Đưa đón sân bay", "Quán rượu"],
-    oldPrice: 720000,
-    price: 650000,
-    images: ["/static/media/feature-4.jpg","/static/media/feature-5.jpg","/static/media/feature-6.jpg"]
-  },
-  {
-    id: 3,
-    name: "Furama Villas Danang",
-    category: "Villas",
-    rating: 5,
-    location: "Khuê Mỹ, Ngũ Hành Sơn",
-    tags: ["Phòng giải trí", "Nhà bếp mini"],
-    oldPrice: 7320000,
-    price: 6250000,
-    images: ["/static/media/feature-7.jpg","/static/media/feature-8.jpg","/static/media/feature-9.jpg"]
-  },
-  {
-    id: 4,
-    name: "Moskva Motel & Apartment",
-    category: "Căn hộ",
-    rating: 3,
-    location: "Hoa Hiệp Nam, Liên Chiểu",
-    tags: ["Các tiện nghi ngoài trời", "Nhà bếp mini"],
-    oldPrice: 560000,
-    price: 415000,
-    images: ["/static/media/feature-10.jpg","/static/media/feature-11.jpg","/static/media/feature-12.jpg"]
-  }
-];
 
 const currency = (v) => {
   if (v === null || v === undefined) return "";
@@ -61,10 +15,17 @@ const Stars = ({ n }) => (
   </div>
 );
 
-const FilterHotel = () => {
+const FilterHotel = ({ locationSlug, searchData }) => {
   const [sortOpen, setSortOpen] = useState(false);
   const [sortValue, setSortValue] = useState("Độ phổ biến");
+  const [hotels, setHotels] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [totalResults, setTotalResults] = useState(0);
   const sortRef = useRef(null);
+
+  // Extract location name from searchData or slug
+  const locationName = searchData?.location || locationSlug?.replace(/-/g, ' ') || 'Đà Nẵng';
 
   useEffect(() => {
     function onDocClick(e) {
@@ -74,7 +35,60 @@ const FilterHotel = () => {
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
+  useEffect(() => {
+    const fetchHotels = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Build search params
+        const params = {
+          location: locationName,
+          page: 0,
+          size: 20
+        };
+
+        const response = await hotelApi.searchHotels(params);
+        const results = response.data.result || [];
+        
+        setHotels(results);
+        setTotalResults(results.length);
+      } catch (err) {
+        console.error('Error fetching hotels:', err);
+        setError(err.message || 'Không thể tải danh sách khách sạn');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchHotels();
+  }, [locationName]);
+
   const sortOptions = ["Độ phổ biến", "Giá cao nhất", "Điểm đánh giá", "Giá thấp nhất"];
+
+  if (loading) {
+    return (
+      <div className="hotel-page container">
+        <div className="text-center py-5">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Đang tải...</span>
+          </div>
+          <p className="mt-3">Đang tìm kiếm khách sạn...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="hotel-page container">
+        <div className="alert alert-danger my-4" role="alert">
+          <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="hotel-page container">
@@ -124,8 +138,8 @@ const FilterHotel = () => {
         <main className="hotel-results">
           <div className="results-head">
             <div>
-              <h2 className="results-title">Đà Nẵng</h2>
-              <p className="results-sub">61 nơi lưu trú được tìm thấy</p>
+              <h2 className="results-title">{locationName}</h2>
+              <p className="results-sub">{totalResults} nơi lưu trú được tìm thấy</p>
             </div>
             <div className="sort" ref={sortRef}>
               <button className={`sort-btn ${sortOpen ? 'open' : ''}`} onClick={() => setSortOpen((s) => !s)}>
@@ -149,40 +163,49 @@ const FilterHotel = () => {
           </div>
 
           <div className="hotel-list">
-            {hotels.map((h) => (
-              <div className="hotel-card" key={h.id}>
-                <div className="hotel-media">
-                  <div className="main-img" style={{backgroundImage:`url(${h.images[0]})`}} />
-                  <div className="thumbs">
-                    {h.images.slice(1).map((src, i) => (
-                      <div key={i} className="thumb" style={{backgroundImage:`url(${src})`}} />
-                    ))}
-                  </div>
-                </div>
-
-                <div className="hotel-info">
-                  <div className="hotel-top">
-                    <span className="badge">{h.category}</span>
-                    <Stars n={h.rating} />
-                  </div>
-
-                  <h3 className="hotel-name">{h.name}</h3>
-                  <div className="hotel-location">📍 {h.location}</div>
-
-                  <div className="hotel-tags">
-                    {h.tags.map((t, i) => (
-                      <span key={i} className="tag">{t}</span>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="hotel-price">
-                  <div className="old">{currency(h.oldPrice)}</div>
-                  <div className="price">{currency(h.price)}</div>
-                  <button className="view-btn">Xem phòng ▸</button>
-                </div>
+            {hotels.length === 0 ? (
+              <div className="text-center py-5">
+                <p className="text-muted">Không tìm thấy khách sạn nào</p>
               </div>
-            ))}
+            ) : (
+              hotels.map((h) => (
+                <div className="hotel-card" key={h.id}>
+                  <div className="hotel-media">
+                    <div 
+                      className="main-img" 
+                      style={{
+                        backgroundImage: `url(${h.thumbnail || '/static/media/feature-1.jpg'})`,
+                        backgroundSize: 'cover',
+                        backgroundPosition: 'center'
+                      }} 
+                    />
+                  </div>
+
+                  <div className="hotel-info">
+                    <div className="hotel-top">
+                      <span className="badge">{h.hotelType || 'Khách sạn'}</span>
+                      <Stars n={h.starRating || 3} />
+                    </div>
+
+                    <h3 className="hotel-name">{h.name}</h3>
+                    <div className="hotel-location">📍 {h.address || h.locationName}</div>
+
+                    {h.amenities && (
+                      <div className="hotel-tags">
+                        {h.amenities.slice(0, 2).map((t, i) => (
+                          <span key={i} className="tag">{t}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="hotel-price">
+                    <div className="price">{currency(h.minPrice)}</div>
+                    <button className="view-btn">Xem phòng ▸</button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
 
           <div className="pagination">

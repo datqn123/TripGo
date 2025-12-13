@@ -5,17 +5,57 @@ import "react-datepicker/dist/react-datepicker.css";
 import "../AdvanceSearch/advancesearch.css";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import CustomDropdown from "../CustomDropdown/CustomDropdown";
+import { useNavigate } from "react-router-dom";
 
 const HotelSearch = () => {
+  const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
+  const nextDay = new Date();
+  nextDay.setDate(nextDay.getDate() + 1);
+  const [endDate, setEndDate] = useState(nextDay);
+  const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
+  const [location, setLocation] = useState("");
+  const [guests, setGuests] = useState("");
 
   const selectedLocation = (value) => {
+    setLocation(value);
     console.log("Location", value);
   };
 
   const selectedGuest = (value) => {
+    setGuests(value);
     console.log("Guest ", value);
+  };
+
+  // Convert location to slug
+  const slugify = (text = "") => {
+    return text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '') // Remove accents
+      .replace(/đ/g, 'd')
+      .replace(/Đ/g, 'D')
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
+  };
+
+  const handleSearch = () => {
+    if (!location) {
+      alert('Vui lòng chọn điểm đến');
+      return;
+    }
+    
+    const slug = slugify(location);
+    navigate(`/filter/${slug}`, {
+      state: {
+        location,
+        startDate,
+        endDate,
+        guests
+      }
+    });
   };
 
   return (
@@ -38,48 +78,66 @@ const HotelSearch = () => {
                 </div>
               </div>
 
-              <div className="field-col">
-                <label className="item-search-label">
-                  {" "}
-                  Ngày nhận phòng{" "}
-                </label>
-                <div className="d-flex" style={{ gap: 12 }}>
-                  <div className="pill-input" style={{ flex: 1 }}>
-                    <span className="icon">📅</span>
-                    <div className="content">
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        selectsStart
-                        startDate={startDate}
-                        endDate={endDate}
-                        dateFormat="dd/MM/yyyy"
-                      />
-                    </div>
-                  </div>
-
-                </div>
-              </div>
-              <div className="field-col">
-                <label className="item-search-label">
-                  {" "}
-                  Ngày trả phòng{" "}
-                </label>
-                <div className="d-flex" style={{ gap: 12 }}>
-                  <div className="pill-input" style={{ flex: 1 }}>
-                    <span className="icon">📅</span>
-                    <div className="content">
-                      <DatePicker
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        selectsStart
-                        startDate={startDate}
-                        endDate={endDate}
-                        dateFormat="dd/MM/yyyy"
-                      />
+              <div className="field-col" style={{ position: "relative" }}>
+                <label className="item-search-label"> Ngày ở </label>
+                <div className="pill-input" onClick={() => setIsDatePickerOpen(!isDatePickerOpen)} style={{ cursor: "pointer" }}>
+                  <span className="icon">📅</span>
+                  <div className="content">
+                    <div className="date-range-display">
+                      {startDate && endDate ? (
+                        <span>
+                          {startDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                          {' - '}
+                          {endDate.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit', year: 'numeric' })}
+                        </span>
+                      ) : (
+                        <span style={{ color: '#999' }}>Chọn ngày</span>
+                      )}
                     </div>
                   </div>
                 </div>
+                {isDatePickerOpen && (
+                  <div className="hotel-datepicker-overlay" onClick={() => setIsDatePickerOpen(false)}>
+                    <div className="hotel-datepicker-container" onClick={(e) => e.stopPropagation()}>
+                      <div className="hotel-datepicker-header">
+                        <h5>Ngày ở</h5>
+                        <div className="date-info-row">
+                          <div className="date-info-item">
+                            <span className="date-info-label">Nhận phòng</span>
+                            <span className="date-info-value">
+                              {startDate ? startDate.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                            </span>
+                          </div>
+                          <div className="date-info-item">
+                            <span className="date-info-label">Trả phòng</span>
+                            <span className="date-info-value">
+                              {endDate ? endDate.toLocaleDateString('vi-VN', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : '-'}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <DatePicker
+                        selected={startDate}
+                        onChange={(dates) => {
+                          const [start, end] = dates;
+                          setStartDate(start);
+                          setEndDate(end);
+                          if (start && end) {
+                            setIsDatePickerOpen(false);
+                          }
+                        }}
+                        startDate={startDate}
+                        endDate={endDate}
+                        selectsRange
+                        inline
+                        monthsShown={2}
+                        minDate={new Date()}
+                        dateFormat="dd/MM/yyyy"
+                        calendarClassName="hotel-calendar"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div className="field-col" style={{ maxWidth: 300 }}>
@@ -101,7 +159,7 @@ const HotelSearch = () => {
               </div>
 
               <div style={{ display: "flex", alignItems: "flex-end" }}>
-                <Button className="search-circle">
+                <Button className="search-circle" onClick={handleSearch}>
                   <i className="bi bi-search"></i>
                 </Button>
               </div>
