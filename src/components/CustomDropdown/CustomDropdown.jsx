@@ -7,28 +7,55 @@ const CustomDropdown = ({ label, options = [], onSelect }) => {
   const [selectedValue, setSelectedValue] = useState("");
   const [showOptions, setShowOptions] = useState(false);
 
-  const handleClick = (selectedVal) => {
-    setSelectedValue(selectedVal);
+  // Hỗ trợ cả options dạng string và object {id, name}
+  const getOptionName = (option) => {
+    return typeof option === "object" ? option.name : option;
+  };
+
+  const getOptionId = (option) => {
+    return typeof option === "object" ? option.id : option;
+  };
+
+  const handleClick = (eventKey) => {
+    // Tìm option được chọn dựa trên eventKey (id hoặc string)
+    const selectedOption = options.find(
+      (opt) => String(getOptionId(opt)) === String(eventKey)
+    );
+
+    const displayName = selectedOption ? getOptionName(selectedOption) : eventKey;
+    const optionId = selectedOption ? getOptionId(selectedOption) : eventKey;
+
+    setSelectedValue(displayName);
     setValue("");
     setShowOptions(false);
-    onSelect && onSelect(selectedVal);
+
+    // Trả về cả id và name cho parent component
+    if (onSelect) {
+      onSelect({
+        id: optionId,
+        name: displayName,
+      });
+    }
   };
+
+  // Filter options dựa trên search value
+  const filteredOptions = options.filter((option) => {
+    const name = getOptionName(option);
+    return !value || name.toLowerCase().includes(value.toLowerCase());
+  });
 
   return (
     <>
-      {/* <label className="item-search-label"> {label}</label> */}
       <Dropdown
         className="dropdown-custom"
         onSelect={handleClick}
         onToggle={(isOpen) => {
-          // if dropdown is opened and a value was previously selected,
-          // show options immediately on subsequent opens
           if (isOpen && selectedValue) setShowOptions(true);
           if (!isOpen) setShowOptions(false);
         }}
       >
         <Dropdown.Toggle id="dropdown-custom-components">
-         <span>{selectedValue ? selectedValue : label}</span> 
+          <span>{selectedValue ? selectedValue : label}</span>
         </Dropdown.Toggle>
 
         <Dropdown.Menu>
@@ -45,7 +72,6 @@ const CustomDropdown = ({ label, options = [], onSelect }) => {
           />
 
           <ul className="list-unstyled">
-            {/* If options are not shown yet and there's no search value, show label placeholder first */}
             {!showOptions && !value && !selectedValue ? (
               <li className="placeholder-item" key="placeholder">
                 <button
@@ -57,21 +83,20 @@ const CustomDropdown = ({ label, options = [], onSelect }) => {
                 </button>
               </li>
             ) : (
-              // show filtered options when user focuses or types
-              (options || [])
-                .filter((option) => !value || option.toLowerCase().startsWith(value.toLowerCase()))
-                .map((option, index) => (
-                  <li key={index}>
-                    <Dropdown.Item eventKey={option}>{option}</Dropdown.Item>
-                  </li>
-                ))
+              filteredOptions.map((option, index) => (
+                <li key={getOptionId(option) || index}>
+                  <Dropdown.Item eventKey={getOptionId(option)}>
+                    {getOptionName(option)}
+                  </Dropdown.Item>
+                </li>
+              ))
             )}
           </ul>
         </Dropdown.Menu>
       </Dropdown>
-      
     </>
   );
 };
 
 export default CustomDropdown;
+

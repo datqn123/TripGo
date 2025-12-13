@@ -8,8 +8,13 @@ const VoucherList = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const sliderRef = useRef(null);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
+    // Ngăn gọi API 2 lần trong React.StrictMode
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     const loadVouchers = async () => {
       try {
         setLoading(true);

@@ -1,25 +1,4 @@
-// Voucher data utilities
 
-/**
- * Fetch vouchers from API and return the JSON shape:
- * {
- *   code: number,
- *   message: string,
- *   result: [{
- *     id: number,
- *     name: string,
- *     code: string,
- *     description: string,
- *     image: string,
- *     discountType: "PERCENTAGE" | "FIXED_AMOUNT",
- *     discountValue: number,
- *     maxDiscountAmount: number,
- *     isActive: boolean
- *   }]
- * }
- *
- * On error, the function returns a fallback response with empty result array.
- */
 export async function fetchVouchers() {
   try {
     const res = await fetch("https://tripgo-api.onrender.com/api/public/vouchers/hotel-page");

@@ -8,21 +8,21 @@
     border: none;
     font-size: var(--textFont);
     position: relative;
-    color:var(--textClr)
+    color: var(--textClr)
 }
 
-.dropdown-custom #dropdown-custom-components span{
-    font-family: var(--fontFamily) !important; 
+.dropdown-custom #dropdown-custom-components span {
+    font-family: var(--fontFamily) !important;
     font-weight: bold;
 }
 
-.dropdown-custom #dropdown-custom-components:focus{
+.dropdown-custom #dropdown-custom-components:focus {
     border: none;
     outline: unset;
     box-shadow: none;
 }
 
-.dropdown-custom .dropdown-toggle{
+.dropdown-custom .dropdown-toggle {
     font-family: bootstrap-icons !important;
     font-style: normal;
     font-weight: 400 !important;
@@ -37,7 +37,7 @@
     bottom: 6px;
     content: "\f52a";
     font-size: var(--bodyText);
-    color: var(--textclr);   
+    color: var(--textclr);
 }
 
 .dropdown-custom .dropdown-toggle::after {
@@ -47,7 +47,7 @@
     bottom: 6px;
     content: "\f282";
     font-size: var(--bodyText);
-    color: var(--textclr);   
+    color: var(--textclr);
 }
 
 .dropdown-custom .dropdown-menu {
@@ -56,18 +56,41 @@
     min-width: 12rem;
 }
 
-.dropdown-custom  .list-unstyled li a {
+.dropdown-custom .list-unstyled li a {
     padding: 10px 8px;
     padding: 10px;
     font-weight: 500;
     transition: all 0.4s ease-out;
 }
 
-.dropdown-custom  .list-unstyled li:hover a{
+.dropdown-custom .list-unstyled li:hover a {
 
     font-weight: bold;
 }
 
+/* Scroll cho danh sách dài */
+.dropdown-custom .list-unstyled {
+    max-height: 250px;
+    overflow-y: auto;
+    margin: 0;
+    padding: 0;
+}
 
+/* Custom scrollbar */
+.dropdown-custom .list-unstyled::-webkit-scrollbar {
+    width: 6px;
+}
 
+.dropdown-custom .list-unstyled::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
 
+.dropdown-custom .list-unstyled::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 10px;
+}
+
+.dropdown-custom .list-unstyled::-webkit-scrollbar-thumb:hover {
+    background: #a1a1a1;
+}

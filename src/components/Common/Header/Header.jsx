@@ -120,7 +120,6 @@ const Header = () => {
                       className="user-dropdown"
                       title={
                         <span className="d-flex align-items-center">
-                          <span className="greeting-text me-2">Xin chào {user?.fullName || "User"}</span>
                           <img
                             src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.fullName || "U") + "&background=random&size=32"}
                             alt="avatar"

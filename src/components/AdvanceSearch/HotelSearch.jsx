@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -6,6 +6,7 @@ import "../AdvanceSearch/advancesearch.css";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import CustomDropdown from "../CustomDropdown/CustomDropdown";
 import { useNavigate } from "react-router-dom";
+import axiosClient from "../../api/axiosClient";
 
 const HotelSearch = () => {
   const navigate = useNavigate();
@@ -14,17 +15,33 @@ const HotelSearch = () => {
   nextDay.setDate(nextDay.getDate() + 1);
   const [endDate, setEndDate] = useState(nextDay);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState(null); // {id, name}
   const [guests, setGuests] = useState("");
+  const [locations, setLocations] = useState([]);
+
+  // Gọi API lấy danh sách địa điểm
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await axiosClient.get("public/locations/dropdown");
+        if (response.data?.result) {
+          setLocations(response.data.result);
+        }
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+      }
+    };
+    fetchLocations();
+  }, []);
 
   const selectedLocation = (value) => {
-    setLocation(value);
-    console.log("Location", value);
+    setLocation(value); // {id, name}
+    console.log("Location selected:", value);
   };
 
   const selectedGuest = (value) => {
-    setGuests(value);
-    console.log("Guest ", value);
+    setGuests(value.name || value);
+    console.log("Guest:", value);
   };
 
   // Convert location to slug
@@ -46,11 +63,12 @@ const HotelSearch = () => {
       alert('Vui lòng chọn điểm đến');
       return;
     }
-    
-    const slug = slugify(location);
+
+    const slug = slugify(location.name);
     navigate(`/filter/${slug}`, {
       state: {
-        location,
+        locationId: location.id,
+        locationName: location.name,
         startDate,
         endDate,
         guests
@@ -72,7 +90,7 @@ const HotelSearch = () => {
                     <CustomDropdown
                       onSelect={selectedLocation}
                       label="Bạn muốn đến đâu?"
-                      options={["Đà Nẵng", "Hà Nội", "Hồ Chí Minh", "Hội An"]}
+                      options={locations}
                     />
                   </div>
                 </div>

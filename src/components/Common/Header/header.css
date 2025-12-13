@@ -153,8 +153,38 @@ header .navbar .offcanvas-body .dropdown-menu .dropdown-item {
     padding: 12px 10px;
     color: var(--black);
   }
+}
 
+/* Fixed centered navigation */
+header .navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
 
+header .navbar .offcanvas-body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
 
+header .navbar .offcanvas-body .nav {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
 
+/* Truncate long email/username */
+.greeting-text {
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* User section always on the right */
+.user-section {
+  margin-left: auto;
+  flex-shrink: 0;
 }

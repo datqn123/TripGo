@@ -15,8 +15,10 @@ import Cards from "../../components/Cards/Cards";
 import { destinationsData, popularsData } from "../../utils/data";
 import { fetchLocations } from "../../utils/locationdata";
 import { fetchHotels } from "../../utils/hoteldata";
+import { fetchFlights } from "../../utils/flightdata";
 import VoucherList from "../../components/Cards/VoucherList";
 import PopularCard from "../../components/Cards/PopularCard";
+import FlightCard from "../../components/Cards/FlightCard";
 
 const Home = () => {
   var settings = {
@@ -69,20 +71,29 @@ const Home = () => {
   };
   const [locations, setLocations] = useState([]);
   const [hotels, setHotels] = useState([]);
+  const [flights, setFlights] = useState([]);
+  const hasFetched = React.useRef(false);
 
   useEffect(() => {
+    // Ngăn gọi API 2 lần trong React.StrictMode
+    if (hasFetched.current) return;
+    hasFetched.current = true;
+
     async function loadData() {
-      // Fetch both locations and hotels in parallel
-      const [locationsRes, hotelsRes] = await Promise.all([
+      // Fetch locations, hotels and flights in parallel
+      const [locationsRes, hotelsRes, flightsRes] = await Promise.all([
         fetchLocations(),
-        fetchHotels()
+        fetchHotels(),
+        fetchFlights()
       ]);
-      
+
       setLocations(locationsRes.result);
       setHotels(hotelsRes.result);
-      
+      setFlights(flightsRes.result);
+
       console.log('Locations:', locationsRes.result);
       console.log('Hotels:', hotelsRes.result);
+      console.log('Flights:', flightsRes.result);
     }
     loadData();
   }, []);
@@ -118,26 +129,120 @@ const Home = () => {
         </Container>
       </section>
 
-      {/* tour seciton start */}
 
-      <section className="popular py-5">
+      {/* Hotel Section */}
+      <section style={{ padding: '40px 0', background: '#fff' }}>
         <Container>
-          <Row>
-            <Col md="12">
-              <div className="main_heading">
-                <h1> Khách sạn giá ưu đãi </h1>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                background: '#e6f3ff',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <i className="bi bi-building" style={{ fontSize: '20px', color: '#0077cc' }}></i>
               </div>
-            </Col>
-          </Row>
+              <div>
+                <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0077cc', margin: 0 }}>
+                  Khách sạn giá ưu đãi
+                </h2>
+                <p style={{ fontSize: '14px', color: '#666', margin: '4px 0 0 0' }}>
+                  Trải nghiệm lưu trú chất lượng với mức giá tối ưu
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Cards */}
           <Row>
-            {hotels.map((val, inx) => {
-              return (
-                <Col md={3} sm={6} xs={12} className="mb-5" key={inx}>
-                  <PopularCard val={val} />
-                </Col>
-              );
-            })}
+            {hotels.slice(0, 4).map((val, inx) => (
+              <Col md={3} sm={6} xs={12} className="mb-4" key={val.id || inx}>
+                <PopularCard val={val} />
+              </Col>
+            ))}
           </Row>
+
+          {/* View More Button */}
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <button style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              background: 'white',
+              color: '#0077cc',
+              fontSize: '15px',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}>
+              Xem thêm <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
+        </Container>
+      </section>
+
+      {/* Flight Section */}
+      <section style={{ padding: '40px 0', background: '#f8f9fa' }}>
+        <Container>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                background: '#e6f3ff',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <i className="bi bi-airplane" style={{ fontSize: '20px', color: '#0077cc' }}></i>
+              </div>
+              <div>
+                <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0077cc', margin: 0 }}>
+                  Vé máy bay giá tốt nhất
+                </h2>
+                <p style={{ fontSize: '14px', color: '#666', margin: '4px 0 0 0' }}>
+                  Khám phá thế giới với vé bay giá tốt nhất, bay là thích!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Cards */}
+          <Row>
+            {flights.slice(0, 5).map((flight, inx) => (
+              <Col lg={true} md={4} sm={6} xs={12} className="mb-4" key={flight.id || inx}>
+                <FlightCard flight={flight} />
+              </Col>
+            ))}
+          </Row>
+
+          {/* View More Button */}
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <button style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '12px 24px',
+              border: '1px solid #ddd',
+              borderRadius: '8px',
+              background: 'white',
+              color: '#0077cc',
+              fontSize: '15px',
+              fontWeight: '600',
+              cursor: 'pointer',
+            }}>
+              Xem thêm <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
         </Container>
       </section>
 
