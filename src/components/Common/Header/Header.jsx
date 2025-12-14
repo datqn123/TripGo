@@ -7,8 +7,7 @@ import {
   Nav,
   NavDropdown,
 } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../../assets/images/icons/Logo.png"
 import "../Header/header.css";
 
@@ -17,6 +16,7 @@ const Header = () => {
   const [isLogged, setIsLogged] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleMenu = () => {
     setOpen(!open);
@@ -59,7 +59,7 @@ const Header = () => {
 
   return (
 
-    <header className="header-section">
+    <header className={`header-section ${['/payment', '/hotel-detail', '/tour-detail'].includes(location.pathname) ? 'payment-header' : ''}`}>
       <Container>
 
         <Navbar expand="lg" className="p-0">
@@ -120,6 +120,7 @@ const Header = () => {
                       className="user-dropdown"
                       title={
                         <span className="d-flex align-items-center">
+                          <span className="greeting-text me-2">Xin chào {user?.username || user?.fullName || "User"}</span>
                           <img
                             src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.fullName || "U") + "&background=random&size=32"}
                             alt="avatar"

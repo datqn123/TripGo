@@ -11,6 +11,9 @@ import Filter from "./pages/Filter/Filter";
 
 import Payment from "./pages/Payment/Payment";
 import Classification from "./pages/Payment/Classification";
+import Hotel_Detail from "./pages/Hotel/Hotel_Detail";
+import Tour_Detail from "./pages/Tour/Detail_Tour";
+import Tour from "./pages/Tour/Tour";
 
 function App() {
   const location = useLocation();
@@ -43,6 +46,9 @@ function App() {
         <Route path="/filter/:slug" element={<Filter />} />
         <Route path="/payment" element={<Payment />} />
         <Route path="/classification" element={<Classification />} />
+        <Route path="/hotel-detail" element={<Hotel_Detail />} />
+        <Route path="/tour-detail" element={<Tour_Detail />} />
+        <Route path="/tour" element={<Tour />} />
       </Routes>
 
       {!isHideLayout && <Footer />}

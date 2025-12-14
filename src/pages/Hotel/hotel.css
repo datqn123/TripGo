@@ -1,0 +1,161 @@
+/* Hotel Page Styles - Reusing some Tour styles logic */
+.hotel-page {
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+/* Category Icons */
+.cat-icon-circle {
+    width: 60px;
+    height: 60px;
+    background-color: #e0f2fe;
+    /* Light Blue */
+    color: #009abb;
+    font-size: 24px;
+    transition: all 0.3s ease;
+}
+
+.category-item:hover .cat-icon-circle,
+.cat-icon-circle.active {
+    background-color: #009abb;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 154, 187, 0.3);
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+/* Vouchers - Same as Tour */
+.voucher-card {
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s;
+}
+
+.voucher-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+.voucher-icon-box {
+    width: 60px;
+    height: 60px;
+    flex-shrink: 0;
+}
+
+.code-badge {
+    border: 1px dashed #cbd5e1 !important;
+    font-family: monospace;
+}
+
+/* Cards */
+.tour-card {
+    transition: all 0.3s ease;
+}
+
+.tour-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1) !important;
+    z-index: 2;
+}
+
+.card-heart-icon {
+    font-size: 1.25rem;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.card-heart-icon:hover {
+    color: #ef4444 !important;
+    transform: scale(1.1);
+}
+
+/* Nav Arrows overlay */
+/* Nav Arrows overlay */
+.nav-arrow {
+    width: 48px;
+    height: 48px;
+    background: #009abb;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 40%;
+    /* Adjust based on image height approx 200px */
+    transform: translateY(-50%);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    /* opacity: 0; */
+    transition: all 0.3s ease;
+    z-index: 100;
+    font-size: 20px;
+}
+
+/* .position-relative:hover .nav-arrow {
+    opacity: 1;
+} */
+
+.nav-arrow.prev {
+    left: -24px;
+}
+
+.nav-arrow.next {
+    right: -24px;
+}
+
+.nav-arrow:hover {
+    background: #007c96;
+    transform: translateY(-50%) scale(1.1);
+}
+
+/* Utilities */
+.x-small {
+    font-size: 12px;
+}
+
+.text-truncate-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Hide scrollbar for category pills area */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Destination Masonry/Grid */
+.destination-card {
+    transition: transform 0.3s ease;
+}
+
+.destination-card:hover {
+    transform: scale(1.02);
+}
+
+.bg-gradient-dark {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+/* Override Primary Text Color for Hotel Page to match design */
+.hotel-page .text-primary {
+    color: #009abb !important;
+}
+
+.hotel-page .fw-bold {
+    font-weight: 700 !important;
+}
+
+.hotel-page .card-title {
+    color: #333;
+    font-weight: 700;
+}

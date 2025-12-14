@@ -188,3 +188,37 @@ header .navbar .offcanvas-body .nav {
   margin-left: auto;
   flex-shrink: 0;
 }
+
+/* Payment Page Header Styles */
+.payment-header {
+  background: linear-gradient(to bottom, #e1f5fe, #ffffff);
+  position: sticky;
+  top: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.payment-header .navbar-brand a {
+  color: #009abb !important;
+}
+
+/* Increased specificity to override default white color */
+.payment-header .navbar .offcanvas-body a.nav-link {
+  color: rgba(0, 0, 0, 0.5) !important;
+  font-weight: 600;
+}
+
+.payment-header .nav-link:hover {
+  color: #009abb !important;
+}
+
+.payment-header .bi-bell {
+  color: rgba(0, 0, 0, 0.5) !important;
+}
+
+.payment-header .greeting-text {
+  color: #009abb !important;
+}
+
+.payment-header .navbar-brand img {
+  filter: brightness(0) saturate(100%) invert(48%) sepia(69%) saturate(836%) hue-rotate(152deg) brightness(96%) contrast(101%);
+}
