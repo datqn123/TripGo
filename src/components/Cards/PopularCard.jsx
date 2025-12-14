@@ -18,26 +18,25 @@ const PopularCard = ({ val }) => {
 
   const imgStyle = {
     width: '100%',
-    height: '180px',
+    height: '130px',
     objectFit: 'cover',
     display: 'block',
   };
 
   const bodyStyle = {
-    padding: '16px',
+    padding: '12px',
   };
 
   const nameStyle = {
     fontSize: '16px',
     fontWeight: '700',
     color: '#1a1a1a',
-    marginBottom: '8px',
+    marginBottom: '6px',
     lineHeight: '1.4',
     display: '-webkit-box',
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
-    minHeight: '44px',
   };
 
   const linkStyle = {
@@ -49,8 +48,8 @@ const PopularCard = ({ val }) => {
     display: 'flex',
     alignItems: 'center',
     gap: '4px',
-    marginBottom: '12px',
-    fontSize: '14px',
+    marginBottom: '8px',
+    fontSize: '12px',
   };
 
   const starStyle = {
@@ -64,18 +63,18 @@ const PopularCard = ({ val }) => {
 
   const countStyle = {
     color: '#666',
-    fontSize: '13px',
+    fontSize: '11px',
   };
 
   const priceLabelStyle = {
-    fontSize: '13px',
+    fontSize: '11px',
     color: '#666',
     display: 'block',
     marginBottom: '2px',
   };
 
   const priceValueStyle = {
-    fontSize: '18px',
+    fontSize: '15px',
     fontWeight: '700',
     color: '#0077cc',
   };
