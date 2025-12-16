@@ -1,12 +1,13 @@
 import React, { useState } from "react";
+import Outstandingoffer from "./Outstandingoffer";
 import "./filter.css";
 
 const mockFlights = [
-  { id: 1, airline: "Vietnam Airlines", logo: "\u2605", depTime: "13:00", arrTime: "14:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" },
-  { id: 2, airline: "Vietnam Airlines", logo: "\u2605", depTime: "14:00", arrTime: "15:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" },
-  { id: 3, airline: "Vietnam Airlines", logo: "\u2605", depTime: "15:00", arrTime: "16:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" },
-  { id: 4, airline: "Vietnam Airlines", logo: "\u2605", depTime: "16:00", arrTime: "17:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" },
-  { id: 5, airline: "Vietnam Airlines", logo: "\u2605", depTime: "17:00", arrTime: "18:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" }
+  { id: 1, airline: "Vietnam Airlines", logo: "★", depTime: "13:00", arrTime: "14:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" },
+  { id: 2, airline: "Vietnam Airlines", logo: "★", depTime: "14:00", arrTime: "15:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" },
+  { id: 3, airline: "Vietnam Airlines", logo: "★", depTime: "15:00", arrTime: "16:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" },
+  { id: 4, airline: "Vietnam Airlines", logo: "★", depTime: "16:00", arrTime: "17:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" },
+  { id: 5, airline: "Vietnam Airlines", logo: "★", depTime: "17:00", arrTime: "18:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" }
 ];
 
 const currency = (v) => v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
@@ -18,6 +19,7 @@ const FilterPlane = () => {
     timeRanges: [],
     flightType: []
   });
+  const [filterApplied, setFilterApplied] = useState(false);
 
   const toggleFilter = (key, value) => {
     setFilters((prev) => {
@@ -26,6 +28,10 @@ const FilterPlane = () => {
       else s.add(value);
       return { ...prev, [key]: Array.from(s) };
     });
+  };
+
+  const handleApplyFilter = () => {
+    setFilterApplied(true);
   };
 
   return (
@@ -68,59 +74,65 @@ const FilterPlane = () => {
               </div>
 
               <div className="filter-apply">
-                <button className="btn-apply">Áp dụng bộ lọc</button>
+                <button className="btn-apply" onClick={handleApplyFilter}>Áp dụng bộ lọc</button>
               </div>
             </div>
           </aside>
 
           <main className="filter-results">
-            <h2 className="results-title">Kết quả cho Đà Nẵng - Hà Nội</h2>
-            <p className="results-sub">Có {mockFlights.length} chuyến bay</p>
+            {!filterApplied ? (
+              <Outstandingoffer />
+            ) : (
+              <>
+                <h2 className="results-title">Kết quả cho Đà Nẵng - Hà Nội</h2>
+                <p className="results-sub">Có {mockFlights.length} chuyến bay</p>
 
-            <div className="results-list">
-              {mockFlights.map((f) => (
-                <div className="flight-card" key={f.id}>
-                  <div className="flight-left">
-                    <div className="airline">
-                      <div className="airline-logo">{f.logo}</div>
-                      <div className="airline-name">{f.airline}</div>
-                    </div>
+                <div className="results-list">
+                  {mockFlights.map((f) => (
+                    <div className="flight-card" key={f.id}>
+                      <div className="flight-left">
+                        <div className="airline">
+                          <div className="airline-logo">{f.logo}</div>
+                          <div className="airline-name">{f.airline}</div>
+                        </div>
 
-                    <div className="times">
-                      <div className="time-block">
-                        <div className="time">{f.depTime}</div>
-                        <div className="iata">{f.from}</div>
+                        <div className="times">
+                          <div className="time-block">
+                            <div className="time">{f.depTime}</div>
+                            <div className="iata">{f.from}</div>
+                          </div>
+
+                          <div className="duration">
+                            <div className="dur-text">{f.duration}</div>
+                            <div className="type">{f.type}</div>
+                          </div>
+
+                          <div className="time-block">
+                            <div className="time">{f.arrTime}</div>
+                            <div className="iata">{f.to}</div>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="duration">
-                        <div className="dur-text">{f.duration}</div>
-                        <div className="type">{f.type}</div>
-                      </div>
-
-                      <div className="time-block">
-                        <div className="time">{f.arrTime}</div>
-                        <div className="iata">{f.to}</div>
+                      <div className="flight-right">
+                        <div className="price-container">
+                          <div className="price">{currency(f.price)}</div>
+                          <div className="per">/khách</div>
+                        </div>
+                        <button className="choose-btn">Chọn</button>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="flight-right">
-                    <div className="price-container">
-                      <div className="price">{currency(f.price)}</div>
-                      <div className="per">/khách</div>
-                    </div>
-                    <button className="choose-btn">Chọn</button>
-                  </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            <div className="pagination">
-              <button className="page-btn">Trước</button>
-              <button className="page-num active">1</button>
-              <button className="page-num">2</button>
-              <button className="page-btn">Sau</button>
-            </div>
+                <div className="pagination">
+                  <button className="page-btn">Trước</button>
+                  <button className="page-num active">1</button>
+                  <button className="page-num">2</button>
+                  <button className="page-btn">Sau</button>
+                </div>
+              </>
+            )}
           </main>
         </div>
       </div>

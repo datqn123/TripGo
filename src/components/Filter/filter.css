@@ -172,7 +172,7 @@
 .results-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
 }
 
 .flight-card {
@@ -181,16 +181,21 @@
   gap: 32px;
   align-items: center;
   background: #fff;
-  padding: 20px 28px;
-  border-radius: 12px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-  border: 1px solid #e2e8f0;
-  transition: all 0.3s;
+  padding: 18px 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  border: 2px solid #f3f4f6;
+  transition: all 0.2s;
+}
+
+.flight-card:first-child {
+  border: 2px solid #0ea5e9;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.1);
 }
 
 .flight-card:hover {
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.12);
-  border-color: #bae6fd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+  border-color: #e5e7eb;
 }
 
 .flight-left {
@@ -381,5 +386,225 @@
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+  }
+}
+
+/* Outstanding Offers Styles - New Design */
+.outstanding-offers-container {
+  padding: 24px 0;
+}
+
+.offers-title {
+  color: #0ea5e9;
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.offers-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.offer-card-new {
+  position: relative;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s;
+}
+
+.offer-card-new:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-color: #cbd5e1;
+}
+
+.offer-date-badge {
+  position: absolute;
+  margin-bottom: 20px;
+  top: 20px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.offer-date-badge i {
+  font-size: 14px;
+}
+
+.offer-content {
+  display: flex;
+  margin-top: 20px;
+  justify-content: space-between;
+  align-items: center;
+  gap: 32px;
+}
+
+.offer-flight-info {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex: 1;
+}
+
+.airline-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  min-width: 80px;
+}
+
+.airline-logo-new {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.airline-name-new {
+  font-size: 12px;
+  color: #1e293b;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.flight-route {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+}
+
+.route-point {
+  text-align: center;
+}
+
+.time-big {
+  font-size: 28px;
+  font-weight: 700;
+  color: #1e293b;
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.city-text {
+  font-size: 13px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.flight-duration {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #0ea5e9;
+  min-width: 60px;
+}
+
+.flight-duration i {
+  font-size: 18px;
+}
+
+.duration-text {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.offer-price-section {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  min-width: 180px;
+}
+
+.price-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.old-price-new {
+  font-size: 13px;
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.discount-tag {
+  background: #FA2C37;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 4px;
+}
+
+.new-price-big {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0ea5e9;
+  line-height: 1;
+}
+
+.select-flight-btn {
+  background: #0ea5e9;
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  margin-top: 4px;
+}
+
+.select-flight-btn:hover {
+  background: #0284c7;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(14, 165, 233, 0.35);
+}
+
+@media (max-width: 900px) {
+  .offer-content {
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .offer-flight-info {
+    width: 100%;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .flight-route {
+    width: 100%;
+  }
+
+  .offer-price-section {
+    width: 100%;
+    align-items: center;
+  }
+
+  .offer-date-badge {
+    position: static;
+    justify-content: center;
+    margin-bottom: 12px;
   }
 }

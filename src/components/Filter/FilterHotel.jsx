@@ -17,7 +17,7 @@ const Stars = ({ n }) => (
 
 const FilterHotel = ({ locationSlug, searchData }) => {
   const [sortOpen, setSortOpen] = useState(false);
-  const [sortValue, setSortValue] = useState("Độ phổ biến");
+  const [sortValue, setSortValue] = useState("Giá thấp đến cao");
   const [hotels, setHotels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -40,7 +40,7 @@ const FilterHotel = ({ locationSlug, searchData }) => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Build search params
         const params = {
           location: locationName,
@@ -49,10 +49,19 @@ const FilterHotel = ({ locationSlug, searchData }) => {
         };
 
         const response = await hotelApi.searchHotels(params);
-        const results = response.data.result || [];
-        
-        setHotels(results);
-        setTotalResults(results.length);
+        console.log(response.data.result.hotels);
+        // Handle different possible response structures
+        let results = [];
+        if (response?.data?.result && Array.isArray(response.data.result)) {
+          results = response.data.result;
+        } else if (response?.data && Array.isArray(response.data)) {
+          results = response.data;
+        } else if (Array.isArray(response)) {
+          results = response;
+        }
+
+        setHotels(response.data.result.hotels);
+        setTotalResults(response.data.result.hotels.length);
       } catch (err) {
         console.error('Error fetching hotels:', err);
         setError(err.message || 'Không thể tải danh sách khách sạn');
@@ -64,7 +73,7 @@ const FilterHotel = ({ locationSlug, searchData }) => {
     fetchHotels();
   }, [locationName]);
 
-  const sortOptions = ["Độ phổ biến", "Giá cao nhất", "Điểm đánh giá", "Giá thấp nhất"];
+  const sortOptions = ["Giá cao đến thấp", "Giá thấp đến cao"];
 
   if (loading) {
     return (
@@ -107,11 +116,11 @@ const FilterHotel = ({ locationSlug, searchData }) => {
 
             <div className="filter-section">
               <h4>Đánh giá</h4>
-              <label className="chk"><input type="checkbox" /> <Stars n={5}/> </label>
-              <label className="chk"><input type="checkbox" /> <Stars n={4}/> </label>
-              <label className="chk"><input type="checkbox" /> <Stars n={3}/> </label>
-              <label className="chk"><input type="checkbox" /> <Stars n={2}/> </label>
-              <label className="chk"><input type="checkbox" /> <Stars n={1}/> </label>
+              <label className="chk"><input type="checkbox" /> <Stars n={5} /> </label>
+              <label className="chk"><input type="checkbox" /> <Stars n={4} /> </label>
+              <label className="chk"><input type="checkbox" /> <Stars n={3} /> </label>
+              <label className="chk"><input type="checkbox" /> <Stars n={2} /> </label>
+              <label className="chk"><input type="checkbox" /> <Stars n={1} /> </label>
             </div>
 
             <div className="filter-section">
@@ -142,8 +151,9 @@ const FilterHotel = ({ locationSlug, searchData }) => {
               <p className="results-sub">{totalResults} nơi lưu trú được tìm thấy</p>
             </div>
             <div className="sort" ref={sortRef}>
+              <span className="sort-label">Xếp theo</span>
               <button className={`sort-btn ${sortOpen ? 'open' : ''}`} onClick={() => setSortOpen((s) => !s)}>
-                Xếp theo <span>{sortValue} ▾</span>
+                {sortValue} <i className="bi bi-chevron-down"></i>
               </button>
 
               {sortOpen && (
@@ -171,37 +181,50 @@ const FilterHotel = ({ locationSlug, searchData }) => {
               hotels.map((h) => (
                 <div className="hotel-card" key={h.id}>
                   <div className="hotel-media">
-                    <div 
-                      className="main-img" 
+                    <div
+                      className="main-img"
                       style={{
-                        backgroundImage: `url(${h.thumbnail || '/static/media/feature-1.jpg'})`,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center'
-                      }} 
+                        backgroundImage: `url(${h.thumbnail || h.images?.[0] || '/static/media/feature-1.jpg'})`,
+                      }}
                     />
+
                   </div>
 
                   <div className="hotel-info">
+                    <h3 className="hotel-name">{h.name}</h3>
+
                     <div className="hotel-top">
-                      <span className="badge">{h.hotelType || 'Khách sạn'}</span>
+                      <span className="badge">
+                        <i className={`bi ${h.hotelType === 'Villas' ? 'bi-house-door' : h.hotelType === 'Căn hộ' ? 'bi-building' : 'bi-buildings'}`}></i>
+                        {h.hotelType || 'Khách sạn'}
+                      </span>
                       <Stars n={h.starRating || 3} />
                     </div>
 
-                    <h3 className="hotel-name">{h.name}</h3>
-                    <div className="hotel-location">📍 {h.address || h.locationName}</div>
+                    <div className="hotel-location">
+                      <i className="bi bi-geo-alt mb-3"></i> {h.address || h.locationName}
+                    </div>
 
-                    {h.amenities && (
+                    {h.amenities && h.amenities.length > 0 && (
                       <div className="hotel-tags">
-                        {h.amenities.slice(0, 2).map((t, i) => (
-                          <span key={i} className="tag">{t}</span>
+                        {h.amenities.slice(0, 2).map((amenity, i) => (
+                          <span key={i} className="tag">{amenity}</span>
                         ))}
                       </div>
                     )}
                   </div>
 
                   <div className="hotel-price">
+                    <button className="heart-btn">
+                      <i className="bi bi-heart"></i>
+                    </button>
+                    {h.originalPrice && h.originalPrice > h.minPrice && (
+                      <div className="old-price">{currency(h.originalPrice)}</div>
+                    )}
                     <div className="price">{currency(h.minPrice)}</div>
-                    <button className="view-btn">Xem phòng ▸</button>
+                    <button className="view-btn">
+                      Xem phòng <i className="bi bi-chevron-right"></i>
+                    </button>
                   </div>
                 </div>
               ))

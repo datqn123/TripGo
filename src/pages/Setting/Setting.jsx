@@ -1,9 +1,34 @@
-import { Container, Row, Col, Form, Button } from 'react-bootstrap';
+import { useState, useEffect } from 'react';
+import { Container, Row, Col } from 'react-bootstrap';
+import { useLocation } from 'react-router-dom';
 import './setting.css';
 import Profile from './Profile';
+import Favorite from './Favorite';
+import MyHistory from './MyHistory';
 
 const Setting = () => {
+    const location = useLocation();
+    const [activeTab, setActiveTab] = useState('account'); // Default active tab
 
+    useEffect(() => {
+        if (location.state?.activeTab) {
+            setActiveTab(location.state.activeTab);
+        }
+    }, [location]);
+
+    const renderContent = () => {
+        switch (activeTab) {
+            case 'account':
+                return <Profile />;
+            case 'favorite':
+                return <Favorite />;
+            case 'history':
+                return <MyHistory />;
+            // Add other cases as needed
+            default:
+                return <Profile />;
+        }
+    };
 
     return (
         <div className="setting-page py-4">
@@ -20,23 +45,23 @@ const Setting = () => {
                                 />
                                 <div>
                                     <div className="fw-bold text-dark">Nguyễn ABC</div>
-                                    <div className="text-muted small" style={{ color: '#009abb' }}>Hạng Explorer</div>
+                                    <div className="text-muted small mt-2" style={{ color: '#009abb' }}>Hạng Explorer</div>
                                 </div>
                             </div>
                             <div className="sidebar-menu">
-                                <div className="sidebar-item">
+                                <div className={`sidebar-item ${activeTab === 'points' ? 'active' : ''}`} onClick={() => setActiveTab('points')}>
                                     <i className="bi bi-award"></i> Điểm của tôi
                                 </div>
-                                <div className="sidebar-item active">
+                                <div className={`sidebar-item ${activeTab === 'account' ? 'active' : ''}`} onClick={() => setActiveTab('account')}>
                                     <i className="bi bi-person"></i> Tài khoản
                                 </div>
-                                <div className="sidebar-item">
+                                <div className={`sidebar-item ${activeTab === 'favorite' ? 'active' : ''}`} onClick={() => setActiveTab('favorite')}>
                                     <i className="bi bi-heart"></i> Yêu thích
                                 </div>
-                                <div className="sidebar-item">
+                                <div className={`sidebar-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
                                     <i className="bi bi-credit-card"></i> Thẻ của tôi
                                 </div>
-                                <div className="sidebar-item">
+                                <div className={`sidebar-item ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
                                     <i className="bi bi-receipt"></i> Giao dịch của tôi
                                 </div>
                                 <div className="sidebar-item logout-text">
@@ -47,7 +72,9 @@ const Setting = () => {
                     </Col>
 
                     {/* Main Content */}
-                    <Profile />
+                    <Col lg={9}>
+                        {renderContent()}
+                    </Col>
                 </Row>
             </Container>
         </div>

@@ -131,8 +131,45 @@ const Header = () => {
                       id="user-nav-dropdown"
                       align="end"
                     >
-                      <NavDropdown.Item onClick={() => navigate('/profile')}>Hồ sơ</NavDropdown.Item>
+
+                      <div className="dropdown-header-section">
+                        <div className="dropdown-user-name-large">{user?.fullName || user?.username || "Nguyễn ABC"}</div>
+                        <div className="dropdown-membership-row">
+                          <i className="bi bi-compass"></i>
+                          <span>Bạn là thành viên hạng Explorer</span>
+                          <i className="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                      </div>
+
+                      <div className="dropdown-points">
+                        <i className="bi bi-star"></i>
+                        <span style={{ paddingLeft: '7px' }}>{user?.points || 0} Điểm</span>
+                      </div>
+
                       <NavDropdown.Divider />
+
+                      <NavDropdown.Item onClick={() => navigate('/setting', { state: { activeTab: 'account' } })} className="dropdown-menu-item">
+                        <i className="bi bi-person"></i>
+                        <span>Chỉnh sửa hồ sơ</span>
+                      </NavDropdown.Item>
+
+                      <NavDropdown.Item onClick={() => navigate('/setting', { state: { activeTab: 'favorite' } })} className="dropdown-menu-item">
+                        <i className="bi bi-heart"></i>
+                        <span>Yêu thích</span>
+                      </NavDropdown.Item>
+
+                      <NavDropdown.Item onClick={() => navigate('/setting', { state: { activeTab: 'cards' } })} className="dropdown-menu-item">
+                        <i className="bi bi-credit-card"></i>
+                        <span>Thẻ của tôi</span>
+                      </NavDropdown.Item>
+
+                      <NavDropdown.Item onClick={() => navigate('/setting', { state: { activeTab: 'history' } })} className="dropdown-menu-item">
+                        <i className="bi bi-receipt"></i>
+                        <span>Giao dịch của tôi</span>
+                      </NavDropdown.Item>
+
+                      <NavDropdown.Divider />
+
                       <NavDropdown.Item onClick={() => {
                         localStorage.removeItem('user');
                         localStorage.removeItem('accessToken');
@@ -141,7 +178,10 @@ const Header = () => {
                         setUser(null);
                         setIsLogged(false);
                         navigate('/');
-                      }}>Đăng xuất</NavDropdown.Item>
+                      }} className="dropdown-menu-item">
+                        <i className="bi bi-box-arrow-right"></i>
+                        <span>Đăng xuất</span>
+                      </NavDropdown.Item>
                     </NavDropdown>
                   </>
                 )}

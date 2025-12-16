@@ -113,7 +113,7 @@ header .navbar .offcanvas-body a:hover {
 }
 
 header .navbar .offcanvas-body .dropdown-menu {
-  min-width: 12rem;
+  min-width: 20rem;
 }
 
 header .navbar .offcanvas-body .dropdown-menu .dropdown-item {
@@ -221,4 +221,138 @@ header .navbar .offcanvas-body .nav {
 
 .payment-header .navbar-brand img {
   filter: brightness(0) saturate(100%) invert(48%) sepia(69%) saturate(836%) hue-rotate(152deg) brightness(96%) contrast(101%);
+}
+
+/* Enhanced User Dropdown Menu Styles */
+.user-dropdown .dropdown-menu {
+  min-width: 290px;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  border: 1px solid #e5e7eb;
+  margin-top: 8px;
+}
+
+/* Dropdown User Header */
+.dropdown-user-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px 16px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+  border-radius: 12px 12px 0 0;
+}
+
+.dropdown-user-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 8px;
+}
+
+/* Dropdown User Header New */
+.dropdown-header-section {
+  background: linear-gradient(90deg, #9A6A45, #B98A63);
+  padding: 20px;
+  border-radius: 12px 12px 0 0;
+  color: white;
+}
+
+.dropdown-user-name-large {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: white;
+}
+
+.dropdown-membership-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.dropdown-membership-row:hover {
+  color: white;
+}
+
+.dropdown-membership-row i.bi-compass {
+  font-size: 20px;
+  /* Icon circle background if needed, but image shows plain icon on brown bg? 
+     Actually image shows icon inside a circle maybe? 
+     "Bạn là thành viên" text is clear. 
+     The image shows a compass icon with a circle around it inside the brown header. 
+  */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  padding: 14px;
+  /* Makes it bigger circle */
+}
+
+.dropdown-membership-row i.bi-chevron-right {
+  font-size: 12px;
+  margin-left: auto;
+  opacity: 0.8;
+}
+
+/* Points Display */
+.dropdown-points {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: #e0f2fe;
+  color: #075985;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.dropdown-points i {
+  font-size: 16px;
+  color: #0284c7;
+}
+
+/* Dropdown Menu Items */
+.dropdown-menu-item {
+  display: flex !important;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px !important;
+  color: #475569 !important;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.dropdown-menu-item:hover {
+  background: #f1f5f9 !important;
+  color: #0ea5e9 !important;
+}
+
+.dropdown-menu-item i {
+  font-size: 16px;
+  width: 20px;
+  text-align: center;
+  color: #64748b;
+}
+
+.dropdown-menu-item:hover i {
+  color: #0ea5e9;
+}
+
+/* Divider styling */
+.user-dropdown .dropdown-divider {
+  margin: 0;
+  border-color: #e5e7eb;
 }
