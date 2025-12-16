@@ -14,6 +14,7 @@ import Classification from "./pages/Payment/Classification";
 import Hotel_Detail from "./pages/Hotel/Hotel_Detail";
 import Tour_Detail from "./pages/Tour/Detail_Tour";
 import Tour from "./pages/Tour/Tour";
+import Setting from "./pages/Setting/Setting";
 
 function App() {
   const location = useLocation();
@@ -49,6 +50,7 @@ function App() {
         <Route path="/hotel-detail" element={<Hotel_Detail />} />
         <Route path="/tour-detail" element={<Tour_Detail />} />
         <Route path="/tour" element={<Tour />} />
+        <Route path="/setting" element={<Setting />} />
       </Routes>
 
       {!isHideLayout && <Footer />}

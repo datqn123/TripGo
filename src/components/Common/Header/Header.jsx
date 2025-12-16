@@ -59,7 +59,7 @@ const Header = () => {
 
   return (
 
-    <header className={`header-section ${['/payment', '/hotel-detail', '/tour-detail'].includes(location.pathname) ? 'payment-header' : ''}`}>
+    <header className={`header-section ${['/payment', '/hotel-detail', '/tour-detail', '/setting'].includes(location.pathname) ? 'payment-header' : ''}`}>
       <Container>
 
         <Navbar expand="lg" className="p-0">

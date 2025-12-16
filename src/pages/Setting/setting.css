@@ -1,0 +1,173 @@
+/* Setting Page Styles */
+.setting-page {
+    background-color: #f8fafc;
+    min-height: calc(100vh - 80px);
+    /* Adjust based on header height */
+    font-family: 'Be Vietnam Pro', sans-serif;
+}
+
+/* Sidebar */
+.setting-sidebar {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    overflow: hidden;
+}
+
+.user-profile-header {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.user-avatar-lg {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.sidebar-menu {
+    padding: 8px 0;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    font-weight: 500;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.sidebar-item:hover {
+    background-color: #f1f5f9;
+    color: #0f172a;
+}
+
+.sidebar-item.active {
+    color: #009abb;
+    background-color: #e0f2fe;
+    border-right: 3px solid #009abb;
+}
+
+.sidebar-item i {
+    font-size: 1.25rem;
+}
+
+/* Account Content */
+.account-section-title {
+    font-weight: 700;
+    color: #009abb;
+    margin-bottom: 24px;
+    font-size: 1.5rem;
+}
+
+.setting-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    margin-bottom: 24px;
+    overflow: hidden;
+}
+
+.setting-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #f1f5f9;
+    font-weight: 600;
+    color: #009abb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.setting-card-body {
+    padding: 24px;
+}
+
+/* Form Styles */
+.form-label-custom {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 8px;
+    font-weight: 500;
+}
+
+.form-control-custom {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 0.95rem;
+    color: #1e293b;
+    background-color: white;
+}
+
+.form-control-custom:focus {
+    border-color: #009abb;
+    box-shadow: 0 0 0 2px rgba(0, 154, 187, 0.1);
+}
+
+.btn-save {
+    background-color: #009abb;
+    color: white;
+    border: none;
+    padding: 8px 32px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background 0.2s;
+}
+
+.btn-save:hover {
+    background-color: #007c96;
+}
+
+.btn-delete {
+    background-color: #009abb;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+
+.btn-delete:hover {
+    background-color: #007c96;
+}
+
+.btn-outline-custom {
+    border: 1px solid #cbd5e1;
+    color: #64748b;
+    padding: 6px 16px;
+    border-radius: 6px;
+    background: white;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-outline-custom:hover {
+    background-color: #f8fafc;
+    border-color: #94a3b8;
+    color: #475569;
+}
+
+.logout-text {
+    color: #64748b !important;
+}
+
+.logout-text:hover {
+    background-color: #fef2f2 !important;
+    color: #ef4444 !important;
+}
+
+/* Form Row fixes */
+.form-select.form-control-custom {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23009abb' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+}
