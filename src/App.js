@@ -15,6 +15,7 @@ import Hotel_Detail from "./pages/Hotel/Hotel_Detail";
 import Tour_Detail from "./pages/Tour/Detail_Tour";
 import Tour from "./pages/Tour/Tour";
 import Setting from "./pages/Setting/Setting";
+import Promotion from "./pages/Promotion/Promotion";
 
 function App() {
   const location = useLocation();
@@ -51,6 +52,7 @@ function App() {
         <Route path="/tour-detail" element={<Tour_Detail />} />
         <Route path="/tour" element={<Tour />} />
         <Route path="/setting" element={<Setting />} />
+        <Route path="/promotion" element={<Promotion />} />
       </Routes>
 
       {!isHideLayout && <Footer />}

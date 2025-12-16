@@ -1,0 +1,284 @@
+/* Promotion Page Styles */
+.promotion-page {
+    font-family: 'Be Vietnam Pro', sans-serif;
+    color: #334155;
+    background-color: #f8fafc;
+}
+
+/* Banner */
+.promo-banner-section {
+    background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://images.unsplash.com/photo-1506158669146-619067b6b3e7?auto=format&fit=crop&w=1920&q=80');
+    background-size: cover;
+    background-position: center;
+    height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 40px;
+}
+
+.section-title {
+    font-weight: 700;
+    color: #009abb;
+    margin-bottom: 16px;
+}
+
+.text-primary-custom {
+    color: #009abb;
+}
+
+/* Tier Cards */
+.tier-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    height: 100%;
+    cursor: pointer;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.tier-icon-wrapper {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+}
+
+.tier-icon-wrapper i {
+    font-size: 32px;
+    color: white;
+}
+
+.tier-name {
+    font-weight: 700;
+    margin-bottom: 8px;
+    font-size: 1.25rem;
+}
+
+.tier-desc {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    height: 40px;
+    /* fixed height for alignment */
+}
+
+.tier-points {
+    background: #f1f5f9;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #334155;
+}
+
+/* Hover Glow Effects */
+.tier-card.explorer:hover {
+    border-color: #a0785a;
+    box-shadow: 0 0 20px rgba(160, 120, 90, 0.3);
+}
+
+.tier-card.traveler:hover {
+    border-color: #3b82f6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+}
+
+.tier-card.adventurer:hover {
+    border-color: #14b8a6;
+    box-shadow: 0 0 20px rgba(20, 184, 166, 0.3);
+}
+
+.tier-card.elite:hover {
+    border-color: #f59e0b;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+}
+
+.tier-card.infinity:hover {
+    border-color: #8b5cf6;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+}
+
+/* Points Dashboard */
+.points-section .badge-pill {
+    background: #e0f2fe;
+    color: #009abb;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.points-dashboard-card {
+    background: linear-gradient(135deg, #0ea5e9, #009abb);
+    border-radius: 20px;
+    box-shadow: 0 10px 25px rgba(14, 165, 233, 0.25);
+    overflow: hidden;
+    position: relative;
+}
+
+.step-num {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.circle-progress {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    border: 8px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+/* Benefits Grid */
+.badge-pill-outline {
+    border: 1px solid #009abb;
+    color: #009abb;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.benefit-card {
+    background: white;
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    height: 100%;
+    transition: transform 0.2s;
+}
+
+.benefit-card:hover {
+    transform: translateY(-5px);
+}
+
+.benefit-icon {
+    width: 48px;
+    height: 48px;
+    background: #f0f9ff;
+    color: #009abb;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+    font-size: 24px;
+}
+
+.benefit-title {
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #0f172a;
+}
+
+.benefit-desc {
+    color: #64748b;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* Feature Blocks */
+.feature-block {
+    border-radius: 16px;
+    overflow: hidden;
+    height: 300px;
+    position: relative;
+    color: white;
+    background-size: cover;
+    background-position: center;
+}
+
+.feature-block.resort {
+    background-image: url('https://images.unsplash.com/photo-1540541338287-41700207dee6?auto=format&fit=crop&w=800&q=80');
+}
+
+.feature-block.adventure {
+    background-image: url('https://images.unsplash.com/photo-1533240332313-0db49b459ad6?auto=format&fit=crop&w=800&q=80');
+}
+
+.feature-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 30px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+}
+
+.feature-tag {
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(4px);
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: inline-block;
+}
+
+/* Comparison Table */
+.comparison-table th {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.comparison-table td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.comparison-table td:first-child {
+    text-align: left;
+    font-weight: 600;
+    color: #334155;
+}
+
+.color-explorer {
+    color: #a0785a;
+}
+
+.color-traveler {
+    color: #3b82f6;
+}
+
+.color-adventurer {
+    color: #14b8a6;
+}
+
+.color-elite {
+    color: #f59e0b;
+}
+
+.color-infinity {
+    color: #8b5cf6;
+}
+
+/* FAQ */
+.accordion-button:not(.collapsed) {
+    color: #009abb;
+    background-color: #e0f2fe;
+}
+
+.accordion-button:focus {
+    box-shadow: 0 0 0 0.25rem rgba(0, 154, 187, 0.25);
+}
