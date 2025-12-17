@@ -95,7 +95,7 @@ const Header = () => {
                 <NavLink className="nav-link" to="/explore">
                   Khám phá
                 </NavLink>
-                <NavLink className="nav-link" to="/promotions">
+                <NavLink className="nav-link" to="/promotion">
                   Khuyến mãi
                 </NavLink>
                 <NavLink className="nav-link" to="/my-bookings">

@@ -6,8 +6,7 @@ import FilterTour from "../../components/Filter/FilterTour";
 import { useParams, useLocation } from "react-router-dom";
 import "./filter.css";
 
-const Filter = () => {
-    const { slug } = useParams();
+const Filter = ({type}) => {
     const location = useLocation();
     const searchData = location.state || {};
 
@@ -19,7 +18,9 @@ const Filter = () => {
                 locationSlug={slug}
                 searchData={searchData}
             /> */}
-            <FilterTour/>
+            {type === "hotel" && <FilterHotel />}
+            {type === "tour" && <FilterTour />}
+            {type === "plane" && <FilterPlane/>}
         </>
     )
 }

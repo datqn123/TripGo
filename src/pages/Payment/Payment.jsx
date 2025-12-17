@@ -3,7 +3,6 @@ import Payment_Hotel from "./Payment_Hotel";
 import Payment_Tour from "./Payment_Tour";
 
 const Payment = ({ type }) => {
-  type="tour"
   return (
     <>
       {type === "hotel" ? <Payment_Hotel /> : type === "tour" ? <Payment_Tour /> : <Payment_Flight />}

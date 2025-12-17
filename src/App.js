@@ -40,18 +40,29 @@ function App() {
       />
       {!isHideLayout && <Header />}
 
-      <Routes>
+      <Routes>  
+        {/* home */}
+        {/* Trong trang home phần search có 3 lựa chọn sẽ hiển thị cả hotel, tour, plane */}
         <Route path="/" element={<Home />} />
+        {/* authenticate */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/filter" element={<Filter />} />
-        <Route path="/filter/:slug" element={<Filter />} />
-        <Route path="/payment" element={<Payment />} />
+        {/* filter : trang tour và trang plane sau khi nhấn áp dụng bộ lọc sẽ mất trang ưu đãi */}
+        <Route path="/filterhotel" element={<Filter type="hotel" />} />
+        <Route path="/filtertour" element={<Filter type="tour" />} />
+        <Route path="/filterplane" element={<Filter type="plane" />} />
+        {/* payment */}
+        <Route path="/paymenthotel" element={<Payment type="hotel" />} />
+        <Route path="/paymenttour" element={<Payment type="tour" />} />
+        <Route path="/paymentplane" element={<Payment type="plane" />} />
+        {/* classification : này là phân bậc các loại vé trong paymentplane */}
         <Route path="/classification" element={<Classification />} />
+        {/* details */}
         <Route path="/hotel-detail" element={<Hotel_Detail />} />
         <Route path="/tour-detail" element={<Tour_Detail />} />
-        <Route path="/tour" element={<Tour />} />
+        {/* setting */}
         <Route path="/setting" element={<Setting />} />
+        {/* promotion */}
         <Route path="/promotion" element={<Promotion />} />
       </Routes>
 

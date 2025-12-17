@@ -256,7 +256,7 @@ const Hotel = () => {
                                 </Col>
                                 <Col md={6}>
                                     <div className="destination-card rounded-4 overflow-hidden position-relative h-100">
-                                        <img src="https://images.unsplash.com/photo-1594967347963-c77573d8bc5e?q=80&w=2670&auto=format&fit=crop" className="w-100 h-100 object-fit-cover" style={{ minHeight: '140px' }} alt="Hue" />
+                                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2670&auto=format&fit=crop" className="w-100 h-100 object-fit-cover" style={{ minHeight: '140px' }} alt="Hue" />
                                         <div className="destination-overlay position-absolute bottom-0 start-0 w-100 p-3 text-white bg-gradient-dark">
                                             <h6 className="fw-bold mb-0">Huế</h6>
                                             <small className="x-small">247 khách sạn</small>
@@ -274,7 +274,7 @@ const Hotel = () => {
                                 </Col>
                                 <Col md={6}>
                                     <div className="destination-card rounded-4 overflow-hidden position-relative h-100">
-                                        <img src="https://images.unsplash.com/photo-1596238779644-84d5df2f7c22?q=80&w=2574&auto=format&fit=crop" className="w-100 h-100 object-fit-cover" style={{ minHeight: '140px' }} alt="HCMC" />
+                                        <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2670&auto=format&fit=crop" className="w-100 h-100 object-fit-cover" style={{ minHeight: '140px' }} alt="HCMC" />
                                         <div className="destination-overlay position-absolute bottom-0 start-0 w-100 p-3 text-white bg-gradient-dark">
                                             <h6 className="fw-bold mb-0">TP Hồ Chí Minh</h6>
                                             <small className="x-small">1621 khách sạn</small>

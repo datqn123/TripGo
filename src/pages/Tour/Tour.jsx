@@ -35,7 +35,7 @@ const Tour = () => {
             discount: "-25%"
         },
         {
-            image: "https://images.unsplash.com/photo-1590523278135-1e240292ead6?q=80&w=2664&auto=format&fit=crop",
+            image: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2600&auto=format&fit=crop",
             location: "North Atoll, Maldives",
             title: "Thiên đường biển xanh Maldives",
             duration: "5N4Đ",
@@ -59,7 +59,7 @@ const Tour = () => {
             discount: "-25%"
         },
         {
-            image: "https://images.unsplash.com/photo-1565620739988-cb97920ab435?q=80&w=2574&auto=format&fit=crop",
+            image: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2600&auto=format&fit=crop",
             location: "Hội An, Việt Nam",
             title: "Hành trình trải nghiệm Hội An",
             duration: "3N2Đ",

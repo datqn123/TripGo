@@ -13,7 +13,7 @@ const Detail_Tour = () => {
         price: "1.700.000 VND",
         priceUnit: "/người",
         images: [
-            "https://images.unsplash.com/photo-1544979590-37e9b47cd705?q=80&w=2574&auto=format&fit=crop", // Cham Island view
+            "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=2674&auto=format&fit=crop", // Cham Island view
             "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=2674&auto=format&fit=crop", // Snorkeling
             "https://images.unsplash.com/photo-1540202404-a2f29016b523?q=80&w=2666&auto=format&fit=crop"  // Beach activities
         ],

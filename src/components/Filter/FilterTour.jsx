@@ -2,11 +2,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./filter-hotel.css";
 import "./filter.css";
+import Outstandingtoday from "./Outstandingtoday";
 
 const FilterTour = () => {
     const [sortOpen, setSortOpen] = useState(false);
     const [sortValue, setSortValue] = useState("Độ phổ biến");
+    const [filterApplied, setFilterApplied] = useState(false);
     const sortRef = useRef(null);
+
+    const handleApplyFilter = () => {
+        setFilterApplied(true);
+    };
 
     // Mock data based on the provided image
     const tours = [
@@ -151,82 +157,88 @@ const FilterTour = () => {
                         </div>
 
                         <div className="filter-apply">
-                            <button className="btn-apply">Áp dụng bộ lọc</button>
+                            <button className="btn-apply" onClick={handleApplyFilter}>Áp dụng bộ lọc</button>
                         </div>
                     </div>
                 </aside>
 
                 {/* Main Content */}
                 <main className="hotel-results">
-                    <div className="results-head">
-                        <div>
-                            <h2 className="results-title">Đà Nẵng</h2>
-                            <p className="results-sub">10 tour du lịch được tìm thấy</p>
-                        </div>
-                        <div className="sort" ref={sortRef}>
-                            <span className="sort-label">Xếp theo</span>
-                            <button className={`sort-btn ${sortOpen ? 'open' : ''}`} onClick={() => setSortOpen((s) => !s)}>
-                                {sortValue} <i className="bi bi-chevron-down"></i>
-                            </button>
-
-                            {sortOpen && (
-                                <ul className="sort-dropdown">
-                                    {sortOptions.map((opt) => (
-                                        <li
-                                            key={opt}
-                                            className={`sort-item ${opt === sortValue ? 'active' : ''}`}
-                                            onClick={() => { setSortValue(opt); setSortOpen(false); }}
-                                        >
-                                            {opt}
-                                        </li>
-                                    ))}
-                                </ul>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="tour-list">
-                        {tours.map((tour) => (
-                            <div className="tour-card" key={tour.id}>
-                                <div className="tour-header">
-                                    <img src={tour.image} alt={tour.title} className="tour-img" />
-                                    <span className="discount-tag">{tour.discount}</span>
+                    {!filterApplied ? (
+                        <Outstandingtoday />
+                    ) : (
+                        <>
+                            <div className="results-head">
+                                <div>
+                                    <h2 className="results-title">Đà Nẵng</h2>
+                                    <p className="results-sub">10 tour du lịch được tìm thấy</p>
                                 </div>
-                                <div className="tour-body">
-                                    <div className="tour-location">
-                                        <i className="bi bi-geo-alt"></i> {tour.location}
-                                    </div>
-                                    <h3 className="tour-title">{tour.title}</h3>
+                                <div className="sort" ref={sortRef}>
+                                    <span className="sort-label">Xếp theo</span>
+                                    <button className={`sort-btn ${sortOpen ? 'open' : ''}`} onClick={() => setSortOpen((s) => !s)}>
+                                        {sortValue} <i className="bi bi-chevron-down"></i>
+                                    </button>
 
-                                    <div className="tour-meta">
-                                        <div className="tour-meta-item">
-                                            <i className="bi bi-calendar3"></i> {tour.duration}
-                                        </div>
-                                        <div className="tour-meta-item">
-                                            <i className="bi bi-people"></i> {tour.groupSize}
-                                        </div>
-                                    </div>
-
-                                    <div className="tour-rating-row">
-                                        <Stars n={tour.rating} />
-                                        <span>({tour.reviews})</span>
-                                    </div>
-
-                                    <div className="tour-price-section">
-                                        <div className="tour-old-price">{tour.oldPrice}</div>
-                                        <div className="tour-price">{tour.price}</div>
-                                    </div>
+                                    {sortOpen && (
+                                        <ul className="sort-dropdown">
+                                            {sortOptions.map((opt) => (
+                                                <li
+                                                    key={opt}
+                                                    className={`sort-item ${opt === sortValue ? 'active' : ''}`}
+                                                    onClick={() => { setSortValue(opt); setSortOpen(false); }}
+                                                >
+                                                    {opt}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
                                 </div>
                             </div>
-                        ))}
-                    </div>
 
-                    <div className="pagination">
-                        <button className="page-btn" style={{ color: "#0ea5e9", borderColor: "#0ea5e9" }}>Trước</button>
-                        <button className="page-num active">1</button>
-                        <button className="page-num">2</button>
-                        <button className="page-btn" style={{ color: "#0ea5e9", borderColor: "#0ea5e9" }}>Sau</button>
-                    </div>
+                            <div className="tour-list">
+                                {tours.map((tour) => (
+                                    <div className="tour-card" key={tour.id}>
+                                        <div className="tour-header">
+                                            <img src={tour.image} alt={tour.title} className="tour-img" />
+                                            <span className="discount-tag">{tour.discount}</span>
+                                        </div>
+                                        <div className="tour-body">
+                                            <div className="tour-location">
+                                                <i className="bi bi-geo-alt"></i> {tour.location}
+                                            </div>
+                                            <h3 className="tour-title">{tour.title}</h3>
+
+                                            <div className="tour-meta">
+                                                <div className="tour-meta-item">
+                                                    <i className="bi bi-calendar3"></i> {tour.duration}
+                                                </div>
+                                                <div className="tour-meta-item">
+                                                    <i className="bi bi-people"></i> {tour.groupSize}
+                                                </div>
+                                            </div>
+
+                                            <div className="tour-rating-row">
+                                                <Stars n={tour.rating} />
+                                                <span>({tour.reviews})</span>
+                                            </div>
+
+                                            <div className="tour-price-section">
+                                                <div className="tour-old-price">{tour.oldPrice}</div>
+                                                <div className="tour-price">{tour.price}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="pagination">
+                                <button className="page-btn" style={{ color: "#0ea5e9", borderColor: "#0ea5e9" }}>Trước</button>
+                                <button className="page-num active">1</button>
+                                <button className="page-num">2</button>
+                                <button className="page-btn" style={{ color: "#0ea5e9", borderColor: "#0ea5e9" }}>Sau</button>
+                            </div>
+                        </>
+                    )}
                 </main>
             </div>
         </div>
