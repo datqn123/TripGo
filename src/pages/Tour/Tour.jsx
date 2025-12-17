@@ -127,12 +127,12 @@ const Tour = () => {
                     </Col>
                     <Col md={4}>
                         <div className="banner-img rounded-4 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1550951711-d0b471ca002f?q=80&w=2670&auto=format&fit=crop" className="w-100 object-fit-cover" height="180" alt="Banner 2" />
+                            <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=2574&auto=format&fit=crop" className="w-100 object-fit-cover" height="180" alt="Banner 2" />
                         </div>
                     </Col>
                     <Col md={4}>
                         <div className="banner-img rounded-4 overflow-hidden">
-                            <img src="https://images.unsplash.com/photo-1698648171701-a1e6878b663b?q=80&w=2670&auto=format&fit=crop" className="w-100 object-fit-cover" height="180" alt="Banner 3" />
+                            <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=2574&auto=format&fit=crop" className="w-100 object-fit-cover" height="180" alt="Banner 3" />
                         </div>
                     </Col>
                 </Row>
