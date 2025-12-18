@@ -59,7 +59,7 @@ const Header = () => {
 
   return (
 
-    <header className={`header-section ${['/payment', '/hotel-detail', '/tour-detail', '/setting'].includes(location.pathname) ? 'payment-header' : ''}`}>
+    <header className={`header-section ${['/paymenthotel', '/paymenttour', '/paymentplane', '/hotel-detail', '/tour-detail', '/setting'].includes(location.pathname) ? 'payment-header' : ''}`}>
       <Container>
 
         <Navbar expand="lg" className="p-0">
@@ -109,7 +109,7 @@ const Header = () => {
                     <NavLink className="primaryBtn d-none d-sm-inline-block" to="/login">
                       Đăng nhập
                     </NavLink>
-                    <NavLink className="primaryBtn1 d-none d-sm-inline-block" to="/register">
+                    <NavLink className="primaryBtn1 d-none d-sm-inline-block" style={{ color: 'black' }} to="/register">
                       Đăng ký
                     </NavLink>
                   </>

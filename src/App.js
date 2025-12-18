@@ -14,9 +14,11 @@ import Classification from "./pages/Payment/Classification";
 import Hotel_Detail from "./pages/Hotel/Hotel_Detail";
 import Tour_Detail from "./pages/Tour/Detail_Tour";
 import Tour from "./pages/Tour/Tour";
+import Hotel from "./pages/Hotel/Hotel";
 import Setting from "./pages/Setting/Setting";
 import Promotion from "./pages/Promotion/Promotion";
-
+import Outstandingoffer from "./components/Filter/Outstandingoffer";
+import Outstandingtour from "./components/Filter/Outstandingtour";
 function App() {
   const location = useLocation();
 
@@ -41,28 +43,33 @@ function App() {
       {!isHideLayout && <Header />}
 
       <Routes>  
-        {/* home */}
-        {/* Trong trang home phần search có 3 lựa chọn sẽ hiển thị cả hotel, tour, plane */}
+        {/* Home */}
         <Route path="/" element={<Home />} />
-        {/* authenticate */}
+        {/*More : Khi nhấn xem thêm ở trang home*/}
+        <Route path="/plane" element={<Outstandingoffer/>} />
+        <Route path="/tour" element={<Tour/>} />
+        <Route path="/hotel" element={<Hotel />} />
+        {/*Chọn loại tour trong trang /tour*/}
+        <Route path="/outstanding-tour" element={<Outstandingtour/>} />
+        {/* Authenticate */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {/* filter : trang tour và trang plane sau khi nhấn áp dụng bộ lọc sẽ mất trang ưu đãi */}
+        {/* Filter : trang tour và trang plane sau khi nhấn áp dụng bộ lọc sẽ mất trang ưu đãi */}
         <Route path="/filterhotel" element={<Filter type="hotel" />} />
         <Route path="/filtertour" element={<Filter type="tour" />} />
         <Route path="/filterplane" element={<Filter type="plane" />} />
-        {/* payment */}
+        {/* Payment : Trang thanh toán */}
         <Route path="/paymenthotel" element={<Payment type="hotel" />} />
         <Route path="/paymenttour" element={<Payment type="tour" />} />
         <Route path="/paymentplane" element={<Payment type="plane" />} />
-        {/* classification : này là phân bậc các loại vé trong paymentplane */}
+        {/* Classification : này là phân bậc các loại vé trong paymentplane */}
         <Route path="/classification" element={<Classification />} />
-        {/* details */}
+        {/* Details */}
         <Route path="/hotel-detail" element={<Hotel_Detail />} />
         <Route path="/tour-detail" element={<Tour_Detail />} />
-        {/* setting */}
+        {/* Setting */}
         <Route path="/setting" element={<Setting />} />
-        {/* promotion */}
+        {/* Promotion */}
         <Route path="/promotion" element={<Promotion />} />
       </Routes>
 

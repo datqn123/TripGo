@@ -13,7 +13,7 @@ const Detail_Tour = () => {
         images: [
             "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2670&auto=format&fit=crop",
             "https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=2525&auto=format&fit=crop",
-            "https://images.unsplash.com/photo-1550951711-d0b471ca002f?q=80&w=2670&auto=format&fit=crop"
+            "https://images.unsplash.com/photo-1582719508461-905c673771fd?q=80&w=2525&auto=format&fit=crop"
         ],
         description: "Callix Hotel Đà Nẵng nằm tại trung tâm thành phố, gần các điểm du lịch và bãi biển. Khách sạn có thiết kế hiện đại, phòng ốc thoải mái và tiện nghi đầy đủ. Dịch vụ chuyên nghiệp và thân thiện mang điểm đến trải nghiệm dễ chịu cho mọi du khách.",
         amenities: [

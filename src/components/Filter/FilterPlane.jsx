@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Outstandingoffer from "./Outstandingoffer";
 import "./filter.css";
+import { useNavigate } from "react-router-dom";
 
 const mockFlights = [
   { id: 1, airline: "Vietnam Airlines", logo: "★", depTime: "13:00", arrTime: "14:10", from: "DAD", to: "HAN", duration: "1h 10p", price: 1250000, type: "Khứ hồi" },
@@ -13,6 +14,7 @@ const mockFlights = [
 const currency = (v) => v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".") + "đ";
 
 const FilterPlane = () => {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState({
     priceRanges: [],
     airlines: [],
@@ -74,15 +76,12 @@ const FilterPlane = () => {
               </div>
 
               <div className="filter-apply">
-                <button className="btn-apply" onClick={handleApplyFilter}>Áp dụng bộ lọc</button>
+                <button className="btn-apply">Áp dụng bộ lọc</button>
               </div>
             </div>
           </aside>
 
           <main className="filter-results">
-            {!filterApplied ? (
-              <Outstandingoffer />
-            ) : (
               <>
                 <h2 className="results-title">Kết quả cho Đà Nẵng - Hà Nội</h2>
                 <p className="results-sub">Có {mockFlights.length} chuyến bay</p>
@@ -119,7 +118,10 @@ const FilterPlane = () => {
                           <div className="price">{currency(f.price)}</div>
                           <div className="per">/khách</div>
                         </div>
-                        <button className="choose-btn">Chọn</button>
+                        <button 
+                        className="choose-btn"
+                        onClick={() => navigate('/classification')}
+                        >Chọn</button>
                       </div>
                     </div>
                   ))}
@@ -132,7 +134,6 @@ const FilterPlane = () => {
                   <button className="page-btn">Sau</button>
                 </div>
               </>
-            )}
           </main>
         </div>
       </div>

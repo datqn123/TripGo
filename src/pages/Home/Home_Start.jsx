@@ -8,11 +8,9 @@ import "slick-carousel/slick/slick-theme.css";
 import "./home.css";
 
 import Cards from "../../components/Cards/Cards";
-import { destinationsData, popularsData } from "../../utils/data";
 import { fetchLocations } from "../../utils/locationdata";
 import { fetchHotels } from "../../utils/hoteldata";
 import { fetchFlights } from "../../utils/flightdata";
-import VoucherList from "../../components/Cards/VoucherList";
 import PopularCard from "../../components/Cards/PopularCard";
 import FlightCard from "../../components/Cards/FlightCard";
 

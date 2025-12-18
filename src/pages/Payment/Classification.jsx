@@ -3,8 +3,10 @@ import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import "./classification.css";
 import logo from "../../assets/images/icons/VietnamAirlines.png";
 import Banner from "../../components/Banner/Banner";
+import { useNavigate } from "react-router-dom";
 
 const Classification = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("economy");
 
   const economyTickets = [
@@ -160,7 +162,9 @@ const Classification = () => {
 
                   <p className="ticket-note">{ticket.note}</p>
 
-                  <Button className="select-btn w-100 py-2">Chọn</Button>
+                  <Button className="select-btn w-100 py-2"
+                  onClick={() => navigate('/paymentplane')}
+                  >Chọn</Button>
                 </Card.Body>
               </Card>
             </Col>

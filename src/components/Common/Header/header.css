@@ -109,7 +109,7 @@ header .navbar .offcanvas-body .dropdown-menu a {
 }
 
 header .navbar .offcanvas-body a:hover {
-  color: var(--primaryClr) !important;
+  color: #e0f2fe !important;
 }
 
 header .navbar .offcanvas-body .dropdown-menu {

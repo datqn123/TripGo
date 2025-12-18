@@ -12,7 +12,7 @@ import TourSearch from "./TourSearch";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
 
-const AdvanceSearch = ({ onTabChange }) => {
+const AdvanceSearch = () => {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
 
@@ -35,7 +35,6 @@ const AdvanceSearch = ({ onTabChange }) => {
                   defaultActiveKey="hotel"
                   id="uncontrolled-tab-example"
                   className="mb-3"
-                  onSelect={(k) => onTabChange && onTabChange(k)}
                 >
                   <Tab eventKey="hotel" title="Khách sạn">
                     <HotelSearch />
