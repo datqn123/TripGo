@@ -11,6 +11,13 @@ import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../../assets/images/icons/Logo.png"
 import "../Header/header.css";
 
+// Helper function để lấy tên cuối cùng
+const getLastName = (fullName) => {
+  if (!fullName) return "bạn";
+  const nameParts = fullName.trim().split(" ");
+  return nameParts[nameParts.length - 1];
+};
+
 const Header = () => {
   const [open, setOpen] = useState(false);
   const [isLogged, setIsLogged] = useState(false);
@@ -120,7 +127,7 @@ const Header = () => {
                       className="user-dropdown"
                       title={
                         <span className="d-flex align-items-center">
-                          <span className="greeting-text me-2">Xin chào {user?.username || user?.fullName || "User"}</span>
+                          <span className="greeting-text me-2">Xin chào {getLastName(user?.fullName || user?.username)}</span>
                           <img
                             src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.fullName || "U") + "&background=random&size=32"}
                             alt="avatar"
@@ -133,7 +140,7 @@ const Header = () => {
                     >
 
                       <div className="dropdown-header-section">
-                        <div className="dropdown-user-name-large">{user?.fullName || user?.username || "Nguyễn ABC"}</div>
+                        <div className="dropdown-user-name-large">{user?.email || user?.username || "Nguyễn ABC"}</div>
                         <div className="dropdown-membership-row">
                           <i className="bi bi-compass"></i>
                           <span>Bạn là thành viên hạng Explorer</span>

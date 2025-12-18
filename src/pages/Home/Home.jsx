@@ -65,6 +65,25 @@ const SkeletonCard = ({ type }) => {
     );
   }
 
+  // Location skeleton
+  if (type === 'location') {
+    return (
+      <div style={{
+        background: '#fff',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        margin: '0 8px',
+      }}>
+        <div style={{ ...skeletonStyle, height: '200px', borderRadius: '12px 12px 0 0' }}></div>
+        <div style={{ padding: '16px' }}>
+          <div style={{ ...skeletonStyle, height: '20px', width: '70%', marginBottom: '8px' }}></div>
+          <div style={{ ...skeletonStyle, height: '14px', width: '50%' }}></div>
+        </div>
+      </div>
+    );
+  }
+
   return null;
 };
 const Home = () => {
@@ -120,6 +139,7 @@ const Home = () => {
   const [locations, setLocations] = useState([]);
   const [hotels, setHotels] = useState([]);
   const [flights, setFlights] = useState([]);
+  const [loadingLocations, setLoadingLocations] = useState(true);
   const [loadingHotels, setLoadingHotels] = useState(true);
   const [loadingFlights, setLoadingFlights] = useState(true);
   const hasFetched = React.useRef(false);
@@ -138,6 +158,7 @@ const Home = () => {
       ]);
 
       setLocations(locationsRes.result);
+      setLoadingLocations(false);
       setHotels(hotelsRes.result);
       setLoadingHotels(false);
       setFlights(flightsRes.result);
@@ -169,11 +190,21 @@ const Home = () => {
 
           <Row>
             <Col md="12">
-              <Slider {...settings}>
-                {locations.map((destination, inx) => {
-                  return <Cards destination={destination} key={inx} />;
-                })}
-              </Slider>
+              {loadingLocations ? (
+                <div style={{ display: 'flex', gap: '16px' }}>
+                  {[1, 2, 3, 4].map((_, inx) => (
+                    <div key={inx} style={{ flex: '1', minWidth: '200px' }}>
+                      <SkeletonCard type="location" />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <Slider {...settings}>
+                  {locations.map((destination, inx) => {
+                    return <Cards destination={destination} key={inx} />;
+                  })}
+                </Slider>
+              )}
             </Col>
           </Row>
         </Container>
@@ -249,19 +280,21 @@ const Home = () => {
 
           {/* View More Button */}
           <div style={{ textAlign: 'center', marginTop: '16px' }}>
-            <button style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '12px 24px',
-              border: '1px solid #ddd',
-              borderRadius: '8px',
-              background: 'white',
-              color: '#0077cc',
-              fontSize: '15px',
-              fontWeight: '600',
-              cursor: 'pointer',
-            }}>
+            <button 
+              onClick={() => navigate('/hotel')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                background: 'white',
+                color: '#0077cc',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}>
               Xem thêm <i className="bi bi-chevron-right"></i>
             </button>
           </div>

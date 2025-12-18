@@ -65,7 +65,7 @@ function App() {
         {/* Classification : này là phân bậc các loại vé trong paymentplane */}
         <Route path="/classification" element={<Classification />} />
         {/* Details */}
-        <Route path="/hotel-detail" element={<Hotel_Detail />} />
+        <Route path="/hotel-detail/:id" element={<Hotel_Detail />} />
         <Route path="/tour-detail" element={<Tour_Detail />} />
         {/* Setting */}
         <Route path="/setting" element={<Setting />} />
