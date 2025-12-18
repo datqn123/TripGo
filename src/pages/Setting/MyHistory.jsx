@@ -63,7 +63,7 @@ const MyHistory = () => {
             price: '3.550.000đ',
             status: 'success',
             statusText: 'Đã hoàn tất',
-            image: 'https://images.unsplash.com/photo-1544551763-46a42a46e865?auto=format&fit=crop&w=200&q=60'
+            image: 'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&w=500&q=60'
         },
         {
             id: 'T4',
