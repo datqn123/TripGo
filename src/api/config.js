@@ -2,10 +2,10 @@
 // Change this URL to switch between local development and production
 
 // Production
-export const API_BASE_URL = "https://tripgo-api.onrender.com/api";
+// export const API_BASE_URL = "https://tripgo-api.onrender.com/api";
 
 // Local development (uncomment to use)
-// export const API_BASE_URL = "http://localhost:8080/api";
+export const API_BASE_URL = "http://localhost:8080/api";
 
 // Helper function to build full API URL
 export const buildApiUrl = (endpoint) => {

@@ -44,28 +44,13 @@ const HotelSearch = () => {
     console.log("Guest:", value);
   };
 
-  // Convert location to slug
-  const slugify = (text = "") => {
-    return text
-      .toString()
-      .toLowerCase()
-      .trim()
-      .normalize('NFD')
-      .replace(/[\u0300-\u036f]/g, '') // Remove accents
-      .replace(/đ/g, 'd')
-      .replace(/Đ/g, 'D')
-      .replace(/\s+/g, '-')
-      .replace(/[^a-z0-9-]/g, '');
-  };
-
   const handleSearch = () => {
     if (!location) {
       alert('Vui lòng chọn điểm đến');
       return;
     }
 
-    const slug = slugify(location.name);
-    navigate(`/filter/${slug}`, {
+    navigate(`/filter-hotel`, {
       state: {
         locationId: location.id,
         locationName: location.name,

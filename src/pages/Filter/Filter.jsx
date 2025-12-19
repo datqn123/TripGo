@@ -18,7 +18,7 @@ const Filter = ({type}) => {
                 locationSlug={slug}
                 searchData={searchData}
             /> */}
-            {type === "hotel" && <FilterHotel />}
+            {type === "hotel" && <FilterHotel searchData={searchData} />}
             {type === "tour" && <FilterTour />}
             {type === "plane" && <FilterPlane/>}
         </>

@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
+import { toast } from "react-toastify";
 import hotelApi from "../../api/hotelApi";
+import { PUBLIC_API } from "../../api/config";
 import "./filter-hotel.css";
 
 const currency = (v) => {
@@ -22,11 +24,13 @@ const FilterHotel = ({ locationSlug, searchData }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [totalResults, setTotalResults] = useState(0);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
   const sortRef = useRef(null);
 
   // Extract location name from searchData or slug
-  const locationName = searchData?.location || locationSlug?.replace(/-/g, ' ') || 'Đà Nẵng';
-
+  const locationName = searchData?.locationName || locationSlug?.replace(/-/g, ' ') || 'Đà Nẵng';
+  const locationId = searchData?.locationId;
   useEffect(() => {
     function onDocClick(e) {
       if (sortRef.current && !sortRef.current.contains(e.target)) setSortOpen(false);
@@ -35,43 +39,124 @@ const FilterHotel = ({ locationSlug, searchData }) => {
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
+  // Reset page when locationId changes
+  useEffect(() => {
+    setCurrentPage(0);
+  }, [locationId]);
+
+  // Fetch hotels when locationId or currentPage changes
   useEffect(() => {
     const fetchHotels = async () => {
+      if (!locationId) {
+        setHotels([]);
+        setTotalResults(0);
+        setTotalPages(0);
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
 
         // Build search params
         const params = {
-          location: locationName,
-          page: 0,
-          size: 20
+          id: Number(locationId),
+          page: currentPage
         };
 
         const response = await hotelApi.searchHotels(params);
-        console.log(response.data.result.hotels);
-        // Handle different possible response structures
-        let results = [];
-        if (response?.data?.result && Array.isArray(response.data.result)) {
-          results = response.data.result;
-        } else if (response?.data && Array.isArray(response.data)) {
-          results = response.data;
-        } else if (Array.isArray(response)) {
-          results = response;
-        }
+        console.log('API Response:', response.data);
 
-        setHotels(response.data.result.hotels);
-        setTotalResults(response.data.result.hotels.length);
+        if (response?.data?.result) {
+          const result = response.data.result;
+          setHotels(result.hotels || []);
+          setTotalResults(result.totalElements || 0);
+          setTotalPages(result.totalPages || 1);
+        } else {
+          setHotels([]);
+          setTotalResults(0);
+          setTotalPages(0);
+        }
       } catch (err) {
         console.error('Error fetching hotels:', err);
-        setError(err.message || 'Không thể tải danh sách khách sạn');
+        setError(err.response?.data?.message || err.message || 'Không thể tải danh sách khách sạn');
       } finally {
         setLoading(false);
       }
     };
 
     fetchHotels();
-  }, [locationName]);
+  }, [locationId, currentPage]);
+
+  // Handle toggle favorite
+  const handleToggleFavorite = async (e, hotelId) => {
+    e.stopPropagation();
+    
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+    if (!token) {
+      toast.warning('Vui lòng đăng nhập để thêm khách sạn yêu thích!');
+      return;
+    }
+
+    try {
+      const response = await fetch(PUBLIC_API.TOGGLE_FAVORITE(hotelId), {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        // Update local state
+        setHotels(prev => prev.map(hotel => 
+          hotel.id === hotelId ? { ...hotel, isFavorite: !hotel.isFavorite } : hotel
+        ));
+        
+        const hotel = hotels.find(h => h.id === hotelId);
+        toast.success(hotel?.isFavorite ? 'Đã xóa khỏi danh sách yêu thích!' : 'Đã thêm vào danh sách yêu thích!');
+      } else {
+        toast.error('Có lỗi xảy ra, vui lòng thử lại!');
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast.error('Có lỗi xảy ra, vui lòng thử lại!');
+    }
+  };
+
+  // Handle page change
+  const handlePageChange = (page) => {
+    if (page >= 0 && page < totalPages) {
+      setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  // Generate page numbers for pagination UI
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+    
+    if (totalPages <= maxVisible) {
+      for (let i = 0; i < totalPages; i++) pages.push(i);
+    } else {
+      pages.push(0); // First page
+      
+      let start = Math.max(1, currentPage - 1);
+      let end = Math.min(totalPages - 2, currentPage + 1);
+      
+      if (currentPage <= 2) end = 3;
+      if (currentPage >= totalPages - 3) start = totalPages - 4;
+      
+      if (start > 1) pages.push('...');
+      for (let i = start; i <= end; i++) pages.push(i);
+      if (end < totalPages - 2) pages.push('...');
+      
+      pages.push(totalPages - 1); // Last page
+    }
+    return pages;
+  };
 
   const sortOptions = ["Giá cao đến thấp", "Giá thấp đến cao"];
 
@@ -180,6 +265,13 @@ const FilterHotel = ({ locationSlug, searchData }) => {
             ) : (
               hotels.map((h) => (
                 <div className="hotel-card" key={h.id}>
+                  <button 
+                    className={`heart-btn ${h.isFavorite ? 'active' : ''}`}
+                    onClick={(e) => handleToggleFavorite(e, h.id)}
+                  >
+                    <i className={h.isFavorite ? "bi bi-heart-fill" : "bi bi-heart"}></i>
+                  </button>
+                  
                   <div className="hotel-media">
                     <div
                       className="main-img"
@@ -192,6 +284,13 @@ const FilterHotel = ({ locationSlug, searchData }) => {
 
                   <div className="hotel-info">
                     <h3 className="hotel-name">{h.name}</h3>
+                    
+                    <div className="hotel-price-inline">
+                      {h.originalPrice && h.originalPrice > h.minPrice && (
+                        <span className="old-price">{currency(h.originalPrice)}</span>
+                      )}
+                      <span className="price">{currency(h.minPrice)}</span>
+                    </div>
 
                     <div className="hotel-top">
                       <span className="badge">
@@ -202,41 +301,53 @@ const FilterHotel = ({ locationSlug, searchData }) => {
                     </div>
 
                     <div className="hotel-location">
-                      <i className="bi bi-geo-alt mb-3"></i> {h.address || h.locationName}
+                      <i className="bi bi-geo-alt"></i> {h.address || h.locationName}
                     </div>
 
-                    {h.amenities && h.amenities.length > 0 && (
-                      <div className="hotel-tags">
-                        {h.amenities.slice(0, 2).map((amenity, i) => (
-                          <span key={i} className="tag">{amenity}</span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="hotel-price">
-                    <button className="heart-btn">
-                      <i className="bi bi-heart"></i>
-                    </button>
-                    {h.originalPrice && h.originalPrice > h.minPrice && (
-                      <div className="old-price">{currency(h.originalPrice)}</div>
-                    )}
-                    <div className="price">{currency(h.minPrice)}</div>
-                    <button className="view-btn">
-                      Xem phòng <i className="bi bi-chevron-right"></i>
-                    </button>
+                    <div className="hotel-bottom">
+                      <button className="view-btn">
+                        Xem phòng <i className="bi bi-chevron-right"></i>
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))
             )}
           </div>
 
-          <div className="pagination">
-            <button className="page-btn">Trước</button>
-            <button className="page-num active">1</button>
-            <button className="page-num">2</button>
-            <button className="page-btn">Sau</button>
-          </div>
+          {totalPages > 1 && (
+            <div className="pagination">
+              <button 
+                className="page-btn" 
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 0}
+              >
+                Trước
+              </button>
+              
+              {getPageNumbers().map((page, index) => (
+                page === '...' ? (
+                  <span key={`ellipsis-${index}`} className="page-ellipsis">...</span>
+                ) : (
+                  <button
+                    key={page}
+                    className={`page-num ${page === currentPage ? 'active' : ''}`}
+                    onClick={() => handlePageChange(page)}
+                  >
+                    {page + 1}
+                  </button>
+                )
+              ))}
+              
+              <button 
+                className="page-btn" 
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages - 1}
+              >
+                Sau
+              </button>
+            </div>
+          )}
         </main>
       </div>
     </div>

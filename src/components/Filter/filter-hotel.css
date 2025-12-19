@@ -210,7 +210,7 @@
 /* Hotel Card - Matching the design */
 .hotel-card {
   display: grid;
-  grid-template-columns: 260px 1fr auto;
+  grid-template-columns: 260px 1fr;
   gap: 20px;
   align-items: stretch;
   background: #fff;
@@ -272,6 +272,25 @@
   font-weight: 700;
   color: #1e293b;
   line-height: 1.3;
+}
+
+.hotel-price-inline {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+.hotel-price-inline .old-price {
+  text-decoration: line-through;
+  color: #94a3b8;
+  font-size: 14px;
+}
+
+.hotel-price-inline .price {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0ea5e9;
 }
 
 .hotel-top {
@@ -337,55 +356,57 @@
   font-weight: 500;
 }
 
-/* Hotel Price Section */
-.hotel-price {
+/* Hotel Price Row - Below Address */
+.hotel-price-row {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 180px;
-  padding: 4px 0;
-  position: relative;
-}
-
-.heart-btn {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  color: #ef4444;
-  font-size: 24px;
-  transition: all 0.2s;
-}
-
-.heart-btn:hover {
-  transform: scale(1.1);
-}
-
-.heart-btn i {
-  transition: all 0.2s;
-}
-
-.heart-btn:hover i {
-  color: #dc2626;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #f1f5f9;
 }
 
 .old-price {
   color: #94a3b8;
   text-decoration: line-through;
   font-size: 14px;
-  margin-top: 24px;
 }
 
 .price {
   color: #0ea5e9;
-  font-weight: 800;
-  font-size: 28px;
-  line-height: 1;
+  font-weight: 700;
+  font-size: 22px;
+}
+
+/* Heart Button - Top Right of Card */
+.heart-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #fff;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  color: #ef4444;
+  font-size: 20px;
+  transition: all 0.2s;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+}
+
+.heart-btn:hover {
+  transform: scale(1.1);
+}
+
+.heart-btn.active i,
+.heart-btn:hover i {
+  color: #dc2626;
 }
 
 .view-btn {
@@ -402,6 +423,7 @@
   gap: 6px;
   transition: all 0.3s;
   white-space: nowrap;
+  margin-left: auto;
 }
 
 .view-btn:hover {
@@ -446,11 +468,29 @@
   color: #0ea5e9;
 }
 
+.page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: #cbd5e1;
+  color: #94a3b8;
+}
+
+.page-btn:disabled:hover {
+  border-color: #cbd5e1;
+  color: #94a3b8;
+}
+
 .page-num.active {
   background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
   color: #fff;
   border-color: #0ea5e9;
   box-shadow: 0 2px 8px rgba(14, 165, 233, 0.3);
+}
+
+.page-ellipsis {
+  padding: 8px 12px;
+  color: #64748b;
+  font-weight: 500;
 }
 
 /* Responsive */
