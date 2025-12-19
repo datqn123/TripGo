@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Card, Button, Form, Badge, Spinner } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Form, Badge, Spinner, Modal } from 'react-bootstrap';
 import { toast } from 'react-toastify';
 import hotelApi from '../../api/hotelApi';
 import './detail_hotel.css';
+import Banner from '../../components/Banner/Banner';
+import AdvanceSearch from '../../components/AdvanceSearch/AdvanceSearch';
+import { PUBLIC_API } from '../../api/config';
 
 const Hotel_Detail = () => {
     const { id } = useParams();
@@ -12,6 +15,113 @@ const Hotel_Detail = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [similarHotels, setSimilarHotels] = useState([]);
+    const viewHistoryIdRef = useRef(null); // Store view history ID for duration tracking
+    const hasTrackedRef = useRef(false); // Prevent double tracking from React Strict Mode
+
+    // Booking modal state
+    const [showBookingModal, setShowBookingModal] = useState(false);
+    const [selectedRoom, setSelectedRoom] = useState(null);
+    const [checkInDate, setCheckInDate] = useState('');
+    const [checkOutDate, setCheckOutDate] = useState('');
+    const [guestCount, setGuestCount] = useState('2 người lớn');
+
+    // Handle book room click
+    const handleBookRoomClick = (room) => {
+        setSelectedRoom(room);
+        // Set default dates (today and tomorrow)
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        setCheckInDate(today.toISOString().split('T')[0]);
+        setCheckOutDate(tomorrow.toISOString().split('T')[0]);
+        
+        // Scroll to booking form
+        setTimeout(() => {
+            const bookingCard = document.querySelector('.booking-card');
+            if (bookingCard) {
+                bookingCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 100);
+    };
+
+    // Auto-update localStorage when dates change
+    useEffect(() => {
+        const existingBooking = localStorage.getItem('hotelBooking');
+        if (existingBooking && selectedRoom && checkInDate && checkOutDate) {
+            try {
+                const bookingData = JSON.parse(existingBooking);
+                const checkIn = new Date(checkInDate);
+                const checkOut = new Date(checkOutDate);
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                const totalPrice = selectedRoom.price * nights;
+                
+                // Update dates and recalculate
+                bookingData.checkInDate = checkInDate;
+                bookingData.checkOutDate = checkOutDate;
+                bookingData.nights = nights;
+                bookingData.totalPrice = totalPrice;
+                
+                localStorage.setItem('hotelBooking', JSON.stringify(bookingData));
+            } catch (error) {
+                console.error('Error updating booking dates:', error);
+            }
+        }
+    }, [checkInDate, checkOutDate, selectedRoom]);
+
+    // Handle confirm booking
+    const handleConfirmBooking = () => {
+        // Validate dates
+        if (!checkInDate || !checkOutDate) {
+            toast.error('Vui lòng chọn ngày nhận và trả phòng');
+            return;
+        }
+        
+        const checkIn = new Date(checkInDate);
+        const checkOut = new Date(checkOutDate);
+        
+        if (checkIn >= checkOut) {
+            toast.error('Ngày trả phòng phải sau ngày nhận phòng');
+            return;
+        }
+
+        // Calculate number of nights
+        const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+        const totalPrice = selectedRoom.price * nights;
+
+        // Create booking data
+        const bookingData = {
+            hotel: {
+                id: hotel.id,
+                name: hotel.name,
+                address: hotel.address,
+                thumbnail: hotel.images?.[0]?.imageUrl || '',
+                starRating: hotel.starRating,
+                checkInTime: hotel.checkInTime || '14:00',
+                checkOutTime: hotel.checkOutTime || '12:00'
+            },
+            room: {
+                id: selectedRoom.id,
+                name: selectedRoom.name,
+                price: selectedRoom.price,
+                capacity: selectedRoom.capacity,
+                area: selectedRoom.area
+            },
+            checkInDate,
+            checkOutDate,
+            nights,
+            guestCount,
+            totalPrice,
+            createdAt: new Date().toISOString()
+        };
+
+        // Save to localStorage
+        localStorage.setItem('hotelBooking', JSON.stringify(bookingData));
+        
+        // Close modal and navigate to payment
+        setShowBookingModal(false);
+        toast.success('Đã lưu thông tin đặt phòng!');
+        navigate('/payment-hotel');
+    };
 
     // Fetch hotel details from API
     useEffect(() => {
@@ -57,6 +167,113 @@ const Hotel_Detail = () => {
         }
     }, [id]);
 
+    // Track hotel view when user enters the page
+    useEffect(() => {
+        if (!id) return;
+        
+        // Skip if already tracked (prevents double call from React Strict Mode)
+        if (hasTrackedRef.current) {
+            console.log(`[View Track] Already tracked, skipping...`);
+            return;
+        }
+        hasTrackedRef.current = true; // Mark as tracked IMMEDIATELY (sync)
+        
+        const trackHotelView = async () => {
+            try {
+                const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+                const url = PUBLIC_API.TRACK_VIEW(id);
+                
+                console.log(`[View Track] Tracking hotel view: ${id}`);
+                
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token && { 'Authorization': `Bearer ${token}` })
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('[View Track] Full response data:', data);
+                    // Get the view history ID from response - result is the ID directly
+                    viewHistoryIdRef.current = data.result?.id || data.id || data.result;
+                    console.log(`[View Track] Response status: ${response.status}, viewHistoryId: ${viewHistoryIdRef.current}`);
+                } else {
+                    console.log(`[View Track] Response status: ${response.status}`);
+                }
+            } catch (err) {
+                console.error('[View Track] Error:', err);
+            }
+        };
+        
+        trackHotelView();
+    }, [id]);
+
+    // Track view duration and send to API when leaving page
+    useEffect(() => {
+        if (!id) return;
+        
+        const startTime = Date.now();
+        let hasSent = false;
+        
+        console.log(`[View Duration] Started tracking for hotel ${id} at ${new Date().toLocaleTimeString()}`);
+        
+        const sendViewDuration = () => {
+            const currentViewHistoryId = viewHistoryIdRef.current;
+            
+            if (hasSent) {
+                console.log('[View Duration] Already sent, skipping...');
+                return;
+            }
+            
+            const endTime = Date.now();
+            const durationSeconds = Math.floor((endTime - startTime) / 1000);
+            
+            console.log(`[View Duration] Attempting to send: ${durationSeconds} seconds, viewHistoryId: ${currentViewHistoryId}`);
+            
+            // Only send if user spent at least 2 seconds and we have viewHistoryId
+            if (durationSeconds >= 2 && currentViewHistoryId) {
+                hasSent = true;
+                const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+                
+                const url = PUBLIC_API.UPDATE_DURATION(currentViewHistoryId, durationSeconds);
+                console.log(`[View Duration] Sending PUT to: ${url}`);
+                
+                // Use synchronous XMLHttpRequest for beforeunload (fetch may not complete)
+                try {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open('PUT', url, false); // PUT method, false = synchronous
+                    xhr.setRequestHeader('Content-Type', 'application/json');
+                    if (token) {
+                        xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                    }
+                    xhr.send();
+                    console.log(`[View Duration] Response status: ${xhr.status}`);
+                } catch (err) {
+                    console.error('[View Duration] Error:', err);
+                }
+            } else {
+                console.log(`[View Duration] Skipped: duration=${durationSeconds}s, viewHistoryId=${currentViewHistoryId}`);
+            }
+        };
+
+        // Handle page unload (close tab, refresh)
+        const handleBeforeUnload = () => {
+            console.log('[View Duration] beforeunload triggered');
+            sendViewDuration();
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+
+        // Cleanup: send duration when component unmounts (React navigation)
+        return () => {
+            console.log('[View Duration] Component unmounting');
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+            sendViewDuration();
+        };
+    }, [id]);
+
     // Loading state
     if (loading) {
         return (
@@ -99,157 +316,62 @@ const Hotel_Detail = () => {
 
     return (
         <div className="detail-page">
-            {/* Banner Section */}
-            <div 
-                className="detail-banner position-relative"
-                style={{
-                    backgroundImage: `url('/banner6.jpg')`,
-                    backgroundSize: 'cover',
-                    backgroundPosition: 'center',
-                    height: '180px',
-                }}
-            >
-                <div className="position-absolute w-100 h-100" style={{ background: 'linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.3))' }}></div>
-            </div>
-
-            {/* Search Bar Section - Overlapping */}
-            <Container style={{ marginTop: '-50px', position: 'relative', zIndex: 20 }}>
-                {/* Breadcrumb */}
-                <nav aria-label="breadcrumb" className="mb-3">
-                    <ol className="breadcrumb mb-0">
-                        <li className="breadcrumb-item">
-                            <a href="/" className="text-muted text-decoration-none small">Trang chủ</a>
-                        </li>
-                       
-                    </ol>
-                </nav>
-
-                {/* Search Bar */}
-                <div className="bg-white rounded-4 shadow-lg p-3 mb-4">
-                    <Row className="g-2 align-items-end">
-                        {/* Điểm đến */}
-                        <Col md={3}>
-                            <div className="text-muted small mb-1">Điểm đến</div>
-                            <div className="input-group">
-                                <span className="input-group-text bg-white border-end-0" style={{ borderRadius: '8px 0 0 8px' }}>
-                                    <i className="bi bi-geo-alt text-muted"></i>
-                                </span>
-                                <input 
-                                    type="text" 
-                                    className="form-control border-start-0" 
-                                    defaultValue={hotel.location?.name || 'Đà Nẵng'}
-                                    style={{ borderRadius: '0 8px 8px 0' }}
-                                />
-                            </div>
-                        </Col>
-                        
-                        {/* Ngày */}
-                        <Col md={4}>
-                            <div className="text-muted small mb-1">Ngày nhận phòng/Ngày trả phòng</div>
-                            <div className="input-group">
-                                <span className="input-group-text bg-white border-end-0" style={{ borderRadius: '8px 0 0 8px' }}>
-                                    <i className="bi bi-calendar-event text-muted"></i>
-                                </span>
-                                <input 
-                                    type="text" 
-                                    className="form-control border-start-0" 
-                                    defaultValue="20/11/2025 - 22/11/2025"
-                                    style={{ borderRadius: '0 8px 8px 0' }}
-                                />
-                            </div>
-                        </Col>
-                        
-                        {/* Số khách */}
-                        <Col md={4}>
-                            <div className="text-muted small mb-1">Số lượng khách</div>
-                            <div className="input-group">
-                                <span className="input-group-text bg-white border-end-0" style={{ borderRadius: '8px 0 0 8px' }}>
-                                    <i className="bi bi-people text-muted"></i>
-                                </span>
-                                <input 
-                                    type="text" 
-                                    className="form-control border-start-0" 
-                                    defaultValue="2 người lớn, 0 trẻ em, 1 phòng"
-                                    style={{ borderRadius: '0 8px 8px 0' }}
-                                />
-                            </div>
-                        </Col>
-                        
-                        {/* Button */}
-                        <Col md={1} className="d-flex justify-content-center">
-                            <button 
-                                className="btn rounded-circle d-flex align-items-center justify-content-center"
-                                style={{ 
-                                    width: '48px', 
-                                    height: '48px', 
-                                    backgroundColor: '#009abb',
-                                    color: 'white'
-                                }}
-                            >
-                                <i className="bi bi-search fs-5"></i>
-                            </button>
-                        </Col>
-                    </Row>
-                </div>
-
-                {/* Hotel Info - No Card, direct on light background */}
-                <div className="d-flex justify-content-between align-items-start flex-wrap gap-3 py-3">
-                    <div>
-                        <h2 className="fw-bold text-primary-custom mb-2">{hotel.name}</h2>
-                        <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
-                            {/* Star Rating */}
-                            <div className="text-warning">
-                                {[...Array(hotel.starRating || 0)].map((_, i) => (
-                                    <i key={i} className="bi bi-star-fill"></i>
-                                ))}
-                            </div>
-                            <Badge bg="warning" className="text-dark">
-                                <i className="bi bi-star-fill me-1"></i>{hotel.averageRating || 0}
-                            </Badge>
-                            <span className="text-muted small">({hotel.totalReviews?.toLocaleString() || 0} đánh giá)</span>
-                        </div>
-                        <div className="text-muted small">
-                            <i className="bi bi-geo-alt-fill me-1 text-primary-custom"></i> {hotel.address}
-                        </div>
-                    </div>
-                    <div className="text-end">
-                        <div className="text-muted small">Giá mỗi đêm từ</div>
-                        <div className="text-primary-custom fw-bold fs-2">
-                            {minRoomPrice ? `${minRoomPrice.toLocaleString('vi-VN')}đ` : 'Liên hệ'}
-                        </div>
-                    </div>
-                </div>
-            </Container>
+            {/* Hero Section - Same as Hotel page */}
+            <Banner />
+            <AdvanceSearch />
 
             {/* Main Content */}
             <div className="bg-light py-4">
                 <Container>
+                    {/* Breadcrumb */}
+                    <nav aria-label="breadcrumb" className="mb-3">
+                        <ol className="breadcrumb mb-0">
+                            <li className="breadcrumb-item">
+                                <a href="/" className="text-muted text-decoration-none small">Trang chủ</a>
+                            </li>
+                            <li className="breadcrumb-item">
+                                <a href="/hotel" className="text-muted text-decoration-none small">Khách sạn</a>
+                            </li>
+                            <li className="breadcrumb-item active small" aria-current="page">{hotel.name}</li>
+                        </ol>
+                    </nav>
 
-                {/* Gallery */}
-                <div className="gallery-grid mb-5">
-                    <div className="gallery-item main">
-                        <img src={mainImage} alt="Main" />
+                    {/* Hotel Info */}
+                    <div className="d-flex justify-content-between align-items-start flex-wrap gap-3 py-3 mb-4">
+                        <div>
+                            <h1 className="fw-bold text-primary-custom mb-2" style={{ fontSize: '32px' }}>{hotel.name}</h1>
+                            <div className="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                {/* Star Rating */}
+                                <div className="text-warning">
+                                    {[...Array(hotel.starRating || 0)].map((_, i) => (
+                                        <i key={i} className="bi bi-star-fill"></i>
+                                    ))}
+                                </div>
+                                <Badge bg="warning" className="text-dark">
+                                    <i className="bi bi-star-fill me-1"></i>{hotel.averageRating || 0}
+                                </Badge>
+                                <span className="text-muted small">({hotel.totalReviews?.toLocaleString() || 0} đánh giá)</span>
+                            </div>
+                            <div className="text-muted small">
+                                <i className="bi bi-geo-alt-fill me-1 text-primary-custom"></i> {hotel.address}
+                            </div>
+                        </div>
+                        <div className="text-end">
+                            <div className="text-muted small">Giá mỗi đêm từ</div>
+                            <div className="text-primary-custom fw-bold fs-2">
+                                {minRoomPrice ? `${minRoomPrice.toLocaleString('vi-VN')}đ` : 'Liên hệ'}
+                            </div>
+                        </div>
                     </div>
-                    {subImages.length > 0 && (
-                        <>
-                            <div className="gallery-item">
-                                <img src={subImages[0]?.imageUrl || mainImage} alt="Sub 1" />
-                            </div>
-                            <div className="gallery-item">
-                                <img src={subImages[1]?.imageUrl || mainImage} alt="Sub 2" />
-                            </div>
-                        </>
-                    )}
-                    {subImages.length === 0 && (
-                        <>
-                            <div className="gallery-item">
-                                <img src={mainImage} alt="Sub 1" />
-                            </div>
-                            <div className="gallery-item">
-                                <img src={mainImage} alt="Sub 2" />
-                            </div>
-                        </>
-                    )}
+
+                {/* Gallery - Single Image */}
+                <div className="mb-5">
+                    <img 
+                        src={mainImage} 
+                        alt={hotel.name}
+                        className="w-100 rounded-4"
+                        style={{ height: '400px', objectFit: 'cover' }}
+                    />
                 </div>
 
                 <Row className="g-4">
@@ -348,6 +470,7 @@ const Hotel_Detail = () => {
                                                     <Button 
                                                         className="bg-primary-custom border-0 rounded-3 px-4 fw-bold"
                                                         disabled={!room.isAvailable}
+                                                        onClick={() => handleBookRoomClick(room)}
                                                     >
                                                         Đặt phòng
                                                     </Button>
@@ -413,10 +536,26 @@ const Hotel_Detail = () => {
                                 </h5>
 
                                 <Form>
+                                    {/* Show selected room info */}
+                                    {selectedRoom && (
+                                        <div className="mb-3 p-3 bg-light rounded-3">
+                                            <div className="fw-bold text-primary-custom mb-1">{selectedRoom.name}</div>
+                                            <div className="text-muted small">
+                                                <i className="bi bi-aspect-ratio me-1"></i>{selectedRoom.area}m² • 
+                                                <i className="bi bi-people-fill ms-2 me-1"></i>{selectedRoom.capacity} người
+                                            </div>
+                                        </div>
+                                    )}
+
                                     <Form.Group className="mb-3">
                                         <Form.Label className="fw-bold small">Ngày nhận phòng</Form.Label>
                                         <div className="position-relative">
-                                            <Form.Control type="date" className="form-control-custom ps-5" />
+                                            <Form.Control 
+                                                type="date" 
+                                                className="form-control-custom ps-5" 
+                                                value={checkInDate}
+                                                onChange={(e) => setCheckInDate(e.target.value)}
+                                            />
                                             <i className="bi bi-calendar3 position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                                         </div>
                                     </Form.Group>
@@ -424,14 +563,23 @@ const Hotel_Detail = () => {
                                     <Form.Group className="mb-3">
                                         <Form.Label className="fw-bold small">Ngày trả phòng</Form.Label>
                                         <div className="position-relative">
-                                            <Form.Control type="date" className="form-control-custom ps-5" />
+                                            <Form.Control 
+                                                type="date" 
+                                                className="form-control-custom ps-5" 
+                                                value={checkOutDate}
+                                                onChange={(e) => setCheckOutDate(e.target.value)}
+                                            />
                                             <i className="bi bi-calendar3 position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                                         </div>
                                     </Form.Group>
 
                                     <Form.Group className="mb-3">
                                         <Form.Label className="fw-bold small">Số lượng khách</Form.Label>
-                                        <Form.Select className="form-control-custom">
+                                        <Form.Select 
+                                            className="form-control-custom"
+                                            value={guestCount}
+                                            onChange={(e) => setGuestCount(e.target.value)}
+                                        >
                                             <option>1 người lớn</option>
                                             <option>2 người lớn</option>
                                             <option>2 người lớn, 1 trẻ em</option>
@@ -442,16 +590,20 @@ const Hotel_Detail = () => {
                                     <div className="dashed-line"></div>
 
                                     <div className="d-flex justify-content-between mb-2 small">
-                                        <span className="text-muted">Giá phòng từ</span>
+                                        <span className="text-muted">{selectedRoom ? selectedRoom.name : 'Giá phòng từ'}</span>
                                         <span className="fw-bold">
-                                            {minRoomPrice ? `${minRoomPrice.toLocaleString('vi-VN')}đ` : 'Liên hệ'}
+                                            {selectedRoom ? `${selectedRoom.price.toLocaleString('vi-VN')}đ` : (minRoomPrice ? `${minRoomPrice.toLocaleString('vi-VN')}đ` : 'Liên hệ')}
                                         </span>
                                     </div>
 
                                     <div className="dashed-line"></div>
 
-                                    <Button className="w-100 bg-primary-custom border-0 py-2 fw-bold rounded-3">
-                                        Xem phòng trống
+                                    <Button 
+                                        className="w-100 bg-primary-custom border-0 py-2 fw-bold rounded-3"
+                                        onClick={handleConfirmBooking}
+                                        disabled={!selectedRoom}
+                                    >
+                                        Đặt phòng
                                     </Button>
                                 </Form>
                             </div>
@@ -496,44 +648,30 @@ const Hotel_Detail = () => {
                             {similarHotels.map((similarHotel) => (
                                 <Col key={similarHotel.id} md={6} lg={3}>
                                     <Card 
-                                        className="h-100 border-0 shadow-sm rounded-4 overflow-hidden cursor-pointer"
+                                        className="similar-hotel-card"
                                         onClick={() => navigate(`/hotel-detail/${similarHotel.id}`)}
-                                        style={{ cursor: 'pointer' }}
                                     >
-                                        <div className="position-relative" style={{ height: '180px' }}>
-                                            <Card.Img 
+                                        <div className="card-img-wrapper">
+                                            <img 
                                                 src={similarHotel.thumbnail || similarHotel.images?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2670&auto=format&fit=crop'} 
                                                 alt={similarHotel.name}
-                                                style={{ height: '100%', objectFit: 'cover' }}
                                             />
                                         </div>
                                         <Card.Body>
-                                            <Card.Title className="fw-bold text-primary-custom mb-2" style={{ fontSize: '1rem' }}>
+                                            <Card.Title className="card-title">
                                                 {similarHotel.name}
                                             </Card.Title>
-                                            <div className="d-flex align-items-center gap-2 mb-2">
-                                                <span className="text-primary-custom small">Khách sạn</span>
-                                                <div className="text-warning">
+                                            <div className="hotel-type-stars">
+                                                <span>Khách sạn</span>
+                                                <div className="text-warning stars">
                                                     {[...Array(similarHotel.starRating || 3)].map((_, i) => (
-                                                        <i key={i} className="bi bi-star-fill" style={{ fontSize: '10px' }}></i>
+                                                        <i key={i} className="bi bi-star-fill"></i>
                                                     ))}
                                                 </div>
                                             </div>
-                                            <div className="text-muted small mb-2">
-                                                <i className="bi bi-geo-alt me-1"></i>
+                                            <div className="hotel-location">
+                                                <i className="bi bi-geo-alt"></i>
                                                 {similarHotel.location?.name || similarHotel.address?.split(',')[1]?.trim() || 'Việt Nam'}
-                                            </div>
-                                            <div className="d-flex flex-wrap gap-1">
-                                                {similarHotel.amenities?.slice(0, 2).map((amenity, idx) => (
-                                                    <Badge 
-                                                        key={idx} 
-                                                        bg="light" 
-                                                        className="text-muted border"
-                                                        style={{ fontSize: '10px' }}
-                                                    >
-                                                        {amenity.name || amenity}
-                                                    </Badge>
-                                                ))}
                                             </div>
                                         </Card.Body>
                                     </Card>

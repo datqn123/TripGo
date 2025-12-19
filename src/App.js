@@ -55,13 +55,13 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         {/* Filter : trang tour và trang plane sau khi nhấn áp dụng bộ lọc sẽ mất trang ưu đãi */}
-        <Route path="/filterhotel" element={<Filter type="hotel" />} />
-        <Route path="/filtertour" element={<Filter type="tour" />} />
-        <Route path="/filterplane" element={<Filter type="plane" />} />
+        <Route path="/filter-hotel" element={<Filter type="hotel" />} />
+        <Route path="/filter-tour" element={<Filter type="tour" />} />
+        <Route path="/filter-plane" element={<Filter type="plane" />} />
         {/* Payment : Trang thanh toán */}
-        <Route path="/paymenthotel" element={<Payment type="hotel" />} />
-        <Route path="/paymenttour" element={<Payment type="tour" />} />
-        <Route path="/paymentplane" element={<Payment type="plane" />} />
+        <Route path="/payment-hotel" element={<Payment type="hotel" />} />
+        <Route path="/payment-tour" element={<Payment type="tour" />} />
+        <Route path="/payment-plane" element={<Payment type="plane" />} />
         {/* Classification : này là phân bậc các loại vé trong paymentplane */}
         <Route path="/classification" element={<Classification />} />
         {/* Details */}

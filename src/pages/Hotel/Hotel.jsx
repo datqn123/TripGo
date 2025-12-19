@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col, Card, Badge, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -6,6 +6,7 @@ import './hotel.css';
 import Banner from '../../components/Banner/Banner';
 import AdvanceSearch from '../../components/AdvanceSearch/AdvanceSearch';
 import homeApi from '../../api/homeApi';
+import { PUBLIC_API } from '../../api/config';
 
 // Skeleton loading component
 const SkeletonCard = () => {
@@ -66,6 +67,198 @@ const Hotel = () => {
     const [vouchers, setVouchers] = useState([]);
     const [loadingVouchers, setLoadingVouchers] = useState(true);
 
+    // State for VN locations and hotels
+    const [vnLocations, setVnLocations] = useState([]);
+    const [selectedVNLocation, setSelectedVNLocation] = useState(null);
+    const [vnHotels, setVnHotels] = useState([]);
+    const [loadingVnHotels, setLoadingVnHotels] = useState(false);
+
+    // State for International locations and hotels
+    const [intlLocations, setIntlLocations] = useState([]);
+    const [selectedIntlLocation, setSelectedIntlLocation] = useState(null);
+    const [intlHotels, setIntlHotels] = useState([]);
+    const [loadingIntlHotels, setLoadingIntlHotels] = useState(false);
+
+    // State for popular destinations
+    const [popularDestinations, setPopularDestinations] = useState([]);
+    const [loadingDestinations, setLoadingDestinations] = useState(true);
+
+    // Slider refs
+    const vnSliderRef = useRef(null);
+    const intlSliderRef = useRef(null);
+    const recSliderRef = useRef(null);
+
+    // Slider scroll functions
+    const scrollSlider = (ref, direction) => {
+        if (ref.current) {
+            const scrollAmount = 300;
+            ref.current.scrollBy({
+                left: direction === 'next' ? scrollAmount : -scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
+
+    // Handle toggle favorite
+    const handleToggleFavorite = async (e, hotelId, listType) => {
+        e.stopPropagation(); // Prevent navigation to hotel detail
+        
+        // Check if user is logged in
+        const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+        if (!token) {
+            toast.warning('Vui lòng đăng nhập để thêm khách sạn yêu thích!');
+            return;
+        }
+
+        try {
+            // Call both APIs in parallel
+            const [response] = await Promise.all([
+                fetch(PUBLIC_API.TOGGLE_FAVORITE(hotelId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }),
+            ]);
+
+            if (response.ok) {
+                // Update local state based on list type
+                if (listType === 'recommendations') {
+                    setRecommendations(prev => prev.map(hotel => 
+                        hotel.id === hotelId ? { ...hotel, favorite: !hotel.favorite } : hotel
+                    ));
+                } else if (listType === 'vnHotels') {
+                    setVnHotels(prev => prev.map(hotel => 
+                        hotel.id === hotelId ? { ...hotel, favorite: !hotel.favorite } : hotel
+                    ));
+                } else if (listType === 'intlHotels') {
+                    setIntlHotels(prev => prev.map(hotel => 
+                        hotel.id === hotelId ? { ...hotel, favorite: !hotel.favorite } : hotel
+                    ));
+                }
+                
+                // Show success message
+                const hotel = [...recommendations, ...vnHotels, ...intlHotels].find(h => h.id === hotelId);
+                const isFavorite = hotel?.favorite;
+                toast.success(isFavorite ? 'Đã xóa khỏi danh sách yêu thích!' : 'Đã thêm vào danh sách yêu thích!');
+            } else {
+                toast.error('Có lỗi xảy ra, vui lòng thử lại!');
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+            toast.error('Có lỗi xảy ra, vui lòng thử lại!');
+        }
+    };
+
+    // Fetch VN locations from API
+    useEffect(() => {
+        const fetchVNLocations = async () => {
+            try {
+                const response = await fetch(PUBLIC_API.VN_LOCATIONS);
+                const data = await response.json();
+                const locations = data.result || [];
+                setVnLocations(locations);
+                
+                // Auto-select first location if available
+                if (locations.length > 0) {
+                    setSelectedVNLocation(locations[0]);
+                }
+            } catch (error) {
+                console.error('Error fetching VN locations:', error);
+            }
+        };
+
+        fetchVNLocations();
+    }, []);
+
+    // Fetch hotels when VN location is selected
+    useEffect(() => {
+        const fetchHotelsByLocation = async () => {
+            if (!selectedVNLocation) return;
+            
+            setLoadingVnHotels(true);
+            try {
+                const response = await fetch(PUBLIC_API.HOTELS_BY_LOCATION(selectedVNLocation.id));
+                const data = await response.json();
+                const hotels = data.result || [];
+                setVnHotels(hotels.slice(0, 10)); // Limit to 10 hotels
+            } catch (error) {
+                console.error('Error fetching hotels by location:', error);
+                setVnHotels([]);
+            } finally {
+                setLoadingVnHotels(false);
+            }
+        };
+
+        fetchHotelsByLocation();
+    }, [selectedVNLocation]);
+
+    // Fetch International locations from API
+    useEffect(() => {
+        const fetchIntlLocations = async () => {
+            try {
+                const response = await fetch(PUBLIC_API.COUNTRY_LOCATIONS);
+                const data = await response.json();
+                const locations = data.result || [];
+                // Filter out Vietnam
+                const filteredLocations = locations.filter(loc => loc.name !== 'Việt Nam');
+                setIntlLocations(filteredLocations);
+                
+                // Auto-select first location if available
+                if (filteredLocations.length > 0) {
+                    setSelectedIntlLocation(filteredLocations[0]);
+                }
+            } catch (error) {
+                console.error('Error fetching international locations:', error);
+            }
+        };
+
+        fetchIntlLocations();
+    }, []);
+
+    // Fetch hotels when International location is selected
+    useEffect(() => {
+        const fetchIntlHotelsByLocation = async () => {
+            if (!selectedIntlLocation) return;
+            
+            setLoadingIntlHotels(true);
+            try {
+                const response = await fetch(PUBLIC_API.HOTELS_SEARCH(selectedIntlLocation.id));
+                const data = await response.json();
+                const hotels = data.result?.hotels || [];
+                setIntlHotels(hotels.slice(0, 10)); // Limit to 10 hotels for slider
+            } catch (error) {
+                console.error('Error fetching international hotels:', error);
+                setIntlHotels([]);
+            } finally {
+                setLoadingIntlHotels(false);
+            }
+        };
+
+        fetchIntlHotelsByLocation();
+    }, [selectedIntlLocation]);
+
+    // Fetch popular destinations from API
+    useEffect(() => {
+        const fetchPopularDestinations = async () => {
+            try {
+                const response = await fetch(PUBLIC_API.DROPDOWN_LOCATIONS);
+                const data = await response.json();
+                const destinations = data.result || [];
+                // Filter out locations with no hotels (count = 0 or null)
+                const filteredDestinations = destinations.filter(dest => dest.count && dest.count > 0);
+                setPopularDestinations(filteredDestinations);
+            } catch (error) {
+                console.error('Error fetching popular destinations:', error);
+            } finally {
+                setLoadingDestinations(false);
+            }
+        };
+
+        fetchPopularDestinations();
+    }, []);
+
     // Fetch vouchers from API
     useEffect(() => {
         const fetchVouchers = async () => {
@@ -88,7 +281,8 @@ const Hotel = () => {
         const fetchRecommendations = async () => {
             try {
                 // Get user_id and token from localStorage
-                const userId = localStorage.getItem('id') || 1;
+                const storedUser = localStorage.getItem('user');
+                const userId = storedUser ? JSON.parse(storedUser).id : 1;
                 const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
                 
                 const headers = {
@@ -105,6 +299,9 @@ const Hotel = () => {
                     headers: headers,
                 });
                 const data = await response.json();
+                console.log('Recommendations data:', data);
+                console.log('User ID:', userId);
+                console.log('Token:', token);
                 
                 setRecommendations(data.recommendations || []);
                 setRecommendationMessage(data.message || '');
@@ -117,51 +314,6 @@ const Hotel = () => {
 
         fetchRecommendations();
     }, []);
-
-    const hotelData = [
-        {
-            image: "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2670&auto=format&fit=crop",
-            location: "Đà Nẵng",
-            title: "Khách sạn Chicland Đà Nẵng",
-            rating: 4.9,
-            reviews: 1259,
-            oldPrice: "Giá mỗi đêm từ",
-            price: "1.500.000 VND",
-        },
-        {
-            image: "https://images.unsplash.com/photo-1590490360182-c33d57733427?q=80&w=2574&auto=format&fit=crop",
-            location: "Đà Nẵng",
-            title: "Khách sạn Chicland Đà Nẵng",
-            rating: 4.9,
-            reviews: 1259,
-            oldPrice: "Giá mỗi đêm từ",
-            price: "1.500.000 VND",
-        },
-        {
-            image: "https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?q=80&w=2670&auto=format&fit=crop",
-            location: "Đà Nẵng",
-            title: "Khách sạn Chicland Đà Nẵng",
-            rating: 4.9,
-            reviews: 1259,
-            oldPrice: "Giá mỗi đêm từ",
-            price: "1.500.000 VND",
-        },
-        {
-            image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?q=80&w=2670&auto=format&fit=crop",
-            location: "Đà Nẵng",
-            title: "Khách sạn Chicland Đà Nẵng",
-            rating: 4.9,
-            reviews: 1259,
-            oldPrice: "Giá mỗi đêm từ",
-            price: "1.500.000 VND",
-        }
-    ];
-
-    const vietnamPlaces = ["Đà Nẵng", "Tp Hồ Chí Minh", "Hà Nội", "Đà Lạt", "Nha Trang", "Phú Quốc", "Huế"];
-    const worldPlaces = ["Bangkok", "Seoul", "Tokyo", "Singapore", "Osaka", "HongKong"];
-
-    const activeVN = "Đà Nẵng";
-    const activeWorld = "Bangkok";
 
     return (
         <>
@@ -247,154 +399,274 @@ const Hotel = () => {
                         {recommendationMessage && (
                             <p className="text-muted mb-3">{recommendationMessage}</p>
                         )}
-                        <Row className="g-4">
-                            {loadingRecommendations ? (
-                                // Skeleton Loading
-                                [1, 2, 3, 4].map((_, idx) => (
-                                    <Col md={6} lg={3} key={idx}>
-                                        <SkeletonCard />
-                                    </Col>
-                                ))
-                            ) : (
-                                recommendations.slice(0, 4).map((item, idx) => (
-                                    <Col md={6} lg={3} key={item.id || idx}>
+                        
+                        <div className="hotel-slider-container">
+                            {/* Navigation Buttons */}
+                            <button 
+                                className="slider-nav-btn prev"
+                                onClick={() => scrollSlider(recSliderRef, 'prev')}
+                            >
+                                <i className="bi bi-chevron-left"></i>
+                            </button>
+                            <button 
+                                className="slider-nav-btn next"
+                                onClick={() => scrollSlider(recSliderRef, 'next')}
+                            >
+                                <i className="bi bi-chevron-right"></i>
+                            </button>
+
+                            {/* Slider Content */}
+                            <div className="hotel-slider-wrapper" ref={recSliderRef}>
+                                {loadingRecommendations ? (
+                                    // Skeleton Loading
+                                    [1, 2, 3, 4].map((_, idx) => (
+                                        <div className="hotel-slider-item" key={idx}>
+                                            <SkeletonCard />
+                                        </div>
+                                    ))
+                                ) : recommendations.length > 0 ? (
+                                    recommendations.slice(0, 10).map((item, idx) => (
                                         <div 
-                                            className="position-relative cursor-pointer"
+                                            className="hotel-slider-item" 
+                                            key={item.id || idx}
                                             onClick={() => navigate(`/hotel-detail/${item.id}`)}
                                             style={{ cursor: 'pointer' }}
                                         >
-                                            <Card className="tour-card h-100 border-0 shadow-sm rounded-4 overflow-hidden" >
-                                                <div className="position-relative">
-                                                    <Card.Img 
-                                                        variant="top" 
+                                            <Card className="hotel-card-uniform border-0 shadow-sm rounded-4 overflow-hidden">
+                                                <div className="card-img-container position-relative">
+                                                    <img 
                                                         src={item.thumbnail || "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2670&auto=format&fit=crop"} 
-                                                        height="200" 
-                                                        className="object-fit-cover" 
+                                                        alt={item.name}
                                                     />
-                                                    <div className="card-heart-icon position-absolute top-0 end-0 m-3 text-white">
-                                                        <i className="bi bi-heart"></i>
+                                                    <div 
+                                                        className={`card-heart-icon position-absolute top-0 end-0 m-3 ${item.favorite ? 'text-danger' : 'text-white'}`}
+                                                        onClick={(e) => handleToggleFavorite(e, item.id, 'recommendations')}
+                                                        style={{ cursor: 'pointer' }}
+                                                    >
+                                                        <i className={item.favorite ? "bi bi-heart-fill" : "bi bi-heart"}></i>
                                                     </div>
                                                 </div>
-                                                <Card.Body className="d-flex flex-column p-3">
-                                                    <Card.Title className="fw-bold fs-6 mb-1 text-truncate-2">{item.name}</Card.Title>
-                                                    <div className="text-muted x-small mb-1">
-                                                        <i className="bi bi-geo-alt me-1"></i>{item.location}
+                                                <Card.Body className="p-3">
+                                                    <Card.Title className="card-title">{item.name}</Card.Title>
+                                                    <div className="card-info">
+                                                        <div className="text-muted x-small mb-1">
+                                                            <i className="bi bi-geo-alt me-1"></i>{item.location}
+                                                        </div>
+                                                        <div className="d-flex align-items-center gap-1 mb-2 x-small">
+                                                            <i className="bi bi-star-fill text-warning"></i>
+                                                            <span className="fw-bold">{item.star_rating || 0}</span>
+                                                            <span className="text-muted">({item.total_reviews?.toLocaleString() || 0} đánh giá)</span>
+                                                        </div>
                                                     </div>
-                                                    <div className="d-flex align-items-center gap-1 mb-2 x-small">
-                                                        <i className="bi bi-star-fill text-warning"></i>
-                                                        <span className="fw-bold">{item.star_rating}</span>
-                                                        <span className="text-muted">({item.total_reviews?.toLocaleString()} đánh giá)</span>
-                                                    </div>
-
-                                                    <div className="mt-auto">
+                                                    <div className="card-price">
                                                         <div className="text-muted x-small">Giá mỗi đêm từ</div>
-                                                        <div className="text-primary fw-bold fs-5">
-                                                            {typeof item.min_room_price === 'number' 
-                                                                ? item.min_room_price.toLocaleString('vi-VN') 
-                                                                : item.min_room_price} VND
+                                                        <div className="text-primary fw-bold fs-6">
+                                                            {item.min_room_price 
+                                                                ? `${item.min_room_price.toLocaleString('vi-VN')} VND`
+                                                                : 'Liên hệ'}
                                                         </div>
                                                     </div>
                                                 </Card.Body>
                                             </Card>
-                                            {idx === 0 && <div className="nav-arrow prev"><i className="bi bi-chevron-left"></i></div>}
-                                            {idx === 3 && <div className="nav-arrow next"><i className="bi bi-chevron-right"></i></div>}
                                         </div>
-                                    </Col>
-                                ))
-                            )}
-                        </Row>
+                                    ))
+                                ) : (
+                                    <div className="w-100 text-center py-4">
+                                        <p className="text-muted">Không có gợi ý khách sạn</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Discover Domestic */}
                     <div className="mb-5">
                         <h4 className="fw-bold mb-3 text-primary" style={{ fontSize: '30px' }}>Khám phá khách sạn nội địa</h4>
                         <div className="d-flex gap-2 overflow-auto pb-3 mb-2 no-scrollbar">
-                            {vietnamPlaces.map((place, idx) => (
+                            {vnLocations.map((location) => (
                                 <Button
-                                    key={idx}
-                                    variant={activeVN === place ? "primary" : "outline-secondary"}
+                                    key={location.id}
+                                    variant={selectedVNLocation?.id === location.id ? "primary" : "outline-secondary"}
                                     className="rounded-pill fw-medium px-4 border-opacity-25 text-nowrap"
+                                    onClick={() => setSelectedVNLocation(location)}
                                 >
-                                    {place}
+                                    {location.name}
                                 </Button>
                             ))}
                         </div>
-                        <Row className="g-4">
-                            {hotelData.map((item, idx) => (
-                                <Col md={6} lg={3} key={idx}>
-                                    <div className="position-relative cursor-pointer">
-                                        <Card className="tour-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                                            <div className="position-relative">
-                                                <Card.Img variant="top" src={item.image} height="200" className="object-fit-cover" />
-                                                <div className="card-heart-icon position-absolute top-0 end-0 m-3 text-white">
-                                                    <i className="bi bi-heart"></i>
+                        
+                        <div className="hotel-slider-container">
+                            {/* Navigation Buttons */}
+                            <button 
+                                className="slider-nav-btn prev"
+                                onClick={() => scrollSlider(vnSliderRef, 'prev')}
+                            >
+                                <i className="bi bi-chevron-left"></i>
+                            </button>
+                            <button 
+                                className="slider-nav-btn next"
+                                onClick={() => scrollSlider(vnSliderRef, 'next')}
+                            >
+                                <i className="bi bi-chevron-right"></i>
+                            </button>
+
+                            {/* Slider Content */}
+                            <div className="hotel-slider-wrapper" ref={vnSliderRef}>
+                                {loadingVnHotels ? (
+                                    // Skeleton Loading
+                                    [1, 2, 3, 4].map((_, idx) => (
+                                        <div className="hotel-slider-item" key={idx}>
+                                            <SkeletonCard />
+                                        </div>
+                                    ))
+                                ) : vnHotels.length > 0 ? (
+                                    vnHotels.map((item, idx) => (
+                                        <div 
+                                            className="hotel-slider-item" 
+                                            key={item.id || idx}
+                                            onClick={() => navigate(`/hotel-detail/${item.id}`)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            <Card className="hotel-card-uniform border-0 shadow-sm rounded-4 overflow-hidden">
+                                                <div className="card-img-container position-relative">
+                                                    <img 
+                                                        src={item.thumbnail || "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2670&auto=format&fit=crop"} 
+                                                        alt={item.name}
+                                                    />
+                                                    <div 
+                                                        className={`card-heart-icon position-absolute top-0 end-0 m-3 ${item.favorite ? 'text-danger' : 'text-white'}`}
+                                                        onClick={(e) => handleToggleFavorite(e, item.id, 'vnHotels')}
+                                                        style={{ cursor: 'pointer' }}
+                                                    >
+                                                        <i className={item.favorite ? "bi bi-heart-fill" : "bi bi-heart"}></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <Card.Body className="d-flex flex-column p-3">
-                                                <Card.Title className="fw-bold fs-6 mb-1 text-truncate-2">{item.title}</Card.Title>
-                                                <div className="d-flex align-items-center gap-1 mb-2 x-small">
-                                                    <i className="bi bi-star-fill text-warning"></i>
-                                                    <span className="fw-bold">{item.rating}</span>
-                                                    <span className="text-muted">({item.reviews} đánh giá)</span>
-                                                </div>
-                                                <div className="mt-auto">
-                                                    <div className="text-muted x-small">{item.oldPrice}</div>
-                                                    <div className="text-primary fw-bold fs-5">{item.price}</div>
-                                                </div>
-                                            </Card.Body>
-                                        </Card>
-                                        {idx === 0 && <div className="nav-arrow prev"><i className="bi bi-chevron-left"></i></div>}
-                                        {idx === 3 && <div className="nav-arrow next"><i className="bi bi-chevron-right"></i></div>}
+                                                <Card.Body className="p-3">
+                                                    <Card.Title className="card-title">{item.name}</Card.Title>
+                                                    <div className="card-info">
+                                                        <div className="text-muted x-small mb-1">
+                                                            <i className="bi bi-geo-alt me-1"></i>{item.locationName || selectedVNLocation?.name}
+                                                        </div>
+                                                        <div className="d-flex align-items-center gap-1 mb-2 x-small">
+                                                            <i className="bi bi-star-fill text-warning"></i>
+                                                            <span className="fw-bold">{item.starRating || 0}</span>
+                                                            <span className="text-muted">(0 đánh giá)</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="card-price">
+                                                        <div className="text-muted x-small">Giá mỗi đêm từ</div>
+                                                        <div className="text-primary fw-bold fs-6">
+                                                            {item.minPrice 
+                                                                ? `${item.minPrice.toLocaleString('vi-VN')} VND`
+                                                                : 'Liên hệ'}
+                                                        </div>
+                                                    </div>
+                                                </Card.Body>
+                                            </Card>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="w-100 text-center py-4">
+                                        <p className="text-muted">Không có khách sạn nào tại {selectedVNLocation?.name}</p>
                                     </div>
-                                </Col>
-                            ))}
-                        </Row>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Discover International */}
                     <div className="mb-5">
                         <h4 className="fw-bold mb-3 text-primary" style={{ fontSize: '30px' }}>Vi vu khách sạn quốc tế</h4>
                         <div className="d-flex gap-2 overflow-auto pb-3 mb-2 no-scrollbar">
-                            {worldPlaces.map((place, idx) => (
+                            {intlLocations.map((location) => (
                                 <Button
-                                    key={idx}
-                                    variant={activeWorld === place ? "primary" : "outline-secondary"}
+                                    key={location.id}
+                                    variant={selectedIntlLocation?.id === location.id ? "primary" : "outline-secondary"}
                                     className="rounded-pill fw-medium px-4 border-opacity-25 text-nowrap"
+                                    onClick={() => setSelectedIntlLocation(location)}
                                 >
-                                    {place}
+                                    {location.name}
                                 </Button>
                             ))}
                         </div>
-                        <Row className="g-4">
-                            {hotelData.map((item, idx) => (
-                                <Col md={6} lg={3} key={idx}>
-                                    <div className="position-relative cursor-pointer">
-                                        <Card className="tour-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                                            <div className="position-relative">
-                                                <Card.Img variant="top" src={item.image} height="200" className="object-fit-cover" />
-                                                <div className="card-heart-icon position-absolute top-0 end-0 m-3 text-white">
-                                                    <i className="bi bi-heart"></i>
+                        
+                        <div className="hotel-slider-container">
+                            {/* Navigation Buttons */}
+                            <button 
+                                className="slider-nav-btn prev"
+                                onClick={() => scrollSlider(intlSliderRef, 'prev')}
+                            >
+                                <i className="bi bi-chevron-left"></i>
+                            </button>
+                            <button 
+                                className="slider-nav-btn next"
+                                onClick={() => scrollSlider(intlSliderRef, 'next')}
+                            >
+                                <i className="bi bi-chevron-right"></i>
+                            </button>
+
+                            {/* Slider Content */}
+                            <div className="hotel-slider-wrapper" ref={intlSliderRef}>
+                                {loadingIntlHotels ? (
+                                    // Skeleton Loading
+                                    [1, 2, 3, 4].map((_, idx) => (
+                                        <div className="hotel-slider-item" key={idx}>
+                                            <SkeletonCard />
+                                        </div>
+                                    ))
+                                ) : intlHotels.length > 0 ? (
+                                    intlHotels.map((item, idx) => (
+                                        <div 
+                                            className="hotel-slider-item" 
+                                            key={item.id || idx}
+                                            onClick={() => navigate(`/hotel-detail/${item.id}`)}
+                                            style={{ cursor: 'pointer' }}
+                                        >
+                                            <Card className="hotel-card-uniform border-0 shadow-sm rounded-4 overflow-hidden">
+                                                <div className="card-img-container position-relative">
+                                                    <img 
+                                                        src={item.thumbnail || "https://images.unsplash.com/photo-1618773928121-c32242e63f39?q=80&w=2670&auto=format&fit=crop"} 
+                                                        alt={item.name}
+                                                    />
+                                                    <div 
+                                                        className={`card-heart-icon position-absolute top-0 end-0 m-3 ${item.favorite ? 'text-danger' : 'text-white'}`}
+                                                        onClick={(e) => handleToggleFavorite(e, item.id, 'intlHotels')}
+                                                        style={{ cursor: 'pointer' }}
+                                                    >
+                                                        <i className={item.favorite ? "bi bi-heart-fill" : "bi bi-heart"}></i>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <Card.Body className="d-flex flex-column p-3">
-                                                <Card.Title className="fw-bold fs-6 mb-1 text-truncate-2">{item.title}</Card.Title>
-                                                <div className="d-flex align-items-center gap-1 mb-2 x-small">
-                                                    <i className="bi bi-star-fill text-warning"></i>
-                                                    <span className="fw-bold">{item.rating}</span>
-                                                    <span className="text-muted">({item.reviews} đánh giá)</span>
-                                                </div>
-                                                <div className="mt-auto">
-                                                    <div className="text-muted x-small">{item.oldPrice}</div>
-                                                    <div className="text-primary fw-bold fs-5">{item.price}</div>
-                                                </div>
-                                            </Card.Body>
-                                        </Card>
-                                        {idx === 0 && <div className="nav-arrow prev"><i className="bi bi-chevron-left"></i></div>}
-                                        {idx === 3 && <div className="nav-arrow next"><i className="bi bi-chevron-right"></i></div>}
+                                                <Card.Body className="p-3">
+                                                    <Card.Title className="card-title">{item.name}</Card.Title>
+                                                    <div className="card-info">
+                                                        <div className="text-muted x-small mb-1">
+                                                            <i className="bi bi-geo-alt me-1"></i>{item.locationName || selectedIntlLocation?.name}
+                                                        </div>
+                                                        <div className="d-flex align-items-center gap-1 mb-2 x-small">
+                                                            <i className="bi bi-star-fill text-warning"></i>
+                                                            <span className="fw-bold">{item.starRating || 0}</span>
+                                                            <span className="text-muted">(0 đánh giá)</span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="card-price">
+                                                        <div className="text-muted x-small">Giá mỗi đêm từ</div>
+                                                        <div className="text-primary fw-bold fs-6">
+                                                            {item.minPrice 
+                                                                ? `${item.minPrice.toLocaleString('vi-VN')} VND`
+                                                                : 'Liên hệ'}
+                                                        </div>
+                                                    </div>
+                                                </Card.Body>
+                                            </Card>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="w-100 text-center py-4">
+                                        <p className="text-muted">Không có khách sạn nào tại {selectedIntlLocation?.name}</p>
                                     </div>
-                                </Col>
-                            ))}
-                        </Row>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Sale Banner */}
@@ -411,58 +683,75 @@ const Hotel = () => {
 
                     {/* Popular Destinations */}
                     <div className="mb-5">
-                        <h4 className="fw-bold mb-3 text-primary text-center">Những điểm đến phố biển</h4>
-                        <Row className="g-3">
-                            <Col md={6}>
-                                <div className="destination-card rounded-4 overflow-hidden position-relative h-100">
-                                    <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2600&auto=format&fit=crop" className="w-100 h-100 object-fit-cover" style={{ minHeight: '300px' }} alt="Da Nang" />
-                                    <div className="destination-overlay position-absolute bottom-0 start-0 w-100 p-3 text-white bg-gradient-dark">
-                                        <h5 className="fw-bold mb-0">Đà Nẵng</h5>
-                                        <small>783 khách sạn</small>
-                                    </div>
-                                </div>
-                            </Col>
-                            <Col md={6}>
-                                <Row className="g-3 h-100">
+                        <h4 className="fw-bold mb-3 text-primary text-center">Những điểm đến phổ biến</h4>
+                        {loadingDestinations ? (
+                            <Row className="g-3">
+                                {[1, 2, 3, 4, 5].map((_, idx) => (
+                                    <Col md={idx === 0 ? 6 : 3} key={idx}>
+                                        <div style={{
+                                            background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+                                            backgroundSize: '200% 100%',
+                                            animation: 'shimmer 1.5s infinite',
+                                            borderRadius: '16px',
+                                            height: idx === 0 ? '300px' : '140px'
+                                        }}></div>
+                                    </Col>
+                                ))}
+                            </Row>
+                        ) : popularDestinations.length > 0 ? (
+                            <Row className="g-3">
+                                {/* First large card */}
+                                {popularDestinations[0] && (
                                     <Col md={6}>
-                                        <div className="destination-card rounded-4 overflow-hidden position-relative h-100">
-                                            <img src="https://images.unsplash.com/photo-1540202404-a2f29016b523?q=80&w=2666&auto=format&fit=crop" className="w-100 h-100 object-fit-cover" style={{ minHeight: '140px' }} alt="Phu Quoc" />
+                                        <div 
+                                            className="destination-card rounded-4 overflow-hidden position-relative h-100"
+                                            style={{ cursor: 'pointer' }}
+                                            onClick={() => navigate(`/hotels?locationId=${popularDestinations[0].id}`)}
+                                        >
+                                            <img 
+                                                src={popularDestinations[0].thumbnail || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2600&auto=format&fit=crop"} 
+                                                className="w-100 h-100 object-fit-cover" 
+                                                style={{ minHeight: '300px' }} 
+                                                alt={popularDestinations[0].name} 
+                                            />
                                             <div className="destination-overlay position-absolute bottom-0 start-0 w-100 p-3 text-white bg-gradient-dark">
-                                                <h6 className="fw-bold mb-0">Phú Quốc</h6>
-                                                <small className="x-small">341 khách sạn</small>
+                                                <h5 className="fw-bold mb-0">{popularDestinations[0].name}</h5>
+                                                <small>{popularDestinations[0].count || 0} khách sạn</small>
                                             </div>
                                         </div>
                                     </Col>
-                                    <Col md={6}>
-                                        <div className="destination-card rounded-4 overflow-hidden position-relative h-100">
-                                            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2670&auto=format&fit=crop" className="w-100 h-100 object-fit-cover" style={{ minHeight: '140px' }} alt="Hue" />
-                                            <div className="destination-overlay position-absolute bottom-0 start-0 w-100 p-3 text-white bg-gradient-dark">
-                                                <h6 className="fw-bold mb-0">Huế</h6>
-                                                <small className="x-small">247 khách sạn</small>
-                                            </div>
-                                        </div>
-                                    </Col>
-                                    <Col md={6}>
-                                        <div className="destination-card rounded-4 overflow-hidden position-relative h-100">
-                                            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2670&auto=format&fit=crop" className="w-100 h-100 object-fit-cover" style={{ minHeight: '140px' }} alt="Da Lat" />
-                                            <div className="destination-overlay position-absolute bottom-0 start-0 w-100 p-3 text-white bg-gradient-dark">
-                                                <h6 className="fw-bold mb-0">Đà Lạt</h6>
-                                                <small className="x-small">321 khách sạn</small>
-                                            </div>
-                                        </div>
-                                    </Col>
-                                    <Col md={6}>
-                                        <div className="destination-card rounded-4 overflow-hidden position-relative h-100">
-                                            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2670&auto=format&fit=crop" className="w-100 h-100 object-fit-cover" style={{ minHeight: '140px' }} alt="HCMC" />
-                                            <div className="destination-overlay position-absolute bottom-0 start-0 w-100 p-3 text-white bg-gradient-dark">
-                                                <h6 className="fw-bold mb-0">TP Hồ Chí Minh</h6>
-                                                <small className="x-small">1621 khách sạn</small>
-                                            </div>
-                                        </div>
-                                    </Col>
-                                </Row>
-                            </Col>
-                        </Row>
+                                )}
+                                {/* Small cards grid */}
+                                <Col md={6}>
+                                    <Row className="g-3 h-100">
+                                        {popularDestinations.slice(1, 5).map((dest, idx) => (
+                                            <Col md={6} key={dest.id || idx}>
+                                                <div 
+                                                    className="destination-card rounded-4 overflow-hidden position-relative h-100"
+                                                    style={{ cursor: 'pointer' }}
+                                                    onClick={() => navigate(`/hotels?locationId=${dest.id}`)}
+                                                >
+                                                    <img 
+                                                        src={dest.thumbnail || "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=2670&auto=format&fit=crop"} 
+                                                        className="w-100 h-100 object-fit-cover" 
+                                                        style={{ minHeight: '140px' }} 
+                                                        alt={dest.name} 
+                                                    />
+                                                    <div className="destination-overlay position-absolute bottom-0 start-0 w-100 p-3 text-white bg-gradient-dark">
+                                                        <h6 className="fw-bold mb-0">{dest.name}</h6>
+                                                        <small className="x-small">{dest.count || 0} khách sạn</small>
+                                                    </div>
+                                                </div>
+                                            </Col>
+                                        ))}
+                                    </Row>
+                                </Col>
+                            </Row>
+                        ) : (
+                            <div className="text-center py-4">
+                                <p className="text-muted">Không có điểm đến nào.</p>
+                            </div>
+                        )}
                     </div>
 
                 </Container>
