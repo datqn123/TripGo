@@ -28,12 +28,9 @@ const Hotel_Detail = () => {
     // Handle book room click
     const handleBookRoomClick = (room) => {
         setSelectedRoom(room);
-        // Set default dates (today and tomorrow)
-        const today = new Date();
-        const tomorrow = new Date(today);
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        setCheckInDate(today.toISOString().split('T')[0]);
-        setCheckOutDate(tomorrow.toISOString().split('T')[0]);
+        // Leave dates empty for user to input
+        setCheckInDate('');
+        setCheckOutDate('');
         
         // Scroll to booking form
         setTimeout(() => {

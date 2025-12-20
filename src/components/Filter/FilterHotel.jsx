@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import hotelApi from "../../api/hotelApi";
 import { PUBLIC_API } from "../../api/config";
@@ -18,6 +19,7 @@ const Stars = ({ n }) => (
 );
 
 const FilterHotel = ({ locationSlug, searchData }) => {
+  const navigate = useNavigate();
   const [sortOpen, setSortOpen] = useState(false);
   const [sortValue, setSortValue] = useState("Giá thấp đến cao");
   const [hotels, setHotels] = useState([]);
@@ -27,6 +29,20 @@ const FilterHotel = ({ locationSlug, searchData }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const sortRef = useRef(null);
+
+  // Temporary filter states (UI state - changes on checkbox click)
+  const [tempFilters, setTempFilters] = useState({
+    priceRanges: [],      // Array of selected price ranges: ['<1000000', '1000000-5000000', ...]
+    starRatings: [],      // Array of selected star ratings: [1, 2, 3, 4, 5]
+    hotelTypes: [],       // Array of selected hotel types: ['RESORT', 'HOTEL', 'APARTMENT', 'VILLA']
+  });
+
+  // Applied filter states (sent to API - only changes when "Áp dụng bộ lọc" clicked)
+  const [appliedFilters, setAppliedFilters] = useState({
+    priceRanges: [],
+    starRatings: [],
+    hotelTypes: [],
+  });
 
   // Extract location name from searchData or slug
   const locationName = searchData?.locationName || locationSlug?.replace(/-/g, ' ') || 'Đà Nẵng';
@@ -39,12 +55,12 @@ const FilterHotel = ({ locationSlug, searchData }) => {
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
-  // Reset page when locationId changes
+  // Reset page when locationId or appliedFilters change
   useEffect(() => {
     setCurrentPage(0);
-  }, [locationId]);
+  }, [locationId, appliedFilters]);
 
-  // Fetch hotels when locationId or currentPage changes
+  // Fetch hotels when locationId, appliedFilters, sortValue, or currentPage changes
   useEffect(() => {
     const fetchHotels = async () => {
       if (!locationId) {
@@ -64,6 +80,48 @@ const FilterHotel = ({ locationSlug, searchData }) => {
           id: Number(locationId),
           page: currentPage
         };
+
+        // Add price filter
+        if (appliedFilters.priceRanges.length > 0) {
+          // Find the minimum minPrice and maximum maxPrice from selected ranges
+          const priceRangeMap = {
+            '<1000000': { min: 0, max: 1000000 },
+            '1000000-5000000': { min: 1000000, max: 5000000 },
+            '5000000-10000000': { min: 5000000, max: 10000000 },
+            '>10000000': { min: 10000000, max: Number.MAX_SAFE_INTEGER }
+          };
+
+          const selectedRanges = appliedFilters.priceRanges.map(range => priceRangeMap[range]);
+          params.minPrice = Math.min(...selectedRanges.map(r => r.min));
+          params.maxPrice = Math.max(...selectedRanges.map(r => r.max));
+          
+          // If maxPrice is MAX_SAFE_INTEGER, don't send it to backend
+          if (params.maxPrice === Number.MAX_SAFE_INTEGER) {
+            delete params.maxPrice;
+          }
+        }
+
+        // Add star rating filter
+        if (appliedFilters.starRatings.length > 0) {
+          params.minStarRating = Math.min(...appliedFilters.starRatings);
+          params.maxStarRating = Math.max(...appliedFilters.starRatings);
+        }
+
+        // Add hotel type filter (backend expects single HotelType enum)
+        // If multiple types selected, we'll need to make multiple calls or change backend
+        // For now, we'll send the first selected type
+        if (appliedFilters.hotelTypes.length > 0) {
+          params.hotelType = appliedFilters.hotelTypes[0]; // Backend accepts single type
+        }
+
+        // Add sort parameter
+        if (sortValue === "Giá cao đến thấp") {
+          params.sortByPrice = "DESC";
+        } else if (sortValue === "Giá thấp đến cao") {
+          params.sortByPrice = "ASC";
+        }
+
+        console.log('Search params:', params);
 
         const response = await hotelApi.searchHotels(params);
         console.log('API Response:', response.data);
@@ -87,7 +145,57 @@ const FilterHotel = ({ locationSlug, searchData }) => {
     };
 
     fetchHotels();
-  }, [locationId, currentPage]);
+  }, [locationId, currentPage, appliedFilters, sortValue]);
+
+  // Filter handlers
+  const handlePriceRangeChange = (range) => {
+    setTempFilters(prev => ({
+      ...prev,
+      priceRanges: prev.priceRanges.includes(range)
+        ? prev.priceRanges.filter(r => r !== range)
+        : [...prev.priceRanges, range]
+    }));
+  };
+
+  const handleStarRatingChange = (rating) => {
+    setTempFilters(prev => ({
+      ...prev,
+      starRatings: prev.starRatings.includes(rating)
+        ? prev.starRatings.filter(r => r !== rating)
+        : [...prev.starRatings, rating]
+    }));
+  };
+
+  const handleHotelTypeChange = (type) => {
+    setTempFilters(prev => ({
+      ...prev,
+      hotelTypes: prev.hotelTypes.includes(type)
+        ? prev.hotelTypes.filter(t => t !== type)
+        : [...prev.hotelTypes, type]
+    }));
+  };
+
+  const handleApplyFilters = () => {
+    // Copy temp filters to applied filters - this will trigger API call
+    setAppliedFilters({
+      priceRanges: [...tempFilters.priceRanges],
+      starRatings: [...tempFilters.starRatings],
+      hotelTypes: [...tempFilters.hotelTypes]
+    });
+    setCurrentPage(0);
+  };
+
+  const handleClearFilters = () => {
+    // Clear both temp and applied filters
+    const emptyFilters = {
+      priceRanges: [],
+      starRatings: [],
+      hotelTypes: []
+    };
+    setTempFilters(emptyFilters);
+    setAppliedFilters(emptyFilters);
+    setCurrentPage(0);
+  };
 
   // Handle toggle favorite
   const handleToggleFavorite = async (e, hotelId) => {
@@ -193,27 +301,118 @@ const FilterHotel = ({ locationSlug, searchData }) => {
 
             <div className="filter-section">
               <h4>Giá phòng/đêm</h4>
-              <label className="chk"><input type="checkbox" /> Dưới 1.000.000đ</label>
-              <label className="chk"><input type="checkbox" /> 1.000.000đ - 5.000.000đ</label>
-              <label className="chk"><input type="checkbox" /> 5.000.000đ - 10.000.000đ</label>
-              <label className="chk"><input type="checkbox" /> Trên 10.000.000đ</label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.priceRanges.includes('<1000000')}
+                  onChange={() => handlePriceRangeChange('<1000000')}
+                />
+                Dưới 1.000.000đ
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.priceRanges.includes('1000000-5000000')}
+                  onChange={() => handlePriceRangeChange('1000000-5000000')}
+                />
+                1.000.000đ - 5.000.000đ
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.priceRanges.includes('5000000-10000000')}
+                  onChange={() => handlePriceRangeChange('5000000-10000000')}
+                />
+                5.000.000đ - 10.000.000đ
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.priceRanges.includes('>10000000')}
+                  onChange={() => handlePriceRangeChange('>10000000')}
+                />
+                Trên 10.000.000đ
+              </label>
             </div>
 
             <div className="filter-section">
               <h4>Đánh giá</h4>
-              <label className="chk"><input type="checkbox" /> <Stars n={5} /> </label>
-              <label className="chk"><input type="checkbox" /> <Stars n={4} /> </label>
-              <label className="chk"><input type="checkbox" /> <Stars n={3} /> </label>
-              <label className="chk"><input type="checkbox" /> <Stars n={2} /> </label>
-              <label className="chk"><input type="checkbox" /> <Stars n={1} /> </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.starRatings.includes(5)}
+                  onChange={() => handleStarRatingChange(5)}
+                />
+                <Stars n={5} />
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.starRatings.includes(4)}
+                  onChange={() => handleStarRatingChange(4)}
+                />
+                <Stars n={4} />
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.starRatings.includes(3)}
+                  onChange={() => handleStarRatingChange(3)}
+                />
+                <Stars n={3} />
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.starRatings.includes(2)}
+                  onChange={() => handleStarRatingChange(2)}
+                />
+                <Stars n={2} />
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.starRatings.includes(1)}
+                  onChange={() => handleStarRatingChange(1)}
+                />
+                <Stars n={1} />
+              </label>
             </div>
 
             <div className="filter-section">
               <h4>Loại hình lưu trú</h4>
-              <label className="chk"><input type="checkbox" /> Villa</label>
-              <label className="chk"><input type="checkbox" /> Khách sạn</label>
-              <label className="chk"><input type="checkbox" /> Căn hộ</label>
-              <label className="chk"><input type="checkbox" /> Resort</label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.hotelTypes.includes('VILLA')}
+                  onChange={() => handleHotelTypeChange('VILLA')}
+                />
+                Villa
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.hotelTypes.includes('HOTEL')}
+                  onChange={() => handleHotelTypeChange('HOTEL')}
+                />
+                Khách sạn
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.hotelTypes.includes('APARTMENT')}
+                  onChange={() => handleHotelTypeChange('APARTMENT')}
+                />
+                Căn hộ
+              </label>
+              <label className="chk">
+                <input 
+                  type="checkbox" 
+                  checked={tempFilters.hotelTypes.includes('RESORT')}
+                  onChange={() => handleHotelTypeChange('RESORT')}
+                />
+                Resort
+              </label>
             </div>
 
             <div className="filter-section">
@@ -224,7 +423,8 @@ const FilterHotel = ({ locationSlug, searchData }) => {
             </div>
 
             <div className="filter-apply">
-              <button className="btn-apply">Áp dụng bộ lọc</button>
+              <button className="btn-apply" onClick={handleApplyFilters}>Áp dụng bộ lọc</button>
+              <button className="btn-apply" onClick={handleClearFilters} style={{ marginTop: '10px', backgroundColor: '#dc3545' }}>Xóa bộ lọc</button>
             </div>
           </div>
         </aside>
@@ -305,7 +505,10 @@ const FilterHotel = ({ locationSlug, searchData }) => {
                     </div>
 
                     <div className="hotel-bottom">
-                      <button className="view-btn">
+                      <button 
+                        className="view-btn"
+                        onClick={() => navigate(`/hotel-detail/${h.id}`)}
+                      >
                         Xem phòng <i className="bi bi-chevron-right"></i>
                       </button>
                     </div>

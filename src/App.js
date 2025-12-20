@@ -73,18 +73,6 @@ function App() {
         <Route path="/promotion" element={<Promotion />} />
       </Routes>
 
-      <ToastContainer 
-        position="top-right"
-        autoClose={3000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
-
       {!isHideLayout && <Footer />}
     </>
   );
