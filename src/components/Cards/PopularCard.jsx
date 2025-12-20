@@ -80,32 +80,31 @@ const PopularCard = ({ val }) => {
   };
 
   return (
-    <div
-      style={cardStyle}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateY(-5px)';
-        e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.12)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateY(0)';
-        e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
-      }}
-    >
-      {/* Image */}
-      <img
-        src={val.thumbnail}
-        alt={val.name || "hotel"}
-        style={imgStyle}
-      />
+    <NavLink to={`/hotel-detail/${val.id}`} style={{ textDecoration: 'none' }}>
+      <div
+        style={cardStyle}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateY(-5px)';
+          e.currentTarget.style.boxShadow = '0 8px 25px rgba(0,0,0,0.12)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateY(0)';
+          e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+        }}
+      >
+        {/* Image */}
+        <img
+          src={val.thumbnail}
+          alt={val.name || "hotel"}
+          style={imgStyle}
+        />
 
-      {/* Body */}
-      <div style={bodyStyle}>
-        {/* Hotel Name */}
-        <div style={nameStyle}>
-          <NavLink to={`/hotel/${val.id}`} style={linkStyle}>
+        {/* Body */}
+        <div style={bodyStyle}>
+          {/* Hotel Name */}
+          <div style={nameStyle}>
             {val.name}
-          </NavLink>
-        </div>
+          </div>
 
         {/* Rating */}
         <div style={ratingStyle}>
@@ -121,6 +120,7 @@ const PopularCard = ({ val }) => {
         </div>
       </div>
     </div>
+    </NavLink>
   )
 }
 

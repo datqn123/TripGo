@@ -1,55 +1,66 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { Spinner } from "react-bootstrap";
+import { toast } from "react-toastify";
 import "./filter.css";
 import Banner from "../Banner/Banner";
 import AdvanceSearch from "../AdvanceSearch/AdvanceSearch";
 import { useNavigate } from "react-router-dom";
-const mockOffers = [
-    {
-        id: 1,
-        airline: "Vietnam Airlines",
-        logo: "🌟",
-        depTime: "06:00",
-        arrTime: "07:30",
-        depCity: "TP HCM",
-        arrCity: "Đà Nẵng",
-        duration: "1h 30m",
-        date: "28/12/2025",
-        oldPrice: "1.437.500đ",
-        price: "1.150.000đ",
-        discount: "-25%"
-    },
-    {
-        id: 2,
-        airline: "Vietnam Airlines",
-        logo: "🌟",
-        depTime: "18:00",
-        arrTime: "20:55",
-        depCity: "Đà Nẵng",
-        arrCity: "Singapore",
-        duration: "2h 55m",
-        date: "23/12/2025",
-        oldPrice: "6.700.000đ",
-        price: "4.275.000đ",
-        discount: "-36%"
-    },
-    {
-        id: 3,
-        airline: "Vietjet",
-        logo: "✈️",
-        depTime: "06:00",
-        arrTime: "07:30",
-        depCity: "TP.HCM",
-        arrCity: "Hà Nội",
-        duration: "1h 30m",
-        date: "25/12/2025",
-        oldPrice: "3.457.000đ",
-        price: "1.150.000đ",
-        discount: "-67%"
-    }
-];
+import { PUBLIC_API } from "../../api/config";
 
 const Outstandingoffer = () => {
     const navigate = useNavigate();
+    const [flightCards, setFlightCards] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    useEffect(() => {
+        const fetchFlightCards = async () => {
+            try {
+                setLoading(true);
+                setError(null);
+
+                const response = await fetch(PUBLIC_API.FLIGHT_CARDS, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Không thể tải danh sách chuyến bay');
+                }
+
+                const data = await response.json();
+                console.log('Flight cards:', data);
+                setFlightCards(data.result || data);
+            } catch (err) {
+                console.error('Error fetching flight cards:', err);
+                setError(err.message);
+                toast.error('Không thể tải danh sách chuyến bay');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFlightCards();
+    }, []);
+
+    // Format price
+    const formatPrice = (price) => {
+        if (!price) return '0đ';
+        return price.toLocaleString('vi-VN') + 'đ';
+    };
+
+    // Format date
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}/${month}/${year}`;
+    };
+
     return (
         <>
         <Banner/>
@@ -98,51 +109,74 @@ const Outstandingoffer = () => {
                         </div>
                     </aside>
                     <div className="outstanding-offers-container">
-                        <h3 className="offers-title">Ưu đãi nổi bật</h3>
-                        <div className="offers-grid">
-                            {mockOffers.map((offer) => (
-                                <div key={offer.id} className="offer-card-new">
-                                    <div className="offer-date-badge">
-                                        <i className="bi bi-calendar3"></i> {offer.date}
-                                    </div>
-
-                                    <div className="offer-content">
-                                        <div className="offer-flight-info">
-                                            <div className="airline-section">
-                                                <div className="airline-logo-new">{offer.logo}</div>
-                                                <div className="airline-name-new">{offer.airline}</div>
-                                            </div>
-
-                                            <div className="flight-route">
-                                                <div className="route-point">
-                                                    <div className="time-big">{offer.depTime}</div>
-                                                    <div className="city-text">{offer.depCity}</div>
-                                                </div>
-
-                                                <div className="flight-duration">
-                                                    <i className="bi bi-send"></i>
-                                                    <div className="duration-text">{offer.duration}</div>
-                                                </div>
-
-                                                <div className="route-point">
-                                                    <div className="time-big">{offer.arrTime}</div>
-                                                    <div className="city-text">{offer.arrCity}</div>
-                                                </div>
-                                            </div>
+                        <h3 className="offers-title">Chuyến bay gần nhất</h3>
+                        
+                        {loading ? (
+                            <div className="text-center py-5">
+                                <Spinner animation="border" variant="primary" />
+                                <p className="mt-3 text-muted">Đang tải danh sách chuyến bay...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="alert alert-danger" role="alert">
+                                <i className="bi bi-exclamation-triangle-fill me-2"></i>
+                                {error}
+                            </div>
+                        ) : flightCards.length === 0 ? (
+                            <div className="text-center py-5 text-muted">
+                                Hiện không có chuyến bay nào
+                            </div>
+                        ) : (
+                            <div className="offers-grid">
+                                {flightCards.map((flight) => (
+                                    <div key={flight.id} className="offer-card-new">
+                                        <div className="offer-date-badge">
+                                            <i className="bi bi-calendar3"></i> {flight.flightDate || 'N/A'}
                                         </div>
 
-                                        <div className="offer-price-section">
-                                            <div className="price-info">
-                                                <div className="old-price-new">{offer.oldPrice}</div>
-                                                <div className="flight-discount-tag">{offer.discount}</div>
+                                        <div className="offer-content">
+                                            <div className="offer-flight-info">
+                                                <div className="airline-section">
+                                                    <div className="airline-logo-new">
+                                                        {flight.airlineLogo ? (
+                                                            <img src={flight.airlineLogo} alt={flight.airlineName} style={{ width: '24px', height: '24px' }} />
+                                                        ) : (
+                                                            '✈️'
+                                                        )}
+                                                    </div>
+                                                    <div className="airline-name-new">{flight.airlineName || 'N/A'}</div>
+                                                </div>
+
+                                                <div className="flight-route">
+                                                    <div className="route-point">
+                                                        <div className="time-big">{flight.departureTime || 'N/A'}</div>
+                                                        <div className="city-text">
+                                                            {flight.departureCode || flight.departureCity || 'N/A'}
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flight-duration">
+                                                        <i className="bi bi-send"></i>
+                                                        <div className="duration-text">{flight.duration || 'N/A'}</div>
+                                                    </div>
+
+                                                    <div className="route-point">
+                                                        <div className="time-big">{flight.arrivalTime || 'N/A'}</div>
+                                                        <div className="city-text">
+                                                            {flight.arrivalCode || flight.arrivalCity || 'N/A'}
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div className="new-price-big">{offer.price}</div>
-                                            <button className="select-flight-btn">Chọn chuyến bay</button>
+
+                                            <div className="offer-price-section">
+                                                <div className="new-price-big">{formatPrice(flight.originalPrice)}</div>
+                                                <button className="select-flight-btn">Chọn chuyến bay</button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

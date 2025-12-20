@@ -44,7 +44,6 @@ const Setting = () => {
                                     alt="User"
                                 />
                                 <div>
-                                    <div className="fw-bold text-dark">Nguyễn ABC</div>
                                     <div className="text-muted small mt-2" style={{ color: '#009abb' }}>Hạng Explorer</div>
                                 </div>
                             </div>
@@ -57,9 +56,6 @@ const Setting = () => {
                                 </div>
                                 <div className={`sidebar-item ${activeTab === 'favorite' ? 'active' : ''}`} onClick={() => setActiveTab('favorite')}>
                                     <i className="bi bi-heart"></i> Yêu thích
-                                </div>
-                                <div className={`sidebar-item ${activeTab === 'cards' ? 'active' : ''}`} onClick={() => setActiveTab('cards')}>
-                                    <i className="bi bi-credit-card"></i> Thẻ của tôi
                                 </div>
                                 <div className={`sidebar-item ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
                                     <i className="bi bi-receipt"></i> Giao dịch của tôi

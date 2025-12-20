@@ -69,7 +69,7 @@ const FlightCard = ({ flight }) => {
     const routeDisplay = `${flight.fromLocation} - ${flight.toLocation}`;
 
     return (
-        <NavLink to={`/flight/${flight.id}`} style={{ textDecoration: 'none' }}>
+        <NavLink to={`/classification?flightId=${flight.id}`} style={{ textDecoration: 'none' }}>
             <div
                 style={cardStyle}
                 onMouseEnter={(e) => {

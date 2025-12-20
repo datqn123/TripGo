@@ -349,7 +349,9 @@ const Home = () => {
 
           {/* View More Button */}
           <div style={{ textAlign: 'center', marginTop: '16px' }}>
-            <button style={{
+            <button 
+              onClick={() => navigate('/filter-plane')}
+              style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',

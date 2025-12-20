@@ -1,21 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 import "../AdvanceSearch/advancesearch.css";
 import { Container, Row, Col, Button } from "react-bootstrap";
 import CustomDropdown from "../CustomDropdown/CustomDropdown";
+import { PUBLIC_API } from "../../api/config";
 
 const PlaneSearch = () => {
+  const navigate = useNavigate();
   const [departDate, setDepartDate] = useState(new Date());
   const nextDay = new Date();
   nextDay.setDate(nextDay.getDate() + 1);
   const [returnDate, setReturnDate] = useState(nextDay);
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
-  const onFromSelect = (v) => console.log("From", v);
-  const onToSelect = (v) => console.log("To", v);
+  // Location states
+  const [locations, setLocations] = useState([]);
+  const [departureLocation, setDepartureLocation] = useState(null);
+  const [arrivalLocation, setArrivalLocation] = useState(null);
+
+  // Fetch locations from API
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const response = await fetch(PUBLIC_API.DROPDOWN_LOCATIONS);
+        const data = await response.json();
+        setLocations(data.result || []);
+      } catch (error) {
+        console.error("Error fetching locations:", error);
+      }
+    };
+    fetchLocations();
+  }, []);
+
+  const onFromSelect = (locationName) => {
+    const location = locations.find(loc => loc.name === locationName);
+    if (location) {
+      setDepartureLocation(location);
+    }
+  };
+
+  const onToSelect = (locationName) => {
+    const location = locations.find(loc => loc.name === locationName);
+    if (location) {
+      setArrivalLocation(location);
+    }
+  };
+
   const onGuestSelect = (v) => console.log("Guest", v);
+
+  const handleSearch = () => {
+    if (!departureLocation || !arrivalLocation) {
+      alert("Vui lòng chọn điểm khởi hành và điểm đến");
+      return;
+    }
+
+    // Navigate to filter-plane with query parameters
+    const params = new URLSearchParams({
+      departureLocationId: departureLocation.id,
+      departureLocationName: departureLocation.name,
+      arrivalLocationId: arrivalLocation.id,
+      arrivalLocationName: arrivalLocation.name,
+    });
+
+    if (departDate) {
+      params.append('departureDate', departDate.toISOString().split('T')[0]);
+    }
+
+    navigate(`/filter-plane?${params.toString()}`);
+  };
+
+  // Get location names for dropdown options
+  const locationOptions = locations.map(loc => loc.name);
 
   return (
     <section className="box-search-advance">
@@ -30,8 +88,8 @@ const PlaneSearch = () => {
                   <span className="icon">✈️</span>
                   <div className="content">
                     <CustomDropdown
-                      label="Nơi đi"
-                      options={["Đà Nẵng", "Hà Nội", "Hồ Chí Minh"]}
+                      label={departureLocation ? departureLocation.name : "Nơi đi"}
+                      options={locationOptions}
                       onSelect={onFromSelect}
                     />
                   </div>
@@ -44,8 +102,8 @@ const PlaneSearch = () => {
                   <span className="icon">🧭</span>
                   <div className="content">
                     <CustomDropdown
-                      label="Nơi đến"
-                      options={["Hà Nội", "Đà Nẵng", "Hồ Chí Minh"]}
+                      label={arrivalLocation ? arrivalLocation.name : "Nơi đến"}
+                      options={locationOptions}
                       onSelect={onToSelect}
                     />
                   </div>
@@ -152,7 +210,7 @@ const PlaneSearch = () => {
               </div>
 
               <div style={{ display: "flex", alignItems: "flex-end" }}>
-                <Button className="search-circle">
+                <Button className="search-circle" onClick={handleSearch}>
                   <i className="bi bi-search"></i>
                 </Button>
               </div>

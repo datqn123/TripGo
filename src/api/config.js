@@ -27,6 +27,7 @@ export const PUBLIC_API = {
     
     // Favorites
     TOGGLE_FAVORITE: (hotelId) => `${API_BASE_URL}/public/favorites/hotels/${hotelId}`,
+    FAVORITE_HOTELS: `${API_BASE_URL}/public/favorites/hotels`,
     
     // Vouchers
     HOTEL_VOUCHERS: `${API_BASE_URL}/public/vouchers/hotel-page`,
@@ -34,6 +35,20 @@ export const PUBLIC_API = {
     // View History
     TRACK_VIEW: (hotelId) => `${API_BASE_URL}/public/view-history/track?hotelId=${hotelId}`,
     UPDATE_DURATION: (viewHistoryId, seconds) => `${API_BASE_URL}/public/view-history/${viewHistoryId}/duration?seconds=${seconds}`,
+    
+    // User Profile
+    USER_PROFILE: `${API_BASE_URL}/public/user/profile`,
+    
+    // Bookings
+    MY_HOTELS_BOOKINGS: `${API_BASE_URL}/public/booking/my-hotels`,
+    MY_FLIGHTS_BOOKINGS: `${API_BASE_URL}/public/booking/my-flights`,
+    MY_CANCELLED_BOOKINGS: `${API_BASE_URL}/public/booking/my-cancelled`,
+    CANCEL_BOOKING: (bookingId) => `${API_BASE_URL}/public/booking/${bookingId}/cancel`,
+    LOOKUP_BOOKING: (bookingCode) => `${API_BASE_URL}/public/booking/lookup/${bookingCode}`,
+    
+    // Flights
+    FLIGHT_CARDS: `${API_BASE_URL}/public/flights/cards`,
+    FLIGHTS_SEARCH: `${API_BASE_URL}/public/flights/search`,
 };
 
 export default API_BASE_URL;
