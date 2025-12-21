@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import tourApi from '../../../api/tourApi';
 import homeApi from '../../../api/homeApi';
-import './AddTour.css';
+import './AddTour.css'; // Reuse existing styles
 
-const AddTour = () => {
+const EditTour = () => {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
   const [locations, setLocations] = useState([]);
 
   // Form State
@@ -32,6 +33,7 @@ const AddTour = () => {
   });
 
   // Image State
+  const [existingImages, setExistingImages] = useState([]); // List of Strings (URLs)
   const [selectedFiles, setSelectedFiles] = useState([]); // List of File objects
   const [previewImages, setPreviewImages] = useState([]); // List of Strings (Blob URLs)
 
@@ -41,23 +43,72 @@ const AddTour = () => {
   const [newExclude, setNewExclude] = useState('');
   
   useEffect(() => {
-    fetchLocations();
+    fetchInitialData();
     // Cleanup blob URLs on unmount
     return () => {
         previewImages.forEach(url => URL.revokeObjectURL(url));
     };
-  }, []);
+  }, [id]);
 
-  const fetchLocations = async () => {
+  // Helper to parse potential string lists from backend
+  const parseList = (input) => {
+      if (!input) return [];
+      if (Array.isArray(input)) return input;
+      if (typeof input === 'string') {
+          // Attempt to parse if JSON
+          try {
+             const parsed = JSON.parse(input);
+             if (Array.isArray(parsed)) return parsed;
+          } catch(e) {}
+
+          // Fallback to splitting by special separator used in DB
+          if (input.includes('||')) return input.split('||');
+          return [input];
+      }
+      return [];
+  };
+
+  const fetchInitialData = async () => {
+      setLoading(true);
       try {
           // Fetch locations for dropdowns
           const locRes = await homeApi.getDropdownLocations();
           if (locRes.data && locRes.data.result) {
               setLocations(locRes.data.result);
           }
+
+          // Fetch Tour Details
+          const res = await tourApi.getTour(id);
+          if (res.data) {
+             const tour = res.data.result || res.data;
+             
+             setFormData({
+                 title: tour.title || '',
+                 slug: tour.slug || '',
+                 duration: tour.duration || '',
+                 priceAdult: tour.priceAdult || 0,
+                 priceChild: tour.priceChild || 0,
+                 price: tour.price || 0,
+                 originalPrice: tour.originalPrice || 0,
+                 maxPeople: tour.maxPeople || '',
+                 description: tour.description || '',
+                 transportation: tour.transportation || 'xe-du-lich',
+                 startLocationId: tour.startLocation?.id || tour.startLocationId || '',
+                 destinationId: tour.destination?.id || tour.destinationId || '',
+                 highlights: parseList(tour.highlights),
+                 includes: parseList(tour.includes),
+                 excludes: parseList(tour.excludes),
+                 schedules: Array.isArray(tour.schedules) ? tour.schedules.map(({ startDate, endDate, availableSeats }) => ({ startDate, endDate, availableSeats })) : [],
+                 itineraries: Array.isArray(tour.itineraries) ? tour.itineraries.map(({ dayNumber, title, description }) => ({ dayNumber, title, description })) : [],
+             });
+             setExistingImages(tour.imageUrls || []);
+          }
+
       } catch (error) {
-          console.error("Failed to fetch locations:", error);
-          toast.error("Không thể tải danh sách địa điểm");
+          console.error("Failed to fetch data:", error);
+          toast.error("Không thể tải thông tin tour");
+      } finally {
+          setLoading(false);
       }
   };
 
@@ -148,12 +199,16 @@ const AddTour = () => {
       });
   };
 
+  const removeExistingImage = (index) => {
+      setExistingImages(prev => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     try {
         const submissionData = new FormData();
         
+        // Prepare Tour JSON
         // Prepare Tour JSON with strict fields as requested
         const tourData = {
             title: formData.title,
@@ -171,7 +226,7 @@ const AddTour = () => {
             highlights: formData.highlights,
             includes: formData.includes,
             excludes: formData.excludes,
-            // imageUrls is handled by backend for creates usually, or sent empty
+            imageUrls: existingImages, // Retain remaining existing images
             schedules: formData.schedules.map(({ startDate, endDate, availableSeats }) => ({ startDate, endDate, availableSeats: Number(availableSeats) })),
             itineraries: formData.itineraries.map(({ dayNumber, title, description }) => ({ dayNumber: Number(dayNumber), title, description }))
         };
@@ -184,15 +239,13 @@ const AddTour = () => {
             submissionData.append("images", file);
         });
 
-        console.log("Creating Tour FormData:", tourData);
-        await tourApi.createTour(submissionData);
-        toast.success("Thêm tour mới thành công!");
+        console.log("Submitting Tour FormData:", tourData);
+        await tourApi.updateTour(id, submissionData);
+        toast.success("Cập nhật tour thành công!");
         navigate('/admin/tours');
     } catch (error) {
-        console.error("Create failed:", error);
-        toast.error("Thêm tour thất bại: " + (error.response?.data?.message || "Lỗi hệ thống"));
-    } finally {
-        setLoading(false);
+        console.error("Update failed:", error);
+        toast.error("Cập nhật thất bại");
     }
   };
 
@@ -200,12 +253,14 @@ const AddTour = () => {
     navigate('/admin/tours');
   };
 
+  if (loading) return <div className="p-5 text-center">Loading...</div>;
+
   return (
     <div className="add-tour">
       <div className="add-tour-header">
         <button className="back-button" onClick={handleCancel}>
           <i className="bi bi-arrow-left"></i>
-          Thêm Tour Mới
+          Chi tiết / Chỉnh sửa Tour
         </button>
       </div>
 
@@ -216,23 +271,23 @@ const AddTour = () => {
           <div className="form-grid">
             <div className="form-group full-width">
               <label>Tên Tour</label>
-              <input type="text" name="title" value={formData.title} onChange={handleInputChange} required placeholder="Nhập tên tour..." />
+              <input type="text" name="title" value={formData.title} onChange={handleInputChange} required />
             </div>
             <div className="form-group">
-              <label>Slug (URL)</label>
-              <input type="text" name="slug" value={formData.slug} onChange={handleInputChange} placeholder="tu-dong-theo-ten" />
+              <label>Slug</label>
+              <input type="text" name="slug" value={formData.slug} onChange={handleInputChange} />
             </div>
             <div className="form-group">
               <label>Thời lượng</label>
-              <input type="text" name="duration" value={formData.duration} onChange={handleInputChange} required placeholder="VD: 3 ngày 2 đêm" />
+              <input type="text" name="duration" value={formData.duration} onChange={handleInputChange} required />
             </div>
             <div className="form-group">
               <label>Số người tối đa</label>
-              <input type="text" name="maxPeople" value={formData.maxPeople} onChange={handleInputChange} placeholder="VD: 20 người" />
+              <input type="text" name="maxPeople" value={formData.maxPeople} onChange={handleInputChange} />
             </div>
              <div className="form-group">
               <label>Phương tiện</label>
-              <input type="text" name="transportation" value={formData.transportation} onChange={handleInputChange} placeholder="VD: Máy bay, Ô tô" />
+              <input type="text" name="transportation" value={formData.transportation} onChange={handleInputChange} />
             </div>
           </div>
         </div>
@@ -274,7 +329,7 @@ const AddTour = () => {
              <h2 className="section-title">Mô tả chi tiết</h2>
              <div className="form-group full-width">
                  <label>Mô tả chung</label>
-                 <textarea name="description" rows="5" value={formData.description} onChange={handleInputChange} placeholder="Nhập mô tả chi tiết tour..." />
+                 <textarea name="description" rows="5" value={formData.description} onChange={handleInputChange} />
              </div>
 
              {/* Highlights */}
@@ -291,7 +346,7 @@ const AddTour = () => {
                  </ul>
              </div>
 
-             {/* Includes */}
+             {/* Includes/Excludes simplified for brevity in this update, assume same logic */}
              <div className="list-manager mt-3">
                  <label>Bao gồm (Includes)</label>
                  <div className="input-with-button">
@@ -301,7 +356,6 @@ const AddTour = () => {
                  <ul>{Array.isArray(formData.includes) && formData.includes.map((item, idx) => (<li key={idx}>{item} <i className="bi bi-x" onClick={() => removeItem('includes', idx)}></i></li>))}</ul>
              </div>
 
-             {/* Excludes */}
              <div className="list-manager mt-3">
                  <label>Không bao gồm (Excludes)</label>
                  <div className="input-with-button">
@@ -342,13 +396,13 @@ const AddTour = () => {
                          <h4>Ngày {day.dayNumber}</h4>
                          <button type="button" className="remove-btn-icon" onClick={() => removeItineraryDay(idx)}><i className="bi bi-trash"></i></button>
                      </div>
-                     <div className="form-group"><label>Tiêu đề</label><input type="text" value={day.title} onChange={(e) => updateItinerary(idx, 'title', e.target.value)} placeholder="VD: Đón sân bay - Check in" /></div>
-                     <div className="form-group"><label>Mô tả</label><textarea rows="3" value={day.description} onChange={(e) => updateItinerary(idx, 'description', e.target.value)} placeholder="Mô tả chi tiết hoạt động..." /></div>
+                     <div className="form-group"><label>Tiêu đề</label><input type="text" value={day.title} onChange={(e) => updateItinerary(idx, 'title', e.target.value)} /></div>
+                     <div className="form-group"><label>Mô tả</label><textarea rows="3" value={day.description} onChange={(e) => updateItinerary(idx, 'description', e.target.value)} /></div>
                  </div>
              ))}
         </div>
 
-        {/* Images */}
+        {/* Images - UPDATED */}
         <div className="form-section">
            <div className="section-header">
                 <h2 className="section-title">Hình ảnh</h2>
@@ -370,7 +424,15 @@ const AddTour = () => {
            </div>
 
            <div className="uploaded-images">
-               {/* New File Previews only */}
+               {/* Existing Images */}
+               {existingImages.map((url, idx) => (
+                   <div key={`exist-${idx}`} className="image-card-edit">
+                       <img src={url} alt={`exist-${idx}`} />
+                       <button type="button" className="remove-img-btn" onClick={() => removeExistingImage(idx)}>×</button>
+                   </div>
+               ))}
+               
+               {/* New File Previews */}
                {previewImages.map((url, idx) => (
                    <div key={`new-${idx}`} className="image-card-edit">
                        <img src={url} alt={`new-${idx}`} />
@@ -380,14 +442,15 @@ const AddTour = () => {
            </div>
         </div>
 
+
         {/* Action Buttons */}
         <div className="form-actions sticky-bottom">
-          <button type="button" className="cancel-btn" onClick={handleCancel}>Hủy bỏ</button>
-          <button type="submit" className="submit-btn" disabled={loading}>{loading ? 'Đang tạo...' : 'Tạo Tour Mới'}</button>
+          <button type="button" className="cancel-btn" onClick={handleCancel}>Quay lại</button>
+          <button type="submit" className="submit-btn" disabled={loading}>Lưu thay đổi</button>
         </div>
       </form>
     </div>
   );
 };
 
-export default AddTour;
+export default EditTour;

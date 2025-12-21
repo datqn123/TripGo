@@ -6,7 +6,8 @@ let stompClient = null;
 const WebSocketService = {
   connect: (onMessageReceived) => {
     stompClient = new Client({
-      webSocketFactory: () => new SockJS('http://localhost:8080/ws'),
+      // webSocketFactory: () => new SockJS('http://localhost:8080/ws'), // Local
+      webSocketFactory: () => new SockJS('https://tripgo-api.onrender.com/ws'), // Production
       onConnect: (frame) => {
         console.log('Connected: ' + frame);
         // Example subscription

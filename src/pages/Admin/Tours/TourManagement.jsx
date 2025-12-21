@@ -1,71 +1,103 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import tourApi from '../../../api/tourApi';
 import './TourManagement.css';
 
 const TourManagement = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [tours, setTours] = useState([]);
+  const [pagination, setPagination] = useState({
+    currentPage: 0,
+    totalPages: 0,
+    totalElements: 0,
+    pageSize: 12
+  });
+
+  // Filters state
   const [searchTerm, setSearchTerm] = useState('');
   const [locationFilter, setLocationFilter] = useState('');
   const [durationFilter, setDurationFilter] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
-  // Sample data - Replace with API call
-  const tours = [
-    {
-      id: 1,
-      name: 'Ha Long Bay Cruise 2N1D',
-      image: 'https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?w=100&h=100&fit=crop',
-      location: 'Quảng Ninh',
-      duration: '2 ngày 1 đêm',
-      price: '2.500.000',
-      status: 'Hoạt động'
-    },
-    {
-      id: 2,
-      name: 'Sapa Trekking Adventure',
-      icon: '🏔️',
-      location: 'Lào Cai',
-      duration: '3 ngày 2 đêm',
-      price: '3.200.000',
-      status: 'Hoạt động'
-    },
-    {
-      id: 3,
-      name: 'Đà Nẵng - Hội An - Huế',
-      image: 'https://images.unsplash.com/photo-1583417319070-4a69db38a482?w=100&h=100&fit=crop',
-      location: 'Đà Nẵng',
-      duration: '4 ngày 3 đêm',
-      price: '4.500.000',
-      status: 'Hoạt động'
-    },
-    {
-      id: 4,
-      name: 'Phú Quốc Island Tour',
-      icon: '🏝️',
-      location: 'Kiên Giang',
-      duration: '3 ngày 2 đêm',
-      price: '5.100.000',
-      status: 'Tạm ngưng'
-    },
-    {
-      id: 5,
-      name: 'Mekong Delta Discovery',
-      image: 'https://images.unsplash.com/photo-1528127269322-539801943592?w=100&h=100&fit=crop',
-      location: 'Cần Thơ',
-      duration: '2 ngày 1 đêm',
-      price: '1.800.000',
-      status: 'Hoạt động'
+  useEffect(() => {
+    fetchTours(0);
+  }, []);
+
+  const fetchTours = async (page) => {
+    setLoading(true);
+    try {
+      const params = {
+        page: page,
+        size: pagination.pageSize,
+        // Add other filters if API supports them later
+        // title: searchTerm,
+      };
+
+      const response = await tourApi.getTours(params);
+      
+      if (response.data && response.data.result) {
+        const { content, pageable, totalPages, totalElements, size, number } = response.data.result;
+        setTours(content || []);
+        setPagination({
+          currentPage: number !== undefined ? number : (pageable?.pageNumber || 0),
+          totalPages: totalPages || 0,
+          totalElements: totalElements || 0,
+          pageSize: size || 12
+        });
+      }
+    } catch (error) {
+      console.error("Failed to fetch tours:", error);
+      toast.error("Không thể tải danh sách tour");
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const handlePageChange = (newPage) => {
+    if (newPage >= 0 && newPage < pagination.totalPages) {
+      fetchTours(newPage);
+    }
+  };
 
   const getStatusClass = (status) => {
+    // API might not return status yet, keeping this for future use or mock
     switch (status) {
-      case 'Hoạt động': return 'status-active';
-      case 'Tạm ngưng': return 'status-pending';
-      case 'Ngừng': return 'status-disabled';
+      case 'ACTIVE': return 'status-active';
+      case 'PENDING': return 'status-pending';
+      case 'DISABLED': return 'status-disabled';
       default: return '';
     }
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  };
+
+  const renderPaginationButtons = () => {
+    const pages = [];
+    const { currentPage, totalPages } = pagination;
+    
+    if (totalPages > 0) {
+        for (let i = 0; i < totalPages; i++) {
+            if (i === 0 || i === totalPages - 1 || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                 pages.push(
+                    <button 
+                        key={i} 
+                        className={`page-btn ${currentPage === i ? 'active' : ''}`}
+                        onClick={() => handlePageChange(i)}
+                    >
+                        {i + 1}
+                    </button>
+                 );
+            } else if (i === currentPage - 3 || i === currentPage + 3) {
+                pages.push(<span key={i} className="page-dots">...</span>);
+            }
+        }
+    }
+    return pages;
   };
 
   return (
@@ -129,80 +161,101 @@ const TourManagement = () => {
 
         <select className="filter-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
           <option value="">Trạng thái</option>
-          <option value="active">Hoạt động</option>
-          <option value="pending">Tạm ngưng</option>
-          <option value="disabled">Ngừng</option>
+          <option value="ACTIVE">Hoạt động</option>
+          <option value="PENDING">Tạm ngưng</option>
+          <option value="DISABLED">Ngừng</option>
         </select>
       </div>
 
       {/* Table */}
       <div className="table-container">
-        <table className="tours-table">
-          <thead>
-            <tr>
-              <th>TÊN TOUR</th>
-              <th>ĐỊA ĐIỂM</th>
-              <th>THỜI LƯỢNG</th>
-              <th>GIÁ TỪ</th>
-              <th>TRẠNG THÁI</th>
-              <th>HÀNH ĐỘNG</th>
-            </tr>
-          </thead>
-          <tbody>
-            {tours.map((tour) => (
-              <tr key={tour.id}>
-                <td>
-                  <div className="tour-info">
-                    {tour.image ? (
-                      <img src={tour.image} alt={tour.name} className="tour-image" />
-                    ) : (
-                      <div className="tour-icon">{tour.icon}</div>
-                    )}
-                    <div className="tour-name">{tour.name}</div>
-                  </div>
-                </td>
-                <td>{tour.location}</td>
-                <td>{tour.duration}</td>
-                <td className="price-cell">{tour.price} đ</td>
-                <td>
-                  <span className={`status-badge ${getStatusClass(tour.status)}`}>
-                    {tour.status}
-                  </span>
-                </td>
-                <td>
-                  <div className="action-buttons">
-                    <button className="action-btn view-btn" title="Xem chi tiết">
-                      <i className="bi bi-eye"></i>
-                    </button>
-                    <button className="action-btn edit-btn" title="Chỉnh sửa">
-                      <i className="bi bi-pencil"></i>
-                    </button>
-                    <button className="action-btn delete-btn" title="Xóa">
-                      <i className="bi bi-trash"></i>
-                    </button>
-                  </div>
-                </td>
+        {loading ? (
+           <div className="text-center p-5">Loading...</div>
+        ) : (
+          <table className="tours-table">
+            <thead>
+              <tr>
+                <th>TÊN TOUR</th>
+                <th>ĐỊA ĐIỂM</th>
+                <th>THỜI LƯỢNG</th>
+                <th>GIÁ TỪ</th>
+                
+                <th>HÀNH ĐỘNG</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {tours.map((tour) => (
+                <tr key={tour.id}>
+                  <td>
+                    <div className="tour-info">
+                      {(tour.thumbnail || (tour.imageUrls && tour.imageUrls.length > 0)) ? (
+                        <img 
+                          src={tour.thumbnail || tour.imageUrls[0]} 
+                          alt={tour.title} 
+                          className="tour-image"
+                          onError={(e) => {
+                            e.target.onerror = null; 
+                            e.target.src = 'https://via.placeholder.com/60x60?text=No+Img'
+                          }}
+                        />
+                      ) : (
+                         <div className="tour-icon text-2xl h-[50px] w-[50px] flex items-center justify-center bg-blue-100 rounded-lg">
+                            🏝️
+                         </div>
+                      )}
+                      <div className="tour-name">{tour.title}</div>
+                    </div>
+                  </td>
+                  <td>{tour.destinationName}</td>
+                  <td>{tour.duration}</td>
+                  <td className="price-cell">{formatPrice(tour.price)}</td>
+                 
+                  <td>
+                    <div className="action-buttons">
+                      <button className="action-btn view-btn" title="Xem chi tiết" onClick={() => navigate(`/admin/tours/edit/${tour.id}`)}>
+                        <i className="bi bi-eye"></i>
+                      </button>
+                      <button className="action-btn edit-btn" title="Chỉnh sửa" onClick={() => navigate(`/admin/tours/edit/${tour.id}`)}>
+                        <i className="bi bi-pencil"></i>
+                      </button>
+                      <button className="action-btn delete-btn" title="Xóa">
+                        <i className="bi bi-trash"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+              {tours.length === 0 && (
+                <tr>
+                    <td colSpan="5" className="text-center py-4">Không tìm thấy tour nào</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        )}
       </div>
 
       {/* Pagination */}
       <div className="pagination-container">
         <div className="pagination-info">
-          Hiển thị <strong>1-5</strong> trong số <strong>48</strong> kết quả
+          Hiển thị <strong>{(pagination.currentPage * pagination.pageSize) + 1}-{Math.min((pagination.currentPage + 1) * pagination.pageSize, pagination.totalElements)}</strong> trong số <strong>{pagination.totalElements}</strong> kết quả
         </div>
         <div className="pagination-controls">
-          <button className="page-btn" disabled>
+          <button 
+            className="page-btn" 
+            disabled={pagination.currentPage === 0}
+            onClick={() => handlePageChange(pagination.currentPage - 1)}
+          >
             <i className="bi bi-chevron-left"></i>
           </button>
-          <button className="page-btn active">1</button>
-          <button className="page-btn">2</button>
-          <button className="page-btn">3</button>
-          <span className="page-dots">...</span>
-          <button className="page-btn">8</button>
-          <button className="page-btn">
+          
+          {renderPaginationButtons()}
+
+          <button 
+            className="page-btn" 
+            disabled={pagination.currentPage >= pagination.totalPages - 1}
+            onClick={() => handlePageChange(pagination.currentPage + 1)}
+          >
             <i className="bi bi-chevron-right"></i>
           </button>
         </div>

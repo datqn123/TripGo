@@ -31,6 +31,7 @@ import AddHotel from "./pages/Admin/Hotels/AddHotel";
 import EditHotel from "./pages/Admin/Hotels/EditHotel";
 import TourManagement from "./pages/Admin/Tours/TourManagement";
 import AddTour from "./pages/Admin/Tours/AddTour";
+import EditTour from "./pages/Admin/Tours/EditTour";
 import FlightManagement from "./pages/Admin/Flights/FlightManagement";
 import BookingManagement from "./pages/Admin/Bookings/BookingManagement";
 import CustomerManagement from "./pages/Admin/Customers/CustomerManagement";
@@ -80,6 +81,7 @@ function App() {
           <Route path="hotels/edit/:id" element={<EditHotel />} />
           <Route path="tours" element={<TourManagement />} />
           <Route path="tours/add" element={<AddTour />} />
+          <Route path="tours/edit/:id" element={<EditTour />} />
           <Route path="flights" element={<FlightManagement />} />
           <Route path="bookings" element={<BookingManagement />} />
           <Route path="customers" element={<CustomerManagement />} />

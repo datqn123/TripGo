@@ -327,3 +327,213 @@
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
 }
+
+/* --- NEW STYLES FOR EDIT TOUR --- */
+
+/* List Manager (Highlights, Includes, Excludes) */
+.list-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-with-button {
+  display: flex;
+  gap: 8px;
+}
+
+.input-with-button input {
+  flex: 1;
+  padding: 10px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.input-with-button input:focus {
+  border-color: #0891b2;
+}
+
+.input-with-button button {
+  padding: 0 20px;
+  background: #0891b2;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.input-with-button button:hover {
+  background: #0e7490;
+}
+
+.list-manager ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.list-manager li {
+  background: #f0fdfa;
+  color: #0e7490;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #ccfbf1;
+}
+
+.list-manager li i {
+  cursor: pointer;
+  font-size: 16px;
+  color: #0e7490;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.list-manager li i:hover {
+  opacity: 1;
+  color: #ef4444;
+}
+
+/* Schedule & Itinerary Custom Styles */
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.section-header .section-title {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.add-btn-small {
+  padding: 8px 16px;
+  background: #f0fdfa;
+  color: #0891b2;
+  border: 1px solid #ccfbf1;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.add-btn-small:hover {
+  background: #0891b2;
+  color: white;
+  border-color: #0891b2;
+}
+
+.schedule-item,
+.itinerary-day-edit {
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+}
+
+.day-header-edit {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.day-header-edit h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+.remove-btn,
+.remove-btn-icon {
+  background: #fee2e2;
+  color: #991b1b;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.remove-btn:hover,
+.remove-btn-icon:hover {
+  background: #ef4444;
+  color: white;
+}
+
+.remove-btn-icon {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Image preview in Edit */
+.image-card-edit {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+}
+
+.image-card-edit img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-img-btn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0,0,0,0.5);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.remove-img-btn:hover {
+  background: #ef4444;
+}
+
+.sticky-bottom {
+  position: sticky;
+  bottom: 0;
+  background: white;
+  padding: 16px 24px;
+  margin: 0 -24px -24px -24px; /* offset parent padding */
+  border-top: 1px solid #e5e7eb;
+  z-index: 10;
+  box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+}
