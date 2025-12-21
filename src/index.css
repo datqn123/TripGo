@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@100;200;300;400;500;600;700;800;900&display=swap');
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
 @import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -17,8 +17,8 @@
   --bodyText: 16px;
   --subTitle: 18px;
   --heading: 26px;
-  --fontFamily: "Quicksand", sans-serif;
-  --fontFamily1: "Libre Baskerville", serif;
+  --fontFamily: "Lexend", sans-serif;
+  --fontFamily1: "Lexend", sans-serif;
   
 }
 

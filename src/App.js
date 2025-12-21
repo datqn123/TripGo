@@ -2,29 +2,41 @@ import { Route, Routes, useLocation } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
-import Home from "./pages/Home/Home";
-import Header from "./components/Common/Header/Header";
-import Footer from "./components/Common/Footer/Footer";
-import Login from "./pages/Login/Login";
-import Register from "./pages/Register/Register";
-import Filter from "./pages/Filter/Filter";
+import Home from "./pages/User/Home/Home";
+import Header from "./components/User/Common/Header/Header";
+import Footer from "./components/User/Common/Footer/Footer";
+import Login from "./pages/User/Login/Login";
+import Register from "./pages/User/Register/Register";
+import Filter from "./pages/User/Filter/Filter";
 
-import Payment from "./pages/Payment/Payment";
-import Classification from "./pages/Payment/Classification";
-import Hotel_Detail from "./pages/Hotel/Hotel_Detail";
-import Tour_Detail from "./pages/Tour/Detail_Tour";
-import Tour from "./pages/Tour/Tour";
-import Hotel from "./pages/Hotel/Hotel";
-import Setting from "./pages/Setting/Setting";
-import Promotion from "./pages/Promotion/Promotion";
-import Outstandingoffer from "./components/Filter/Outstandingoffer";
-import Outstandingtour from "./components/Filter/Outstandingtour";
+import Payment from "./pages/User/Payment/Payment";
+import Classification from "./pages/User/Payment/Classification";
+import Hotel_Detail from "./pages/User/Hotel/Hotel_Detail";
+import Tour_Detail from "./pages/User/Tour/Detail_Tour";
+import Tour from "./pages/User/Tour/Tour";
+import Hotel from "./pages/User/Hotel/Hotel";
+import Setting from "./pages/User/Setting/Setting";
+import Promotion from "./pages/User/Promotion/Promotion";
+import Outstandingoffer from "./components/User/Filter/Outstandingoffer";
+import Outstandingtour from "./components/User/Filter/Outstandingtour";
+
+// Admin imports
+import AdminLayout from "./pages/Admin/AdminLayout";
+import Dashboard from "./pages/Admin/Dashboard/Dashboard";
+import AdminLogin from "./pages/Admin/Login/AdminLogin";
+import HotelManagement from "./pages/Admin/Hotels/HotelManagement";
+import AddHotel from "./pages/Admin/Hotels/AddHotel";
+import TourManagement from "./pages/Admin/Tours/TourManagement";
+import AddTour from "./pages/Admin/Tours/AddTour";
+import FlightManagement from "./pages/Admin/Flights/FlightManagement";
+import BookingManagement from "./pages/Admin/Bookings/BookingManagement";
+import CustomerManagement from "./pages/Admin/Customers/CustomerManagement";
 function App() {
   const location = useLocation();
 
   // Những route không cần hiện header & footer
-  const hideLayoutRoutes = ["/login", "/register"];
-  const isHideLayout = hideLayoutRoutes.includes(location.pathname);
+  const hideLayoutRoutes = ["/login", "/register", "/admin/login"];
+  const isHideLayout = hideLayoutRoutes.includes(location.pathname) || location.pathname.startsWith('/admin');
 
   return (
     <>
@@ -43,6 +55,22 @@ function App() {
       {!isHideLayout && <Header />}
 
       <Routes>  
+        {/* Admin Login - Public */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        
+        {/* Admin Routes - Protected */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="hotels" element={<HotelManagement />} />
+          <Route path="hotels/add" element={<AddHotel />} />
+          <Route path="tours" element={<TourManagement />} />
+          <Route path="tours/add" element={<AddTour />} />
+          <Route path="flights" element={<FlightManagement />} />
+          <Route path="bookings" element={<BookingManagement />} />
+          <Route path="customers" element={<CustomerManagement />} />
+          {/* TODO: Add more admin routes here */}
+        </Route>
+
         {/* Home */}
         <Route path="/" element={<Home />} />
         {/*More : Khi nhấn xem thêm ở trang home*/}

@@ -1,0 +1,210 @@
+import React, { useEffect, useState } from "react";
+import {
+  Container,
+  Row,
+  Navbar,
+  Offcanvas,
+  Nav,
+  NavDropdown,
+} from "react-bootstrap";
+import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import Logo from "../../../../assets/images/icons/Logo.png"
+import "../Header/header.css";
+
+// Helper function để lấy tên cuối cùng
+const getLastName = (fullName) => {
+  if (!fullName) return "bạn";
+  const nameParts = fullName.trim().split(" ");
+  return nameParts[nameParts.length - 1];
+};
+
+const Header = () => {
+  const [open, setOpen] = useState(false);
+  const [isLogged, setIsLogged] = useState(false);
+  const [user, setUser] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const toggleMenu = () => {
+    setOpen(!open);
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", isSticky);
+    return () => {
+      window.removeEventListener("scroll", isSticky)
+    }
+  })
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const accessToken = localStorage.getItem("accessToken") || localStorage.getItem("token");
+    setUser(storedUser ? JSON.parse(storedUser) : null);
+    setIsLogged(!!(storedUser || accessToken));
+
+    const onStorage = (e) => {
+      if (e.key === "user" || e.key === "accessToken" || e.key === "token") {
+        const su = localStorage.getItem("user");
+        setUser(su ? JSON.parse(su) : null);
+        setIsLogged(!!(localStorage.getItem("user") || localStorage.getItem("accessToken") || localStorage.getItem("token")));
+      }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  // sticky Header 
+  const isSticky = (e) => {
+    const header = document.querySelector('.header-section');
+    if (!header) return; // Guard clause to prevent null error
+    const scrollTop = window.scrollY;
+    scrollTop >= 120 ? header.classList.add('is-sticky') :
+      header.classList.remove('is-sticky')
+  }
+
+
+
+
+  return (
+
+    <header className={`header-section ${['/paymenthotel', '/paymenttour', '/paymentplane', '/hotel-detail', '/tour-detail', '/setting'].includes(location.pathname) ? 'payment-header' : ''}`}>
+      <Container>
+
+        <Navbar expand="lg" className="p-0">
+          {/* Logo Section  */}
+          <Navbar.Brand>
+            <img
+              src={Logo}
+              alt="Trip Go Logo" />
+            <NavLink to="/"> Trip Go</NavLink>
+          </Navbar.Brand>
+          {/* End Logo Section  */}
+
+          <Navbar.Offcanvas
+            id={`offcanvasNavbar-expand-lg`}
+            aria-labelledby={`offcanvasNavbarLabel-expand-lg`}
+            placement="start"
+            show={open}
+          >
+            {/*mobile Logo Section  */}
+            <Offcanvas.Header>
+              <h1 className="logo">Weekendmonks</h1>
+              <span className="navbar-toggler ms-auto" onClick={toggleMenu}>
+                <i className="bi bi-x-lg"></i>
+              </span>
+            </Offcanvas.Header>
+            {/*end mobile Logo Section  */}
+
+            <Offcanvas.Body>
+              <Nav className="justify-content-center flex-grow-1">
+                <NavLink className="nav-link" to="/">
+                  Trang chủ
+                </NavLink>
+                <NavLink className="nav-link" to="/explore">
+                  Khám phá
+                </NavLink>
+                <NavLink className="nav-link" to="/promotion">
+                  Khuyến mãi
+                </NavLink>
+                <NavLink className="nav-link" to="/my-bookings">
+                  Đặt chỗ của tôi
+                </NavLink>
+              </Nav>
+
+              <div className="d-flex align-items-center user-section">
+                {!isLogged ? (
+                  <>
+                    <NavLink className="primaryBtn d-none d-sm-inline-block" to="/login">
+                      Đăng nhập
+                    </NavLink>
+                    <NavLink className="primaryBtn1 d-none d-sm-inline-block" style={{ color: 'black' }} to="/register">
+                      Đăng ký
+                    </NavLink>
+                  </>
+                ) : (
+                  <>
+                    <i className="bi bi-bell me-3" style={{ fontSize: '18px', color: 'white', cursor: 'pointer' }}></i>
+                    <NavDropdown
+                      className="user-dropdown"
+                      title={
+                        <span className="d-flex align-items-center">
+                          <span className="greeting-text me-2">Xin chào {getLastName(user?.fullName || user?.username)}</span>
+                          <img
+                            src={user?.avatar || "https://ui-avatars.com/api/?name=" + (user?.fullName || "U") + "&background=random&size=32"}
+                            alt="avatar"
+                            className="user-avatar"
+                          />
+                        </span>
+                      }
+                      id="user-nav-dropdown"
+                      align="end"
+                    >
+
+                      <div className="dropdown-header-section">
+                        <div className="dropdown-user-name-large">{user?.email || user?.username || "Nguyễn ABC"}</div>
+                        <div className="dropdown-membership-row">
+                          <i className="bi bi-compass"></i>
+                          <span>Bạn là thành viên hạng Explorer</span>
+                          <i className="bi bi-chevron-right ms-auto"></i>
+                        </div>
+                      </div>
+
+                      <div className="dropdown-points">
+                        <i className="bi bi-star"></i>
+                        <span style={{ paddingLeft: '7px' }}>{user?.points || 0} Điểm</span>
+                      </div>
+
+                      <NavDropdown.Divider />
+
+                      <NavDropdown.Item onClick={() => navigate('/setting', { state: { activeTab: 'account' } })} className="dropdown-menu-item">
+                        <i className="bi bi-person"></i>
+                        <span>Chỉnh sửa hồ sơ</span>
+                      </NavDropdown.Item>
+
+                      <NavDropdown.Item onClick={() => navigate('/setting', { state: { activeTab: 'favorite' } })} className="dropdown-menu-item">
+                        <i className="bi bi-heart"></i>
+                        <span>Yêu thích</span>
+                      </NavDropdown.Item>
+
+                      <NavDropdown.Item onClick={() => navigate('/setting', { state: { activeTab: 'cards' } })} className="dropdown-menu-item">
+                        <i className="bi bi-credit-card"></i>
+                        <span>Thẻ của tôi</span>
+                      </NavDropdown.Item>
+
+                      <NavDropdown.Item onClick={() => navigate('/setting', { state: { activeTab: 'history' } })} className="dropdown-menu-item">
+                        <i className="bi bi-receipt"></i>
+                        <span>Giao dịch của tôi</span>
+                      </NavDropdown.Item>
+
+                      <NavDropdown.Divider />
+
+                      <NavDropdown.Item onClick={() => {
+                        localStorage.removeItem('user');
+                        localStorage.removeItem('accessToken');
+                        localStorage.removeItem('refreshToken');
+                        localStorage.removeItem('token');
+                        setUser(null);
+                        setIsLogged(false);
+                        navigate('/');
+                      }} className="dropdown-menu-item">
+                        <i className="bi bi-box-arrow-right"></i>
+                        <span>Đăng xuất</span>
+                      </NavDropdown.Item>
+                    </NavDropdown>
+                  </>
+                )}
+                <li className="d-inline-block d-lg-none ms-3 toggle_btn">
+                  <i className={open ? "bi bi-x-lg" : "bi bi-list"} onClick={toggleMenu}></i>
+                </li>
+              </div>
+            </Offcanvas.Body>
+          </Navbar.Offcanvas>
+
+        </Navbar>
+
+      </Container>
+    </header >
+  );
+};
+
+export default Header;
