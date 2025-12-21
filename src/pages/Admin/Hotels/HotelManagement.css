@@ -192,6 +192,12 @@
   margin-bottom: 4px;
 }
 
+.hotel-address-small {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.4;
+}
+
 .hotel-id {
   font-size: 12px;
   color: #9ca3af;
@@ -402,4 +408,215 @@
     flex-direction: column;
     gap: 16px;
   }
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+  animation: slideIn 0.3s ease-out;
+}
+
+.modal-header {
+  padding: 16px 24px;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8fafc;
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  color: #94a3b8;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0;
+}
+
+.close-btn:hover {
+  color: #475569;
+}
+
+.modal-body {
+  padding: 24px;
+  color: #334155;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  background-color: #f8fafc;
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-cancel {
+  padding: 8px 16px;
+  background-color: white;
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-cancel:hover {
+  background-color: #f1f5f9;
+  border-color: #94a3b8;
+  color: #1e293b;
+}
+
+.btn-confirm-delete {
+  padding: 8px 16px;
+  background-color: #ef4444;
+  border: 1px solid #ef4444;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.btn-confirm-delete:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(-20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* Custom Dropdown Styling */
+.custom-dropdown {
+  position: relative;
+  width: 200px;
+  cursor: pointer;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  height: 42px;
+  display: flex;
+  align-items: center;
+  user-select: none;
+}
+
+.selected-value {
+  padding: 0 16px;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  color: #475569;
+}
+
+.dropdown-menu-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-top: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  display: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.dropdown-menu-list.show {
+  display: block;
+  animation: fadeIn 0.1s ease-out;
+}
+
+.dropdown-header {
+  background-color: #1d4cd6; /* Blue header from screenshot */
+  color: white;
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.dropdown-items-container {
+  max-height: 200px; /* Scrollable height */
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #475569;
+  transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+  background-color: #f1f5f9;
+  color: #0ea5e9;
+}
+
+.dropdown-item.active {
+  background-color: #e0f2fe;
+  color: #0ea5e9;
+  font-weight: 500;
+}
+
+/* Scrollbar Styling */
+.dropdown-items-container::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdown-items-container::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.dropdown-items-container::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.dropdown-items-container::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }

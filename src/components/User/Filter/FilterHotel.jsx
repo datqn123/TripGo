@@ -465,13 +465,6 @@ const FilterHotel = ({ locationSlug, searchData }) => {
             ) : (
               hotels.map((h) => (
                 <div className="hotel-card" key={h.id}>
-                  <button 
-                    className={`heart-btn ${h.isFavorite ? 'active' : ''}`}
-                    onClick={(e) => handleToggleFavorite(e, h.id)}
-                  >
-                    <i className={h.isFavorite ? "bi bi-heart-fill" : "bi bi-heart"}></i>
-                  </button>
-                  
                   <div className="hotel-media">
                     <div
                       className="main-img"
@@ -479,19 +472,11 @@ const FilterHotel = ({ locationSlug, searchData }) => {
                         backgroundImage: `url(${h.thumbnail || h.images?.[0] || '/static/media/feature-1.jpg'})`,
                       }}
                     />
-
                   </div>
 
-                  <div className="hotel-info">
+                  <div className="hotel-details">
                     <h3 className="hotel-name">{h.name}</h3>
                     
-                    <div className="hotel-price-inline">
-                      {h.originalPrice && h.originalPrice > h.minPrice && (
-                        <span className="old-price">{currency(h.originalPrice)}</span>
-                      )}
-                      <span className="price">{currency(h.minPrice)}</span>
-                    </div>
-
                     <div className="hotel-top">
                       <span className="badge">
                         <i className={`bi ${h.hotelType === 'Villas' ? 'bi-house-door' : h.hotelType === 'Căn hộ' ? 'bi-building' : 'bi-buildings'}`}></i>
@@ -501,11 +486,28 @@ const FilterHotel = ({ locationSlug, searchData }) => {
                     </div>
 
                     <div className="hotel-location">
-                      <i className="bi bi-geo-alt"></i> {h.address || h.locationName}
+                      <i className="bi bi-geo-alt-fill"></i> {h.address || h.locationName}
                     </div>
 
-                    <div className="hotel-bottom">
-                      <button 
+                  </div>
+
+                  <div className="hotel-actions">
+                    <button 
+                      className={`heart-btn ${h.isFavorite ? 'active' : ''}`}
+                      onClick={(e) => handleToggleFavorite(e, h.id)}
+                    >
+                      <i className={h.isFavorite ? "bi bi-heart-fill" : "bi bi-heart"}></i>
+                    </button>
+
+                    <div className="action-bottom">
+                       <div className="price-box">
+                          {h.originalPrice && h.originalPrice > h.minPrice && (
+                            <div className="old-price">{currency(h.originalPrice)}</div>
+                          )}
+                          <div className="price">{currency(h.minPrice)}</div>
+                       </div>
+                       
+                       <button 
                         className="view-btn"
                         onClick={() => navigate(`/hotel-detail/${h.id}`)}
                       >

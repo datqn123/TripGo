@@ -1,8 +1,8 @@
 import axios from "axios";
-import API_BASE_URL from "./config";
+import { ADMIN_API_BASE_URL, API_BASE_URL } from "./config";
 
-const axiosClient = axios.create({
-  baseURL: API_BASE_URL,
+const adminAxiosClient = axios.create({
+  baseURL: ADMIN_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -24,7 +24,7 @@ const processQueue = (error, token = null) => {
 };
 
 // Request interceptor - Gắn token vào mỗi request
-axiosClient.interceptors.request.use((config) => {
+adminAxiosClient.interceptors.request.use((config) => {
   const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
@@ -33,7 +33,7 @@ axiosClient.interceptors.request.use((config) => {
 });
 
 // Response interceptor - Xử lý 401 và tự động refresh token
-axiosClient.interceptors.response.use(
+adminAxiosClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
@@ -53,7 +53,7 @@ axiosClient.interceptors.response.use(
         })
           .then((token) => {
             originalRequest.headers.Authorization = `Bearer ${token}`;
-            return axiosClient(originalRequest);
+            return adminAxiosClient(originalRequest);
           })
           .catch((err) => Promise.reject(err));
       }
@@ -67,21 +67,27 @@ axiosClient.interceptors.response.use(
         // Không có refresh token -> logout
         isRefreshing = false;
         localStorage.clear();
-        // Check if on admin page
-        const isAdminPage = window.location.pathname.startsWith('/admin');
-        window.location.href = isAdminPage ? "/admin/login" : "/login";
+        window.location.href = "/admin/login";
         return Promise.reject(error);
       }
 
       try {
         // Gọi API refresh token (dùng axios trực tiếp để tránh loop)
-        console.log('[Refresh Token] Attempting to refresh with token:', refreshToken?.substring(0, 20) + '...');
+        // Lưu ý: Endpoint refresh token có thể vẫn nằm ở public API hoặc admin API tùy backend.
+        // Giả sử nó nằm ở API chung hoặc bạn muốn point về Admin API?
+        // User yêu cầu base admin riêng, nhưng endpoint refresh thường chung.
+        // Tuy nhiên, để an toàn, ta dùng API_BASE_URL cho refresh token nếu backend chưa tách, 
+        // hoặc ADMIN_API_BASE_URL nếu backend đã tách authen.
+        // Vì user chỉ yêu cầu đổi base url, tôi sẽ dùng ADMIN_API_BASE_URL cho đồng bộ context admin.
         
+        console.log('[Admin Refresh Token] Attempting to refresh with token:', refreshToken?.substring(0, 20) + '...');
+        
+        // Use API_BASE_URL for auth consistency
         const res = await axios.post(`${API_BASE_URL}/auth/refresh-token`, {
           refreshToken,
         });
 
-        console.log('[Refresh Token] API Response:', res.data);
+        console.log('[Admin Refresh Token] API Response:', res.data);
 
         // Lấy token từ nhiều cấu trúc response khác nhau
         const newAccessToken = 
@@ -96,8 +102,8 @@ axiosClient.interceptors.response.use(
           res.data?.refreshToken ||
           res.data?.data?.refreshToken;
 
-        console.log('[Refresh Token] New Access Token:', newAccessToken ? 'Found' : 'Not Found');
-        console.log('[Refresh Token] New Refresh Token:', newRefreshToken ? 'Found' : 'Not Found');
+        console.log('[Admin Refresh Token] New Access Token:', newAccessToken ? 'Found' : 'Not Found');
+        console.log('[Admin Refresh Token] New Refresh Token:', newRefreshToken ? 'Found' : 'Not Found');
 
         if (newAccessToken) {
           localStorage.setItem("accessToken", newAccessToken);
@@ -109,26 +115,24 @@ axiosClient.interceptors.response.use(
             localStorage.setItem("refreshToken", newRefreshToken);
           }
 
-          console.log('[Refresh Token] Tokens saved to localStorage successfully');
+          console.log('[Admin Refresh Token] Tokens saved to localStorage successfully');
 
           // Xử lý các request đang chờ
           processQueue(null, newAccessToken);
 
           // Retry request gốc với token mới
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          return axiosClient(originalRequest);
+          return adminAxiosClient(originalRequest);
         } else {
-          console.error('[Refresh Token] No access token found in response');
+          console.error('[Admin Refresh Token] No access token found in response');
           throw new Error("No access token in response");
         }
       } catch (refreshError) {
         // Refresh token hết hạn hoặc lỗi -> logout
-        console.error('[Refresh Token] Refresh failed:', refreshError);
+        console.error('[Admin Refresh Token] Refresh failed:', refreshError);
         processQueue(refreshError, null);
         localStorage.clear();
-        // Check if on admin page
-        const isAdminPage = window.location.pathname.startsWith('/admin');
-        window.location.href = isAdminPage ? "/admin/login" : "/login";
+        window.location.href = "/admin/login";
         return Promise.reject(refreshError);
       } finally {
         isRefreshing = false;
@@ -139,4 +143,4 @@ axiosClient.interceptors.response.use(
   }
 );
 
-export default axiosClient;
+export default adminAxiosClient;

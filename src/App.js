@@ -1,4 +1,6 @@
 import { Route, Routes, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import WebSocketService from "./services/WebSocketService";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./App.css";
@@ -26,6 +28,7 @@ import Dashboard from "./pages/Admin/Dashboard/Dashboard";
 import AdminLogin from "./pages/Admin/Login/AdminLogin";
 import HotelManagement from "./pages/Admin/Hotels/HotelManagement";
 import AddHotel from "./pages/Admin/Hotels/AddHotel";
+import EditHotel from "./pages/Admin/Hotels/EditHotel";
 import TourManagement from "./pages/Admin/Tours/TourManagement";
 import AddTour from "./pages/Admin/Tours/AddTour";
 import FlightManagement from "./pages/Admin/Flights/FlightManagement";
@@ -37,6 +40,17 @@ function App() {
   // Những route không cần hiện header & footer
   const hideLayoutRoutes = ["/login", "/register", "/admin/login"];
   const isHideLayout = hideLayoutRoutes.includes(location.pathname) || location.pathname.startsWith('/admin');
+
+  useEffect(() => {
+    WebSocketService.connect();
+    return () => {
+      WebSocketService.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
 
   return (
     <>
@@ -63,6 +77,7 @@ function App() {
           <Route index element={<Dashboard />} />
           <Route path="hotels" element={<HotelManagement />} />
           <Route path="hotels/add" element={<AddHotel />} />
+          <Route path="hotels/edit/:id" element={<EditHotel />} />
           <Route path="tours" element={<TourManagement />} />
           <Route path="tours/add" element={<AddTour />} />
           <Route path="flights" element={<FlightManagement />} />

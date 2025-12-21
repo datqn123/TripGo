@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import adminAuthApi from '../../../api/adminAuthApi';
+import { useAuth } from '../../../context/AuthContext';
 import './AdminHeader.css';
 
 const AdminHeader = () => {
@@ -15,10 +18,21 @@ const AdminHeader = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const handleLogout = () => {
-    // TODO: Implement logout logic
-    localStorage.removeItem('token');
-    navigate('/login');
+  const { logout } = useAuth();
+  
+  const handleLogout = async () => {
+    try {
+      await adminAuthApi.logout();
+    } catch (error) {
+      console.error("Logout API error:", error);
+    }
+
+    logout();
+    localStorage.removeItem('userRole');
+    localStorage.removeItem('userName');
+    
+    toast.info('Đã đăng xuất');
+    navigate('/admin/login');
   };
 
   const adminName = localStorage.getItem('userName') || 'Admin';

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import adminAuthApi from '../../../api/adminAuthApi';
+import { useAuth } from '../../../context/AuthContext';
 import './AdminLogin.css';
 
 const AdminLogin = () => {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -21,37 +24,43 @@ const AdminLogin = () => {
 
     setLoading(true);
 
-    // TODO: Replace with real API call
-    setTimeout(() => {
-      // Temporary login - accept any credentials
-      localStorage.setItem('token', 'admin-token');
-      localStorage.setItem('userRole', 'ADMIN');
-      localStorage.setItem('userName', email.split('@')[0]);
-      
-      toast.success('Đăng nhập thành công!');
-      navigate('/admin');
-      setLoading(false);
-    }, 1000);
-
-    // Real API call would look like:
-    /*
     try {
-      const response = await authApi.adminLogin({ email, password });
-      if (response.code === 1000) {
-        localStorage.setItem('token', response.result.token);
-        localStorage.setItem('userRole', 'ADMIN');
-        localStorage.setItem('userName', response.result.name);
-        toast.success('Đăng nhập thành công!');
-        navigate('/admin');
-      } else {
-        toast.error(response.message || 'Đăng nhập thất bại');
+      const res = await adminAuthApi.login({ email, password });
+      // Structure based on user info: 
+      // res.data.result = { id, email, fullName, roles: [ {name: 'ADMIN'} or 'ADMIN' ], accesToken, refreshToken }
+      const userData = res.data.result;
+      
+      if (userData) {
+        // Check for ADMIN role
+        // Assuming roles is a Set/Array of objects or strings. handling both just in case.
+        const isAdmin = userData.roles && userData.roles.some(role => {
+           const roleName = typeof role === 'object' ? role.name : role;
+           return roleName === 'ADMIN';
+        });
+
+        if (isAdmin) {
+          const token = userData.accesToken || userData.accessToken;
+          
+          // Legacy support
+          localStorage.setItem('token', token);
+          localStorage.setItem('userRole', 'ADMIN'); 
+          
+          // Update Context
+          login(userData, token, userData.refreshToken);
+          
+          toast.success('Đăng nhập thành công!');
+          navigate('/admin');
+        } else {
+          toast.error('Tài khoản không có quyền truy cập Admin');
+        }
       }
     } catch (error) {
-      toast.error('Lỗi kết nối. Vui lòng thử lại.');
+      console.error(error);
+      const message = error?.response?.data?.message || 'Đăng nhập thất bại';
+      toast.error(message);
     } finally {
       setLoading(false);
     }
-    */
   };
 
   return (

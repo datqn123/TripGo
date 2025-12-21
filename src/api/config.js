@@ -6,6 +6,7 @@
 
 // Local development (uncomment to use)
 export const API_BASE_URL = "http://localhost:8080/api";
+export const ADMIN_API_BASE_URL = "http://localhost:8080/api/admin";
 
 // Helper function to build full API URL
 export const buildApiUrl = (endpoint) => {

@@ -7,9 +7,22 @@ import './AdminLayout.css';
 const AdminLayout = () => {
   // Check admin authentication
   const isAdmin = () => {
-    const token = localStorage.getItem('token');
-    const userRole = localStorage.getItem('userRole');
-    return token && userRole === 'ADMIN';
+    const token = localStorage.getItem('accessToken') || localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    
+    if (!token || !userStr) return false;
+    
+    try {
+      const user = JSON.parse(userStr);
+      // Check roles for ADMIN
+      // Roles might be array of objects or strings
+      return user.roles && user.roles.some(role => {
+         const roleName = typeof role === 'object' ? role.name : role;
+         return roleName === 'ADMIN';
+      });
+    } catch (e) {
+      return false;
+    }
   };
 
   // Redirect to admin login if not authenticated

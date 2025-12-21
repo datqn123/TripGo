@@ -1,14 +1,29 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import authApi from '../../../api/authApi';
+import { useAuth } from '../../../context/AuthContext';
 import './Sidebar.css';
 
 const Sidebar = () => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('userRole');
-    localStorage.removeItem('userName');
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      // Call API to invalidate token (optional, based on backend)
+      await authApi.logout();
+    } catch (error) {
+      console.error("Logout API error:", error);
+    }
+
+    // Clear local storage and context
+    logout();
+    localStorage.removeItem('userRole'); // Ensure legacy key is removed
+    localStorage.removeItem('userName'); // Ensure legacy key is removed
+    
+    toast.info('Đã đăng xuất');
     navigate('/admin/login');
   };
 

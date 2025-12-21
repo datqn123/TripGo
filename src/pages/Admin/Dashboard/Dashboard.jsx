@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import './Dashboard.css';
+import adminApi from '../../../api/adminApi';
 
 const Dashboard = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [statsData, setStatsData] = useState({
+    totalReward: 0,
+    totalBooking: 0, 
+    totalHotel: 0,
+    totalTour: 0
+  });
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -11,13 +18,31 @@ const Dashboard = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Sample data - Replace with real API calls
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await adminApi.getTotalInfo();
+        if (response.data && response.data.result) {
+          setStatsData(response.data.result);
+        }
+      } catch (error) {
+        console.error("Failed to fetch dashboard stats:", error);
+      }
+    };
+
+    fetchStats();
+  }, []);
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount);
+  };
+
   const stats = [
     {
       id: 1,
       title: 'Tổng Doanh thu',
-      value: '45.000.000 VND',
-      change: '+12.5%',
+      value: formatCurrency(statsData.totalRevenue || 0),
+      change: '+12.5%', // Keep static for now or calculate if historical data available
       icon: 'bi-wallet2',
       color: '#10b981',
       bgColor: '#d1fae5'
@@ -25,7 +50,7 @@ const Dashboard = () => {
     {
       id: 2,
       title: 'Tổng Lượt đặt chỗ',
-      value: '8,883',
+      value: (statsData.totalBooking || 0).toLocaleString(),
       change: '+4.5%',
       icon: 'bi-calendar-check',
       color: '#3b82f6',
@@ -34,7 +59,7 @@ const Dashboard = () => {
     {
       id: 3,
       title: 'Khách sạn đang hoạt động',
-      value: '1,290',
+      value: (statsData.totalHotel || 0).toLocaleString(),
       change: '+3.1%',
       icon: 'bi-building',
       color: '#06b6d4',
@@ -43,7 +68,7 @@ const Dashboard = () => {
     {
       id: 4,
       title: 'Tour đang hoạt động',
-      value: '450',
+      value: (statsData.totalTour || 0).toLocaleString(),
       change: '+12.5%',
       icon: 'bi-signpost-2',
       color: '#f97316',

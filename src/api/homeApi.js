@@ -27,6 +27,12 @@ const homeApi = {
 
   // GET /api/public/home/flights
   getFlights: (params) => axiosClient.get(`${PREFIX}/flights`, { params }),
+
+  // GET /api/public/locations/dropdown
+  getDropdownLocations: () => axiosClient.get(`public/locations/dropdown`),
+
+  // GET /api/public/amenities
+  getAmenities: () => axiosClient.get(`public/amenities`),
 };
 
 export default homeApi;

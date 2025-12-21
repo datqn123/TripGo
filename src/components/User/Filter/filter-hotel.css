@@ -207,63 +207,49 @@
   gap: 16px;
 }
 
-/* Hotel Card - Matching the design */
+/* Hotel Card - 3 Column Layout */
 .hotel-card {
-  display: grid;
-  grid-template-columns: 260px 1fr;
-  gap: 20px;
-  align-items: stretch;
+  display: flex;
+  gap: 24px;
   background: #fff;
-  padding: 16px;
+  padding: 20px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border: 1px solid #e5e7eb;
   transition: all 0.3s;
   position: relative;
+  align-items: stretch;
 }
 
 .hotel-card:hover {
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   transform: translateY(-2px);
+  border-color: #0ea5e9;
 }
 
-/* Image Gallery */
+/* 1. Left Column: Media */
 .hotel-media {
-  display: grid;
-  grid-template-rows: 1fr auto;
-  gap: 8px;
+  width: 280px;
+  flex-shrink: 0;
 }
 
 .main-img {
   width: 100%;
-  height: 160px;
+  height: 100%;
+  min-height: 180px;
   background-size: cover;
   background-position: center;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
 }
 
-.thumbs {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 6px;
-}
-
-.thumb {
-  width: 100%;
-  aspect-ratio: 3/2;
-  background-size: cover;
-  background-position: center;
-  border-radius: 6px;
-  overflow: hidden;
-}
-
-/* Hotel Info */
-.hotel-info {
+/* 2. Middle Column: Details */
+.hotel-details {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 4px 0;
+  gap: 12px;
+  padding-right: 16px;
 }
 
 .hotel-name {
@@ -272,25 +258,6 @@
   font-weight: 700;
   color: #1e293b;
   line-height: 1.3;
-}
-
-.hotel-price-inline {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  margin: 4px 0;
-}
-
-.hotel-price-inline .old-price {
-  text-decoration: line-through;
-  color: #94a3b8;
-  font-size: 14px;
-}
-
-.hotel-price-inline .price {
-  font-size: 24px;
-  font-weight: 700;
-  color: #0ea5e9;
 }
 
 .hotel-top {
@@ -311,10 +278,6 @@
   font-size: 13px;
 }
 
-.badge i {
-  font-size: 14px;
-}
-
 .stars {
   display: flex;
   align-items: center;
@@ -323,21 +286,21 @@
 
 .stars .star {
   color: #fbbf24;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .hotel-location {
   display: flex;
   align-items: center;
-  gap: 6px;
-  color: #64748b;
-  font-size: 14px;
+  gap: 8px;
+  color: #1e293b;
+  font-size: 15px;
   font-weight: 500;
 }
 
 .hotel-location i {
   color: #0ea5e9;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .hotel-tags {
@@ -349,96 +312,101 @@
 
 .tag {
   background: #f1f5f9;
-  color: #475569;
+  color: #64748b;
   padding: 6px 12px;
   border-radius: 6px;
   font-size: 13px;
   font-weight: 500;
 }
 
-/* Hotel Price Row - Below Address */
-.hotel-price-row {
+/* 3. Right Column: Actions */
+.hotel-actions {
+  width: 220px;
+  flex-shrink: 0;
+  border-left: 1px solid #e5e7eb;
+  padding-left: 24px;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid #f1f5f9;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-end;
+  position: relative;
 }
 
-.old-price {
-  color: #94a3b8;
-  text-decoration: line-through;
-  font-size: 14px;
-}
-
-.price {
-  color: #0ea5e9;
-  font-weight: 700;
-  font-size: 22px;
-}
-
-/* Heart Button - Top Right of Card */
 .heart-btn {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  background: #fff;
+  background: none;
   border: none;
   cursor: pointer;
-  padding: 8px;
-  color: #ef4444;
-  font-size: 20px;
-  transition: all 0.2s;
-  border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
+  color: #ef4444; /* Force red color always per design */
+  font-size: 24px;
+  padding: 0;
+  transition: transform 0.2s;
+  /* Override absolute positioning from old CSS */
+  position: static; 
+  width: auto;
+  height: auto;
+  box-shadow: none;
+  display: block;
+  margin-bottom: auto; /* Push everything else down */
 }
 
 .heart-btn:hover {
   transform: scale(1.1);
 }
 
-.heart-btn.active i,
-.heart-btn:hover i {
-  color: #dc2626;
+.action-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 16px;
+  width: 100%;
+}
+
+.price-box {
+  text-align: right;
+}
+
+.old-price {
+  color: #94a3b8;
+  text-decoration: line-through;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.price {
+  font-size: 26px;
+  font-weight: 700;
+  color: #0ea5e9;
+  line-height: 1;
 }
 
 .view-btn {
+  width: 100%;
   background: #0ea5e9;
   color: #fff;
   border: none;
-  padding: 10px 20px;
+  padding: 12px;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  font-size: 14px;
-  display: inline-flex;
+  font-size: 15px;
+  display: flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
   transition: all 0.3s;
-  white-space: nowrap;
-  margin-left: auto;
 }
 
 .view-btn:hover {
   background: #0284c7;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+  box-shadow: 0 4px 12px rgba(14, 165, 233, 0.3);
 }
 
-.view-btn i {
-  font-size: 12px;
-  transition: transform 0.2s;
-}
-
-.view-btn:hover i {
-  transform: translateX(2px);
+/* Clean up unused classes if any */
+.hotel-price-inline,
+.hotel-bottom,
+.hotel-info,
+.hotel-price-row {
+  display: none;
 }
 
 /* Pagination */
