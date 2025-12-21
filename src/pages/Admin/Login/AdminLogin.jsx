@@ -66,7 +66,7 @@ const AdminLogin = () => {
   return (
     <div className="admin-login-container">
       {/* Left Side - Banner */}
-      <div className="banner_login">
+      <div className="banner_login" style={{ backgroundImage: "url('/admin/banner_login.png')" }}>
         <div className="banner-overlay"></div>
         
         {/* Logo at top-left - outside banner-content */}

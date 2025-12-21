@@ -7,7 +7,7 @@
 /* Left Side - Banner */
 .banner_login {
   flex: 1;
-  background-image: url('D:\Source Travell\DACN2\public\admin\banner_login.png');
+  /* background-image removed: handled inline in JSX */
   background-size: cover;
   background-position: center;
   position: relative;
