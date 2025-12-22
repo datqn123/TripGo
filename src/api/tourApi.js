@@ -17,7 +17,7 @@ const tourApi = {
    */
   searchTours: (params) => axiosClient.get(`${PREFIX}/tours/search`, { params }),
 
-  getTour: (id) => axiosClient.get(`/admin/tours/${id}`),
+  getTour: (id) => axiosClient.get(`${PREFIX}/tours/${id}`),
 
   createTour: (data) => axiosClient.post(`/admin/tours`, data, {
     headers: { "Content-Type": "multipart/form-data" }

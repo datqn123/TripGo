@@ -114,7 +114,7 @@ function App() {
         <Route path="/classification" element={<Classification />} />
         {/* Details */}
         <Route path="/hotel-detail/:id" element={<Hotel_Detail />} />
-        <Route path="/tour-detail" element={<Tour_Detail />} />
+        <Route path="/tours/:id" element={<Tour_Detail />} />
         {/* Setting */}
         <Route path="/setting" element={<Setting />} />
         {/* Promotion */}

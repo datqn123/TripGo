@@ -1,11 +1,47 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Banner from "../../../components/User/Banner/Banner";
 import AdvanceSearch from "../../../components/User/AdvanceSearch/AdvanceSearch";
 import { Container, Row, Col, Card, Badge, Button } from 'react-bootstrap';
 import './tour.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
+import tourApi from "../../../api/tourApi";
+
 const Tour = () => {
     const navigate = useNavigate();
+    const location = useLocation();
+    const [tours, setTours] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [filters, setFilters] = useState({
+        page: 0,
+        size: 12,
+        name: location.state?.name || '',
+        destinationId: '',
+        priceRange: '',
+        sortBy: 'id',
+        sortDir: 'desc'
+    });
+
+    useEffect(() => {
+        const fetchTours = async () => {
+            setLoading(true);
+            try {
+                const response = await tourApi.searchTours(filters);
+                // Check struct: response.data.result.content if paged, or response.data.result
+                if (response && response.data && response.data.result) {
+                    setTours(response.data.result.content || response.data.result.tours || response.data.result || []);
+                }
+            } catch (error) {
+                console.error("Failed to fetch tours:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchTours();
+    }, [filters]);
+
+    const formatPrice = (price) => {
+        return price ? price.toLocaleString('vi-VN') + ' VND' : 'Liên hệ';
+    };
     // Mock Data
     const categories = [
         { icon: "bi-grid-fill", label: "Tất cả" },
@@ -148,16 +184,21 @@ const Tour = () => {
                     {/* Discover Vietnam */}
                     <div className="mb-5">
                         <h4 className="fw-bold mb-3 d-flex align-items-center gap-2 text-primary" style={{ fontSize: '30px' }}>
-                            <i className="bi bi-signpost-2-fill"></i> Khám phá Việt Nam
+                            <i className="bi bi-signpost-2-fill"></i> Khám phá Tour
                         </h4>
 
                         <div className="d-flex gap-2 overflow-auto pb-3 mb-2 no-scrollbar">
+                             {/* Keep Vietnam Places filters for demo/future implementation - clicking could update filters.destinationId */}
                             {vietnamPlaces.map((place, idx) => (
                                 <Button
                                     key={idx}
                                     variant={activeVN === place ? "primary" : "outline-secondary"}
                                     className="rounded-pill fw-medium px-4 border-opacity-25 text-nowrap"
-                                    onClick={() => setActiveVN(place)}
+                                    onClick={() => {
+                                        setActiveVN(place);
+                                        // TODO: Map place name to destination ID if API supports name search or get ID map
+                                        setFilters({...filters, name: place}); 
+                                    }}
                                 >
                                     {place}
                                 </Button>
@@ -165,107 +206,64 @@ const Tour = () => {
                         </div>
 
                         <Row className="g-4">
-                            {tourData.map((item, idx) => (
-                                <Col md={6} lg={3} key={idx}>
-                                    <div className="position-relative cursor-pointer">
-                                        <Card className="tour-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                                            <div className="position-relative">
-                                                <Card.Img variant="top" src={item.image} height="200" className="object-fit-cover" />
-                                                <Badge bg="danger" className="position-absolute top-0 end-0 m-3 py-2 px-3 rounded-pill">
-                                                    <span style={{ color: "white" }}>{item.discount}</span>
-                                                </Badge>
-                                                <div className="card-heart-icon position-absolute top-0 start-0 m-3 text-white">
-                                                    <i className="bi bi-heart"></i>
-                                                </div>
+                            {loading ? (
+                                <div className="text-center py-5">Đang tải danh sách tour...</div>
+                            ) : (
+                                tours.length > 0 ? (
+                                    tours.map((item, idx) => (
+                                        <Col md={6} lg={3} key={item.id || idx}>
+                                            <div className="position-relative cursor-pointer" onClick={() => navigate(`/tours/${item.id}`)}>
+                                                <Card className="tour-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
+                                                    <div className="position-relative">
+                                                        <Card.Img variant="top" src={item.image || item.thumbnail || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b"} height="200" className="object-fit-cover" />
+                                                        {item.discount && (
+                                                            <Badge bg="danger" className="position-absolute top-0 end-0 m-3 py-2 px-3 rounded-pill">
+                                                                <span style={{ color: "white" }}>{item.discount}</span>
+                                                            </Badge>
+                                                        )}
+                                                        <div className="card-heart-icon position-absolute top-0 start-0 m-3 text-white">
+                                                            <i className="bi bi-heart"></i>
+                                                        </div>
+                                                    </div>
+                                                    <Card.Body className="d-flex flex-column p-3">
+                                                        <div className="text-secondary x-small mb-1"><i className="bi bi-geo-alt-fill"></i> {item.destinationName || item.location || "Việt Nam"}</div>
+                                                        <Card.Title className="fw-bold fs-6 mb-2 text-truncate-2 title-min-h">{item.title || item.name}</Card.Title>
+
+                                                        <div className="d-flex gap-3 mb-2 x-small text-muted">
+                                                            <span><i className="bi bi-calendar3"></i> {item.duration || "N/A"}</span>
+                                                            <span><i className="bi bi-people-fill"></i> {item.maxGuests || item.guests || "N/A"}</span>
+                                                        </div>
+                                                        <div className="d-flex align-items-center gap-1 mb-3 x-small">
+                                                            <i className="bi bi-star-fill text-warning"></i>
+                                                            <span className="fw-bold">{item.rating || 4.5}</span>
+                                                            <span className="text-muted">({item.reviews || 0} đánh giá)</span>
+                                                        </div>
+
+                                                        <div className="mt-auto">
+                                                            {item.oldPrice && <div className="text-decoration-line-through text-muted x-small">{formatPrice(item.oldPrice)}</div>}
+                                                            <div className="text-primary fw-bold fs-5">{formatPrice(item.price)}</div>
+                                                        </div>
+                                                    </Card.Body>
+                                                </Card>
                                             </div>
-                                            <Card.Body className="d-flex flex-column p-3">
-                                                <div className="text-secondary x-small mb-1"><i className="bi bi-geo-alt-fill"></i> {item.location}</div>
-                                                <Card.Title className="fw-bold fs-6 mb-2 text-truncate-2 title-min-h">{item.title}</Card.Title>
-
-                                                <div className="d-flex gap-3 mb-2 x-small text-muted">
-                                                    <span><i className="bi bi-calendar3"></i> {item.duration}</span>
-                                                    <span><i className="bi bi-people-fill"></i> {item.guests}</span>
-                                                </div>
-                                                <div className="d-flex align-items-center gap-1 mb-3 x-small">
-                                                    <i className="bi bi-star-fill text-warning"></i>
-                                                    <span className="fw-bold">{item.rating}</span>
-                                                    <span className="text-muted">({item.reviews} đánh giá)</span>
-                                                </div>
-
-                                                <div className="mt-auto">
-                                                    <div className="text-decoration-line-through text-muted x-small">{item.oldPrice}</div>
-                                                    <div className="text-primary fw-bold fs-5">{item.price}</div>
-                                                </div>
-                                            </Card.Body>
-                                        </Card>
-                                        {idx === 0 && <div className="nav-arrow prev"><i className="bi bi-chevron-left"></i></div>}
-                                        {idx === 3 && <div className="nav-arrow next"><i className="bi bi-chevron-right"></i></div>}
-                                    </div>
-                                </Col>
-                            ))}
+                                        </Col>
+                                    ))
+                                ) : (
+                                    <Col xs={12} className="text-center py-5">
+                                        Không tìm thấy tour nào phù hợp.
+                                    </Col>
+                                )
+                            )}
                         </Row>
                     </div>
+
+                    {/* Discover World - For now, hide or reuse the same logic if we want to show world tours specifically. 
+                        Let's hide it for now to avoid duplication or implementing complex logic without clear requirements.
+                     */}
+                    {/* <div className="mb-5"> ... </div> */}
 
                     {/* Discover World */}
-                    <div className="mb-5">
-                        <h4 className="fw-bold mb-3 d-flex align-items-center gap-2 text-primary" style={{ fontSize: '30px' }}>
-                            <i className="bi bi-globe"></i> Khám phá thế giới
-                        </h4>
 
-                        <div className="d-flex gap-2 overflow-auto pb-3 mb-2 no-scrollbar">
-                            {worldPlaces.map((place, idx) => (
-                                <Button
-                                    key={idx}
-                                    variant={activeWorld === place ? "primary" : "outline-secondary"}
-                                    className="rounded-pill fw-medium px-4 border-opacity-25 text-nowrap"
-                                    onClick={() => setActiveWorld(place)}
-                                >
-                                    {place}
-                                </Button>
-                            ))}
-                        </div>
-
-                        <Row className="g-4">
-                            {tourData.map((item, idx) => (
-                                <Col md={6} lg={3} key={idx}>
-                                    <div className="position-relative cursor-pointer">
-                                        <Card className="tour-card h-100 border-0 shadow-sm rounded-4 overflow-hidden">
-                                            <div className="position-relative">
-                                                <Card.Img variant="top" src={item.image} height="200" className="object-fit-cover" />
-                                                <Badge bg="danger" className="position-absolute top-0 end-0 m-3 py-2 px-3 rounded-pill">
-                                                    <span style={{ color: "white" }}>{item.discount}</span>
-                                                </Badge>
-                                                <div className="card-heart-icon position-absolute top-0 start-0 m-3 text-white">
-                                                    <i className="bi bi-heart"></i>
-                                                </div>
-                                            </div>
-                                            <Card.Body className="d-flex flex-column p-3">
-                                                <div className="text-secondary x-small mb-1"><i className="bi bi-geo-alt-fill"></i> {item.location}</div>
-                                                <Card.Title className="fw-bold fs-6 mb-2 text-truncate-2 title-min-h">{item.title}</Card.Title>
-
-                                                <div className="d-flex gap-3 mb-2 x-small text-muted">
-                                                    <span><i className="bi bi-calendar3"></i> {item.duration}</span>
-                                                    <span><i className="bi bi-people-fill"></i> {item.guests}</span>
-                                                </div>
-                                                <div className="d-flex align-items-center gap-1 mb-3 x-small">
-                                                    <i className="bi bi-star-fill text-warning"></i>
-                                                    <span className="fw-bold">{item.rating}</span>
-                                                    <span className="text-muted">({item.reviews} đánh giá)</span>
-                                                </div>
-
-                                                <div className="mt-auto">
-                                                    <div className="text-decoration-line-through text-muted x-small">{item.oldPrice}</div>
-                                                    <div className="text-primary fw-bold fs-5">{item.price}</div>
-                                                </div>
-                                            </Card.Body>
-                                        </Card>
-                                        {idx === 0 && <div className="nav-arrow prev"><i className="bi bi-chevron-left"></i></div>}
-                                        {idx === 3 && <div className="nav-arrow next"><i className="bi bi-chevron-right"></i></div>}
-                                    </div>
-                                </Col>
-                            ))}
-                        </Row>
-                    </div>
 
                 </Container>
             </div>

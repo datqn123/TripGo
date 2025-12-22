@@ -1,130 +1,114 @@
-import React, { useState } from 'react';
-import { Container, Row, Col, Card, Button, Form, Badge } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Row, Col, Button, Form, Badge } from 'react-bootstrap';
+import { useParams, useNavigate } from 'react-router-dom';
+import tourApi from "../../../api/tourApi";
 import './detail_tour.css';
 
+import Banner from "../../../components/User/Banner/Banner";
+import AdvanceSearch from "../../../components/User/AdvanceSearch/AdvanceSearch";
+
 const Detail_Tour = () => {
-    // Mock Data for "Tour Cù Lao Chàm - Lặn ngắm san hô"
-    const tourInfo = {
-        title: "Tour Cù Lao Chàm - Lặn ngắm san hô",
-        address: "Đà Nẵng, Việt Nam",
-        rating: 4.9,
-        reviews: 1259,
-        oldPrice: "3.000.000 VND",
-        price: "1.700.000 VND",
-        priceUnit: "/người",
-        images: [
-            "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=2674&auto=format&fit=crop", // Cham Island view
-            "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?q=80&w=2674&auto=format&fit=crop", // Snorkeling
-            "https://images.unsplash.com/photo-1540202404-a2f29016b523?q=80&w=2666&auto=format&fit=crop"  // Beach activities
-        ],
-        description: "Tour Cù Lao Chàm mang đến hành trình khám phá biển đảo hoang sơ và yên bình. Du khách sẽ trải nghiệm lặn ngắm san hô, tham quan lăng chài và tận hưởng những bãi biển trong xanh tuyệt đẹp. Đây là lựa chọn lý tưởng cho cặp đôi hoặc hội người muốn có một chuyến đi thư giãn và tràn trề.",
-        highlights: [
-            { icon: "bi-speedometer", text: "Cano cao tốc đời mới" },
-            { icon: "bi-house-heart", text: "Homestay view biển" },
-            { icon: "bi-basket", text: "Phục vụ hải sản đặc sắc" },
-            { icon: "bi-tsunami", text: "Lặn ngắm san hô" }
-        ],
-        itinerary: [
-            {
-                day: "Ngày 1: Khởi hành - Tham quan đảo - Lặn ngắm san hô",
-                activities: [
-                    "07:30-08:00: Xe đón tại Đà Nẵng/Hội An -> Cảng Cửa Đại",
-                    "08:30: Đi cano cao tốc đến Cù Lao Chàm",
-                    "09:00: Tham quan Bãi Làng, Giếng cổ, Chùa Hải Tạng, Khu bảo tồn biển",
-                    "11:30: Check-in homestay/resort",
-                    "12:00: Ăn trưa hải sản",
-                    "14:00-16:30: Lặn ngắm san hô + tắm biển + kayak",
-                    "18:00: Ăn tối",
-                    "19:30: Hoạt động đêm: dạo biển, đốt lửa trại"
-                ]
-            },
-            {
-                day: "Ngày 2: Tự do khám phá - Trở về",
-                activities: [
-                    "06:00: Ngắm bình minh",
-                    "07:30: Ăn sáng",
-                    "08:30-10:00: Mua hải sản, thăm thú, tắm biển",
-                    "10:30: Trả phòng",
-                    "11:00: Cano về lại Cửa Đại",
-                    "12:00: Xe đưa về Đà Nẵng/Hội An"
-                ]
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [tourInfo, setTourInfo] = useState(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTourDetail = async () => {
+            if (!id) return;
+            setLoading(true);
+            try {
+                const response = await tourApi.getTour(id);
+                if (response && response.data && response.data.result) {
+                    setTourInfo(response.data.result);
+                }
+            } catch (error) {
+                console.error("Failed to load tour detail:", error);
+            } finally {
+                setLoading(false);
             }
-        ],
-        inclusions: [
-            "Xe đưa đón Đà Nẵng/Hội An",
-            "Cano cao tốc khứ hồi",
-            "Vé tham quan Cù Lao Chàm",
-            "Dụng cụ lặn ngắm san hô",
-            "Ăn trưa hải sản",
-            "Hướng dẫn viên"
-        ],
-        exclusions: [
-            "Chi phí cá nhân",
-            "Tiền TIP cho HDV, tài xế"
-        ]
+        };
+        fetchTourDetail();
+    }, [id]);
+
+    const formatPrice = (price) => {
+        return price ? price.toLocaleString('vi-VN') + ' VND' : 'Liên hệ';
     };
 
-    const reviews = [
-        {
-            user: "Nguyễn Thị A",
-            date: "15/11/2025",
-            avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=2576&auto=format&fit=crop",
-            content: "Khách sạn rất đẹp, phòng sạch sẽ, nhân viên thân thiện. View biển tuyệt vời!",
-            rating: 5
-        },
-        {
-            user: "Nguyễn Thị A",
-            date: "15/11/2025",
-            avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=2576&auto=format&fit=crop",
-            content: "Khách sạn rất đẹp, phòng sạch sẽ, nhân viên thân thiện. View biển tuyệt vời!",
-            rating: 5
-        },
-        {
-            user: "Nguyễn Thị A",
-            date: "15/11/2025",
-            avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?q=80&w=2576&auto=format&fit=crop",
-            content: "Khách sạn rất đẹp, phòng sạch sẽ, nhân viên thân thiện. View biển tuyệt vời!",
-            rating: 5
+    if (loading) return <div className="text-center py-5">Đang tải thông tin tour...</div>;
+    if (!tourInfo) return <div className="text-center py-5">Không tìm thấy thông tin tour.</div>;
+
+    // Helper to get image or fallback
+    const getMainImage = () => tourInfo.image || tourInfo.thumbnail || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b";
+    
+    // Fallback for array data if not present in API or if not an array
+    const safelyGetArray = (data, defaultArray = []) => {
+        if (!data) return defaultArray;
+        if (Array.isArray(data)) return data;
+        // If string (e.g. valid JSON), try to parse
+        if (typeof data === 'string') {
+             try {
+                 const parsed = JSON.parse(data);
+                 if (Array.isArray(parsed)) return parsed;
+             } catch (e) {
+                 // Not JSON, might be single string item, return as single item array or default
+                 return [ { icon: "bi-check-circle", text: data } ]; // for highlights style
+             }
         }
+        return defaultArray;
+    };
+
+    const defaultHighlights = [
+        { icon: "bi-speedometer", text: "Di chuyển thuận tiện" },
+        { icon: "bi-house-heart", text: "Khách sạn tiện nghi" },
+        { icon: "bi-basket", text: "Ẩm thực địa phương" },
+        { icon: "bi-tsunami", text: "Hoạt động thú vị" }
     ];
 
+    const highlights = Array.isArray(tourInfo.highlights) ? tourInfo.highlights : defaultHighlights;
+
+    const itinerary = Array.isArray(tourInfo.itinerary) ? tourInfo.itinerary : []; 
+    const inclusions = Array.isArray(tourInfo.inclusions) ? tourInfo.inclusions : ["Xe đưa đón", "Vé tham quan", "Hướng dẫn viên", "Nước uống"];
+    const exclusions = Array.isArray(tourInfo.exclusions) ? tourInfo.exclusions : ["Chi phí cá nhân", "Thuế VAT"];
+
     return (
-        <div className="detail-page py-4 bg-light">
-            <Container>
+        <div className="detail-page">
+            <Banner />
+            <AdvanceSearch />
+            <div className="py-4 bg-light">
+                <Container>
                 {/* Header Info */}
                 <div className="d-flex justify-content-between align-items-end mb-4">
                     <div>
-                        <h2 className="fw-bold text-primary-custom mb-2">{tourInfo.title}</h2>
+                        {/* Larger Title */}
+                        <h1 className="fw-bold text-primary-custom mb-3 display-5">{tourInfo.title || tourInfo.name}</h1>
                         <div className="d-flex align-items-center gap-2 mb-2">
+                             {/* Mock rating if not available */}
                             <Badge bg="warning" className="text-dark">
-                                <i className="bi bi-star-fill me-1"></i>{tourInfo.rating}
+                                <i className="bi bi-star-fill me-1"></i>{tourInfo.rating || 4.5}
                             </Badge>
-                            <span className="text-muted small">({tourInfo.reviews} đánh giá)</span>
+                            <span className="text-muted small">({tourInfo.reviews || 0} đánh giá)</span>
                         </div>
                         <div className="text-muted small">
-                            <i className="bi bi-geo-alt-fill me-1 text-primary-custom"></i> {tourInfo.address}
                         </div>
                     </div>
                     <div className="text-end">
-                        <div className="text-muted small text-decoration-line-through">{tourInfo.oldPrice}</div>
+                        {tourInfo.oldPrice && <div className="text-muted small text-decoration-line-through">{formatPrice(tourInfo.oldPrice)}</div>}
                         <div>
-                            <span className="text-primary-custom fw-bold fs-2">{tourInfo.price}</span>
-                            <span className="text-muted"> {tourInfo.priceUnit}</span>
+                            <span className="text-primary-custom fw-bold fs-2">{formatPrice(tourInfo.price)}</span>
+                            <span className="text-muted"> /khách</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Gallery */}
-                <div className="gallery-grid mb-5">
-                    <div className="gallery-item main">
-                        <img src={tourInfo.images[0]} alt="Main" />
-                    </div>
-                    <div className="gallery-item">
-                        <img src={tourInfo.images[1]} alt="Sub 1" />
-                    </div>
-                    <div className="gallery-item">
-                        <img src={tourInfo.images[2]} alt="Sub 2" />
-                    </div>
+                {/* Gallery - Single Main Image Only */}
+                <div className="mb-5">
+                    <img 
+                        src={getMainImage()} 
+                        alt={tourInfo.title || tourInfo.name} 
+                        className="w-100 rounded-4 shadow-sm"
+                        style={{ height: '500px', objectFit: 'cover' }}
+                    />
                 </div>
 
                 <Row className="g-4">
@@ -134,7 +118,7 @@ const Detail_Tour = () => {
                         <div className="bg-white rounded-4 p-4 shadow-sm mb-4">
                             <h5 className="fw-bold text-primary-custom mb-3">Giới thiệu</h5>
                             <p className="text-muted mb-0 text-justify" style={{ lineHeight: '1.6' }}>
-                                {tourInfo.description}
+                                {tourInfo.description || "Chưa có mô tả chi tiết cho tour này."}
                             </p>
                         </div>
 
@@ -142,7 +126,7 @@ const Detail_Tour = () => {
                         <div className="bg-white rounded-4 p-4 shadow-sm mb-4">
                             <h5 className="fw-bold text-primary-custom mb-3">Điểm nổi bật</h5>
                             <Row className="g-3">
-                                {tourInfo.highlights.map((item, idx) => (
+                                {highlights.map((item, idx) => (
                                     <Col md={6} key={idx}>
                                         <div className="highlight-item border">
                                             <div className="highlight-icon">
@@ -156,32 +140,35 @@ const Detail_Tour = () => {
                         </div>
 
                         {/* Itinerary */}
-                        <div className="bg-white rounded-4 p-4 shadow-sm mb-4">
-                            <h5 className="fw-bold text-primary-custom mb-4">Lịch trình chi tiết</h5>
-                            <div className="ps-2">
-                                {tourInfo.itinerary.map((day, idx) => (
-                                    <div key={idx} className="timeline-item">
-                                        <div className="timeline-dot"></div>
-                                        <h6 className="fw-bold text-primary-custom mb-3">{day.day}</h6>
-                                        <ul className="list-unstyled text-muted small ps-1 mb-0 custom-ul">
-                                            {day.activities.map((act, aIdx) => (
-                                                <li key={aIdx} className="mb-2 position-relative ps-3">
-                                                    <span className="position-absolute top-0 start-0">•</span>
-                                                    {act}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                ))}
+                        {itinerary.length > 0 && (
+                            <div className="bg-white rounded-4 p-4 shadow-sm mb-4">
+                                <h5 className="fw-bold text-primary-custom mb-4">Lịch trình chi tiết</h5>
+                                <div className="ps-2">
+                                    {itinerary.map((day, idx) => (
+                                        <div key={idx} className="timeline-item">
+                                            <div className="timeline-dot"></div>
+                                            <h6 className="fw-bold text-primary-custom mb-3">{day.day || `Ngày ${idx + 1}`}</h6>
+                                            <ul className="list-unstyled text-muted small ps-1 mb-0 custom-ul">
+                                                {day.activities && day.activities.map((act, aIdx) => (
+                                                    <li key={aIdx} className="mb-2 position-relative ps-3">
+                                                        <span className="position-absolute top-0 start-0">•</span>
+                                                        {act}
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
 
                         {/* Inclusions & Exclusions */}
                         <div className="bg-white rounded-4 p-4 shadow-sm mb-4">
                             <h5 className="fw-bold text-primary-custom mb-4">Bao gồm và không bao gồm</h5>
                             <Row>
                                 <Col md={6}>
-                                    {tourInfo.inclusions.map((item, idx) => (
+                                    <h6 className="fw-bold mb-3 text-success">Bao gồm</h6>
+                                    {inclusions.map((item, idx) => (
                                         <div key={idx} className="check-list-item">
                                             <i className="bi bi-check-lg fw-bold fs-5"></i>
                                             <span>{item}</span>
@@ -189,7 +176,8 @@ const Detail_Tour = () => {
                                     ))}
                                 </Col>
                                 <Col md={6}>
-                                    {tourInfo.exclusions.map((item, idx) => (
+                                    <h6 className="fw-bold mb-3 text-danger">Không bao gồm</h6>
+                                    {exclusions.map((item, idx) => (
                                         <div key={idx} className="cross-list-item">
                                             <i className="bi bi-x-lg fw-bold"></i>
                                             <span>{item}</span>
@@ -197,38 +185,6 @@ const Detail_Tour = () => {
                                     ))}
                                 </Col>
                             </Row>
-                        </div>
-
-                        {/* Reviews */}
-                        <div className="bg-white rounded-4 p-4 shadow-sm mb-4">
-                            <div className="d-flex justify-content-between align-items-center mb-4">
-                                <h5 className="fw-bold text-primary-custom mb-0">Đánh giá của khách hàng</h5>
-                                <a href="#" className="text-decoration-none small text-primary-custom fw-bold">Xem thêm</a>
-                            </div>
-
-                            <div className="d-flex flex-column gap-4">
-                                {reviews.map((rv, idx) => (
-                                    <div key={idx} className="border-bottom pb-4 last-border-0">
-                                        <div className="d-flex justify-content-between mb-2">
-                                            <div className="d-flex align-items-center gap-3">
-                                                <img src={rv.avatar} className="review-avatar" alt="User" />
-                                                <div>
-                                                    <h6 className="fw-bold mb-0 text-dark small">{rv.user}</h6>
-                                                    <small className="text-muted x-small">{rv.date}</small>
-                                                </div>
-                                            </div>
-                                            <div className="text-warning small">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <i key={i} className={`bi bi-star${i < rv.rating ? '-fill' : ''}`}></i>
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <p className="mb-0 text-muted small fst-italic">
-                                            "{rv.content}"
-                                        </p>
-                                    </div>
-                                ))}
-                            </div>
                         </div>
                     </Col>
 
@@ -244,29 +200,15 @@ const Detail_Tour = () => {
                                     <Form.Group className="mb-3">
                                         <Form.Label className="fw-bold small">Ngày khởi hành</Form.Label>
                                         <div className="position-relative">
-                                            <Form.Control type="input" className="form-control-custom ps-5" placeholder="22/11/2025" readOnly />
+                                            <Form.Control type="date" className="form-control-custom ps-5" />
                                             <i className="bi bi-calendar3 position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                                         </div>
                                     </Form.Group>
 
                                     <Form.Group className="mb-4">
                                         <Form.Label className="fw-bold small">Số lượng khách</Form.Label>
-                                        <Form.Control type="input" className="form-control-custom" placeholder="2 người lớn" readOnly />
+                                        <Form.Control type="number" min="1" defaultValue="1" className="form-control-custom" />
                                     </Form.Group>
-
-                                    <div className="d-flex justify-content-between mb-2 small text-muted">
-                                        <span>2 người x 1.700.000đ</span>
-                                        <span className="fw-bold text-dark">3.400.000đ</span>
-                                    </div>
-                                    <div className="d-flex justify-content-between mb-4 small text-muted">
-                                        <span>Phí dịch vụ</span>
-                                        <span className="fw-bold text-dark">150.000đ</span>
-                                    </div>
-
-                                    <div className="d-flex justify-content-between mb-4 align-items-center">
-                                        <span className="fw-bold">Tổng cộng</span>
-                                        <span className="fw-bold text-primary-custom fs-5">3.550.000đ</span>
-                                    </div>
 
                                     <Button className="w-100 bg-primary-custom border-0 py-2 fw-bold rounded-3">
                                         Đặt tour ngay
@@ -277,6 +219,7 @@ const Detail_Tour = () => {
                     </Col>
                 </Row>
             </Container>
+            </div>
         </div>
     );
 };

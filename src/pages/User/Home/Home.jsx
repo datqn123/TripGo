@@ -17,6 +17,8 @@ import FlightCard from "../../../components/User/Cards/FlightCard";
 import Banner from "../../../components/User/Banner/Banner";
 import AdvanceSearch from "../../../components/User/AdvanceSearch/AdvanceSearch";
 import Features from "../../../components/User/Features/Features";
+import tourApi from "../../../api/tourApi";
+import TourCard from "../../../components/User/Cards/TourCard";
 const SkeletonCard = ({ type }) => {
   const skeletonStyle = {
     background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
@@ -84,6 +86,28 @@ const SkeletonCard = ({ type }) => {
     );
   }
 
+  if (type === 'tour') {
+    return (
+      <div style={{
+        background: '#fff',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+      }}>
+        <div style={{ ...skeletonStyle, height: '180px', borderRadius: '12px 12px 0 0' }}></div>
+        <div style={{ padding: '16px' }}>
+          <div style={{ ...skeletonStyle, height: '14px', width: '30%', marginBottom: '8px' }}></div>
+          <div style={{ ...skeletonStyle, height: '20px', width: '80%', marginBottom: '8px' }}></div>
+           <div style={{ ...skeletonStyle, height: '14px', width: '50%', marginBottom: '16px' }}></div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+             <div style={{ ...skeletonStyle, height: '20px', width: '40%' }}></div>
+             <div style={{ ...skeletonStyle, height: '24px', width: '20%', borderRadius: '12px' }}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return null;
 };
 const Home = () => {
@@ -142,6 +166,8 @@ const Home = () => {
   const [loadingLocations, setLoadingLocations] = useState(true);
   const [loadingHotels, setLoadingHotels] = useState(true);
   const [loadingFlights, setLoadingFlights] = useState(true);
+  const [tours, setTours] = useState([]);
+  const [loadingTours, setLoadingTours] = useState(true);
   const hasFetched = React.useRef(false);
 
   useEffect(() => {
@@ -150,11 +176,12 @@ const Home = () => {
     hasFetched.current = true;
 
     async function loadData() {
-      // Fetch locations, hotels and flights in parallel
-      const [locationsRes, hotelsRes, flightsRes] = await Promise.all([
+      // Fetch locations, hotels, flights, and tours in parallel
+      const [locationsRes, hotelsRes, flightsRes, toursRes] = await Promise.all([
         fetchLocations(),
         fetchHotels(),
-        fetchFlights()
+        fetchFlights(),
+        tourApi.getTours({ page: 0, size: 8 })
       ]);
 
       setLocations(locationsRes.result);
@@ -163,6 +190,13 @@ const Home = () => {
       setLoadingHotels(false);
       setFlights(flightsRes.result);
       setLoadingFlights(false);
+      
+      // Handle Tours Response
+      const toursData = (toursRes && toursRes.data && toursRes.data.result) 
+          ? (toursRes.data.result.content || toursRes.data.result) 
+          : [];
+      setTours(toursData);
+      setLoadingTours(false);
 
       console.log('Locations:', locationsRes.result);
       console.log('Hotels:', hotelsRes.result);
@@ -207,6 +241,82 @@ const Home = () => {
               )}
             </Col>
           </Row>
+        </Container>
+      </section>
+
+      {/* Actual Tour Section */}
+      <section style={{ padding: '40px 0', background: '#f8f9fa' }}>
+        <Container>
+            {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'flex-start', marginBottom: '24px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{
+                width: '40px',
+                height: '40px',
+                background: '#e6f3ff',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <i className="bi bi-map" style={{ fontSize: '20px', color: '#0077cc' }}></i>
+              </div>
+              <div>
+                <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0077cc', margin: 0 }}>
+                  Tour du lịch nổi bật
+                </h2>
+                <p style={{ fontSize: '14px', color: '#666', margin: '4px 0 0 0' }}>
+                  Khám phá những hành trình thú vị được nhiều người yêu thích
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <Row>
+            {loadingTours ? (
+               [1, 2, 3, 4].map((_, inx) => (
+                <Col md={3} sm={6} xs={12} className="mb-4" key={inx}>
+                  <SkeletonCard type="tour" />
+                </Col>
+              ))
+            ) : (
+               tours && tours.length > 0 ? (
+                 tours.slice(0, 4).map((tour, inx) => (
+                  <Col md={3} sm={6} xs={12} className="mb-4" key={tour.id || inx}>
+                    <TourCard tour={tour} />
+                  </Col>
+                 ))
+               ) : (
+                 <Col md={12}>
+                    <div style={{ textAlign: 'center', padding: '20px', color: '#666' }}>
+                        Chưa có tour nào được hiển thị.
+                    </div>
+                 </Col>
+               )
+            )}
+          </Row>
+
+           {/* View More Button */}
+          <div style={{ textAlign: 'center', marginTop: '16px' }}>
+            <button 
+              onClick={() => navigate('/tour')}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '12px 24px',
+                border: '1px solid #ddd',
+                borderRadius: '8px',
+                background: 'white',
+                color: '#0077cc',
+                fontSize: '15px',
+                fontWeight: '600',
+                cursor: 'pointer',
+              }}>
+              Xem tất cả tour <i className="bi bi-chevron-right"></i>
+            </button>
+          </div>
+
         </Container>
       </section>
 
