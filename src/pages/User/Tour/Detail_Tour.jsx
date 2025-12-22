@@ -12,6 +12,45 @@ const Detail_Tour = () => {
     const navigate = useNavigate();
     const [tourInfo, setTourInfo] = useState(null);
     const [loading, setLoading] = useState(true);
+    const [selectedScheduleId, setSelectedScheduleId] = useState('');
+    const [guestCount, setGuestCount] = useState(1);
+
+    const handleBookTour = () => {
+        if (!selectedScheduleId) {
+            alert("Vui lòng chọn ngày khởi hành");
+            return;
+        }
+        
+        // Find schedule by ID
+        const selectedSchedule = tourInfo.schedules?.find(s => String(s.id) === String(selectedScheduleId));
+        
+        if (!selectedSchedule) {
+             alert("Lịch trình không hợp lệ");
+             return;
+        }
+
+        if (!selectedSchedule.id) {
+            console.error("Selected Schedule missing ID:", selectedSchedule);
+            alert("Lỗi dữ liệu: Lịch trình tour không có ID hợp lệ. Vui lòng thử lại hoặc liên hệ hỗ trợ.");
+            return;
+        }
+
+        console.log("Booking Tour with Schedule:", selectedSchedule);
+
+        navigate('/payment-tour', { 
+            state: { 
+                tourInfo, 
+                bookingDetails: {
+                    date: selectedSchedule.startDate,
+                    guestCount: guestCount,
+                    totalPrice: (tourInfo.price || 0) * guestCount,
+                    tourScheduleId: selectedSchedule.id
+                }
+            } 
+        });
+    };
+
+
 
     useEffect(() => {
         const fetchTourDetail = async () => {
@@ -20,6 +59,10 @@ const Detail_Tour = () => {
             try {
                 const response = await tourApi.getTour(id);
                 if (response && response.data && response.data.result) {
+                    console.log("Tour Detail Response:", response.data.result);
+                    if (response.data.result.schedules) {
+                        console.log("Schedules:", response.data.result.schedules);
+                    }
                     setTourInfo(response.data.result);
                 }
             } catch (error) {
@@ -200,17 +243,41 @@ const Detail_Tour = () => {
                                     <Form.Group className="mb-3">
                                         <Form.Label className="fw-bold small">Ngày khởi hành</Form.Label>
                                         <div className="position-relative">
-                                            <Form.Control type="date" className="form-control-custom ps-5" />
+                                            {tourInfo.schedules && tourInfo.schedules.length > 0 ? (
+                                                <Form.Select
+                                                    className="form-control-custom ps-5"
+                                                    value={selectedScheduleId}
+                                                    onChange={(e) => setSelectedScheduleId(e.target.value)}
+                                                >
+                                                    <option value="">Chọn ngày khởi hành</option>
+                                                    {tourInfo.schedules.map((schedule, idx) => (
+                                                        <option key={schedule.id || idx} value={schedule.id}>
+                                                            {new Date(schedule.startDate).toLocaleDateString('vi-VN')} - Còn {schedule.availableSeats} chỗ
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                            ) : (
+                                                <div className="text-danger p-2 border rounded bg-light">Hiện chưa có lịch trình</div>
+                                            )}
                                             <i className="bi bi-calendar3 position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
                                         </div>
                                     </Form.Group>
 
                                     <Form.Group className="mb-4">
                                         <Form.Label className="fw-bold small">Số lượng khách</Form.Label>
-                                        <Form.Control type="number" min="1" defaultValue="1" className="form-control-custom" />
+                                        <Form.Control 
+                                            type="number" 
+                                            min="1" 
+                                            value={guestCount}
+                                            onChange={(e) => setGuestCount(parseInt(e.target.value) || 1)}
+                                            className="form-control-custom" 
+                                        />
                                     </Form.Group>
 
-                                    <Button className="w-100 bg-primary-custom border-0 py-2 fw-bold rounded-3">
+                                    <Button 
+                                        className="w-100 bg-primary-custom border-0 py-2 fw-bold rounded-3"
+                                        onClick={handleBookTour}
+                                    >
                                         Đặt tour ngay
                                     </Button>
                                 </Form>

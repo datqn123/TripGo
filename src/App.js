@@ -12,6 +12,7 @@ import Register from "./pages/User/Register/Register";
 import Filter from "./pages/User/Filter/Filter";
 
 import Payment from "./pages/User/Payment/Payment";
+import PaymentResult from "./pages/User/Payment/PaymentResult";
 import Classification from "./pages/User/Payment/Classification";
 import Hotel_Detail from "./pages/User/Hotel/Hotel_Detail";
 import Tour_Detail from "./pages/User/Tour/Detail_Tour";
@@ -110,6 +111,7 @@ function App() {
         <Route path="/payment-hotel" element={<Payment type="hotel" />} />
         <Route path="/payment-tour" element={<Payment type="tour" />} />
         <Route path="/payment-plane" element={<Payment type="plane" />} />
+        <Route path="/payment/result" element={<PaymentResult />} />
         {/* Classification : này là phân bậc các loại vé trong paymentplane */}
         <Route path="/classification" element={<Classification />} />
         {/* Details */}
