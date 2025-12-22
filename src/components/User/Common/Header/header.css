@@ -356,3 +356,79 @@ header .navbar .offcanvas-body .nav {
   margin: 0;
   border-color: #e5e7eb;
 }
+
+/* User Notification Styles */
+.user-notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ef4444;
+    color: white;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+.user-notification-dropdown {
+    position: absolute;
+    top: 30px;
+    right: -80px;
+    width: 320px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e5e7eb;
+    z-index: 1000;
+    overflow: hidden;
+    animation: slideDown 0.2s ease;
+    text-align: left;
+}
+
+/* Reuse or Override Notification Styles */
+.notification-header {
+    color: #333;
+    font-weight: 600;
+    padding: 12px 16px;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.notification-title {
+    color: #333;
+    font-weight: 600;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.notification-message {
+    color: #555;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.notification-time {
+    color: #888;
+    font-size: 11px;
+    margin-top: 4px;
+    text-align: right;
+}
+
+.notification-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.notification-item:hover {
+    background: #f9fafb;
+}
+
+.no-notification {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+}

@@ -14,6 +14,9 @@ const PopularCard = ({ val }) => {
     boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
     background: 'white',
     transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+    height: '100%',
+    display: 'flex',
+    flexDirection: 'column',
   };
 
   const imgStyle = {
@@ -25,6 +28,9 @@ const PopularCard = ({ val }) => {
 
   const bodyStyle = {
     padding: '12px',
+    flex: '1',
+    display: 'flex',
+    flexDirection: 'column',
   };
 
   const nameStyle = {
@@ -37,6 +43,7 @@ const PopularCard = ({ val }) => {
     WebkitLineClamp: 2,
     WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
+    minHeight: '45px', // Reserve space for 2 lines
   };
 
   const linkStyle = {
@@ -79,8 +86,12 @@ const PopularCard = ({ val }) => {
     color: '#0077cc',
   };
 
+  const priceContainerStyle = {
+    marginTop: 'auto',
+  };
+
   return (
-    <NavLink to={`/hotel-detail/${val.id}`} style={{ textDecoration: 'none' }}>
+    <NavLink to={`/hotel-detail/${val.id}`} style={{ textDecoration: 'none', height: '100%', display: 'block' }}>
       <div
         style={cardStyle}
         onMouseEnter={(e) => {
@@ -114,7 +125,7 @@ const PopularCard = ({ val }) => {
         </div>
 
         {/* Price */}
-        <div>
+        <div style={priceContainerStyle}>
           <span style={priceLabelStyle}>Giá mỗi đêm từ</span>
           <span style={priceValueStyle}>{formatPrice(val.minPrice)} VND</span>
         </div>

@@ -10,6 +10,10 @@ import {
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import Logo from "../../../../assets/images/icons/Logo.png"
 import "../Header/header.css";
+import notificationApi from '../../../../api/notificationApi';
+import WebSocketService from '../../../../services/WebSocketService';
+
+// ... (other imports)
 
 // Helper function để lấy tên cuối cùng
 const getLastName = (fullName) => {
@@ -23,8 +27,9 @@ const Header = () => {
   const [isLogged, setIsLogged] = useState(false);
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
-  const location = useLocation();
 
+  const location = useLocation();
+  
   const toggleMenu = () => {
     setOpen(!open);
   };
@@ -62,11 +67,93 @@ const Header = () => {
       header.classList.remove('is-sticky')
   }
 
+  // WebSocket Notifications
+  const [notifications, setNotifications] = useState([]); // Persistent DB notifications
+  const [tempNotifications, setTempNotifications] = useState([]); // Temporary WS notifications
+  const [showNotifications, setShowNotifications] = useState(false);
+  
+  // Combined unread count
+  const unreadCount = notifications.filter(n => !n.isRead).length + tempNotifications.length;
 
+  // 1. Fetch initial notifications from DB
+  const fetchNotifications = async () => {
+    try {
+        if(isLogged) {
+            const res = await notificationApi.getNotifications();
+            // Assuming API returns array directly or inside data property
+            setNotifications(res.data || res || []);
+        }
+    } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+    }
+  };
 
+  useEffect(() => {
+    fetchNotifications();
+  }, [isLogged]);
+
+  // 2. WebSocket Subscription
+  useEffect(() => {
+    const unsubscribe = WebSocketService.subscribe((notification) => {
+       // Add receipt time
+       const notifWithTime = {
+           ...notification,
+           receivedAt: notification.createdAt || new Date().toISOString()
+       };
+       // Store in TEMP state
+       setTempNotifications(prev => [notifWithTime, ...prev]);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  // 3. Handle Opening Notification List
+  const handleOpenNotifications = async () => {
+      setShowNotifications(!showNotifications);
+
+      // Only proceed if we are OPENING the list and have temp notifications
+      if (!showNotifications && tempNotifications.length > 0) {
+          try {
+              // Save each temp notification to DB
+              for (const notif of tempNotifications) {
+                  await notificationApi.saveNotification({
+                      title: notif.title,
+                      message: notif.message,
+                      link: notif.link,
+                      isRead: false
+                  });
+              }
+              // Clear temp list
+              setTempNotifications([]);
+              // Refresh full list from DB
+              await fetchNotifications();
+          } catch (error) {
+              console.error("Error syncing notifications:", error);
+          }
+      }
+  };
+
+  // 4. Handle Click Item
+  const handleClickNotification = async (notif) => {
+       try {
+           if(notif.id) {
+               await notificationApi.markAsRead(notif.id);
+               // Update local state to reflect read status
+               setNotifications(prev => prev.map(n => n.id === notif.id ? {...n, isRead: true} : n));
+           }
+           
+           if (notif.link) {
+               navigate(notif.link);
+               setShowNotifications(false);
+           }
+       } catch (error) {
+           console.error("Error marking read:", error);
+       }
+  };
+
+  // Combine lists for display (Temp first, then DB)
+  const displayNotifications = [...tempNotifications, ...notifications];
 
   return (
-
     <header className={`header-section ${['/paymenthotel', '/paymenttour', '/paymentplane', '/hotel-detail', '/tour-detail', '/setting'].includes(location.pathname) ? 'payment-header' : ''}`}>
       <Container>
 
@@ -123,7 +210,45 @@ const Header = () => {
                   </>
                 ) : (
                   <>
-                    <i className="bi bi-bell me-3" style={{ fontSize: '18px', color: 'white', cursor: 'pointer' }}></i>
+                    <div className="user-notification-container" style={{ position: 'relative', marginRight: '1rem' }}>
+                        <i 
+                            className="bi bi-bell" 
+                            style={{ fontSize: '18px', color: 'white', cursor: 'pointer' }}
+                            onClick={handleOpenNotifications}
+                        ></i>
+                        {unreadCount > 0 && (
+                            <span className="user-notification-badge">
+                                {unreadCount}
+                            </span>
+                        )}
+                        
+                        {showNotifications && (
+                           <div className="user-notification-dropdown">
+                               <div className="notification-header">Thông báo</div>
+                               <div className="notification-list">
+                                   {displayNotifications.length === 0 ? (
+                                       <div className="no-notification">Không có thông báo mới</div>
+                                   ) : (
+                                       displayNotifications.map((notif, index) => (
+                                           <div 
+                                                key={index} 
+                                                className={`notification-item ${notif.isRead ? 'read' : 'unread'}`}
+                                                onClick={() => handleClickNotification(notif)}
+                                                style={{ cursor: notif.link ? 'pointer' : 'default', background: notif.isRead ? '#fff' : '#f0f9ff' }}
+                                            >
+                                               <div className="notification-title">{notif.title || 'Thông báo hệ thống'}</div>
+                                               <div className="notification-message">{notif.message}</div>
+                                               <div className="notification-time">
+                                                   {new Date(notif.receivedAt || notif.createdAt || Date.now()).toLocaleTimeString('vi-VN')}
+                                               </div>
+                                           </div>
+                                       ))
+                                   )}
+                               </div>
+                           </div>
+                        )}
+                    </div>
+
                     <NavDropdown
                       className="user-dropdown"
                       title={

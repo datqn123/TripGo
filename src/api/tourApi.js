@@ -10,6 +10,13 @@ const tourApi = {
    */
   getTours: (params) => axiosClient.get(`${PREFIX}/tours`, { params }),
 
+  /**
+   * Search tours with filters
+   * GET /api/public/tours/search
+   * @param {object} params - { title, destinationId, duration, priceRange, status, page, size }
+   */
+  searchTours: (params) => axiosClient.get(`${PREFIX}/tours/search`, { params }),
+
   getTour: (id) => axiosClient.get(`/admin/tours/${id}`),
 
   createTour: (data) => axiosClient.post(`/admin/tours`, data, {
@@ -19,6 +26,8 @@ const tourApi = {
   updateTour: (id, data) => axiosClient.put(`/admin/tours/${id}`, data, {
     headers: { "Content-Type": "multipart/form-data" } 
   }),
+
+  deleteTour: (id) => axiosClient.delete(`/admin/tours/${id}`),
 };
 
 export default tourApi;

@@ -35,6 +35,8 @@ import EditTour from "./pages/Admin/Tours/EditTour";
 import FlightManagement from "./pages/Admin/Flights/FlightManagement";
 import BookingManagement from "./pages/Admin/Bookings/BookingManagement";
 import CustomerManagement from "./pages/Admin/Customers/CustomerManagement";
+import PromotionManagement from "./pages/Admin/Promotions/PromotionManagement";
+
 function App() {
   const location = useLocation();
 
@@ -85,6 +87,7 @@ function App() {
           <Route path="flights" element={<FlightManagement />} />
           <Route path="bookings" element={<BookingManagement />} />
           <Route path="customers" element={<CustomerManagement />} />
+          <Route path="promotions" element={<PromotionManagement />} />
           {/* TODO: Add more admin routes here */}
         </Route>
 

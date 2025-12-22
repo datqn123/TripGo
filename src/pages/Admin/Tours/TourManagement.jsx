@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import tourApi from '../../../api/tourApi';
+import homeApi from '../../../api/homeApi';
 import './TourManagement.css';
 
 const TourManagement = () => {
@@ -17,14 +18,32 @@ const TourManagement = () => {
 
   // Filters state
   const [searchTerm, setSearchTerm] = useState('');
+  const [locations, setLocations] = useState([]);
   const [locationFilter, setLocationFilter] = useState('');
   const [durationFilter, setDurationFilter] = useState('');
   const [priceFilter, setPriceFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
   useEffect(() => {
+    fetchLocations();
     fetchTours(0);
   }, []);
+
+  // Re-fetch when filters change
+  useEffect(() => {
+    fetchTours(0);
+  }, [locationFilter, durationFilter, priceFilter, statusFilter]);
+
+  const fetchLocations = async () => {
+    try {
+      const response = await homeApi.getDropdownLocations();
+      if (response.data && response.data.result) {
+        setLocations(response.data.result);
+      }
+    } catch (error) {
+      console.error("Failed to fetch locations:", error);
+    }
+  };
 
   const fetchTours = async (page) => {
     setLoading(true);
@@ -32,28 +51,90 @@ const TourManagement = () => {
       const params = {
         page: page,
         size: pagination.pageSize,
-        // Add other filters if API supports them later
-        // title: searchTerm,
+        title: searchTerm,
+        destinationId: locationFilter,
+        duration: durationFilter,
+        priceRange: priceFilter,
+        status: statusFilter
       };
 
-      const response = await tourApi.getTours(params);
+      // Clean undefined/empty params
+      Object.keys(params).forEach(key => (params[key] === '' || params[key] === null) && delete params[key]);
+
+      const response = await tourApi.searchTours(params);
       
+      console.log("Search Tours Response:", response.data);
+
       if (response.data && response.data.result) {
-        const { content, pageable, totalPages, totalElements, size, number } = response.data.result;
-        setTours(content || []);
+        const result = response.data.result;
+        // Handle different response structures:
+        // 1. Standard Page: { content, pageable... }
+        // 2. Hotel-like: { tours, currentPage... }
+        // 3. Raw List: [...]
+        // 4. Custom: { result: [...] }
+
+        let tourList = [];
+        let pageInfo = {
+          currentPage: 0,
+          totalPages: 0,
+          totalElements: 0,
+          pageSize: 12
+        };
+
+        if (Array.isArray(result)) {
+           // Case 3: Raw List
+           tourList = result;
+           pageInfo.totalElements = result.length;
+           pageInfo.totalPages = Math.ceil(result.length / 12);
+        } else if (result.content) {
+           // Case 1: Standard Page
+           tourList = result.content;
+           pageInfo.currentPage = result.number !== undefined ? result.number : (result.pageable?.pageNumber || 0);
+           pageInfo.totalPages = result.totalPages || 0;
+           pageInfo.totalElements = result.totalElements || 0;
+           pageInfo.pageSize = result.size || 12;
+        } else if (result.tours) {
+           // Case 2: Hotel-like structure
+           tourList = result.tours;
+           pageInfo.currentPage = result.currentPage || 0;
+           pageInfo.totalPages = result.totalPages || 0;
+           pageInfo.totalElements = result.totalElements || 0;
+           pageInfo.pageSize = result.pageSize || 12;
+        } else if (result.result) {
+           // Recursive result check
+            if (Array.isArray(result.result)) {
+                tourList = result.result;
+            }
+        }
+
+        // Fallback: If totalElements is 0 but we have items, use length
+        if (tourList.length > 0 && pageInfo.totalElements === 0) {
+            pageInfo.totalElements = tourList.length;
+            pageInfo.totalPages = Math.ceil(tourList.length / (pageInfo.pageSize || 12));
+        }
+
+        setTours(tourList || []);
+        setPagination(pageInfo);
+      } else {
+        setTours([]);
         setPagination({
-          currentPage: number !== undefined ? number : (pageable?.pageNumber || 0),
-          totalPages: totalPages || 0,
-          totalElements: totalElements || 0,
-          pageSize: size || 12
+          currentPage: 0,
+          totalPages: 0,
+          totalElements: 0,
+          pageSize: 12
         });
       }
     } catch (error) {
       console.error("Failed to fetch tours:", error);
-      toast.error("Không thể tải danh sách tour");
+      // toast.error("Không thể tải danh sách tour"); // Optional: suppress default toast if just searching
+      setTours([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSearch = () => {
+    fetchTours(0);
   };
 
   const handlePageChange = (newPage) => {
@@ -62,18 +143,38 @@ const TourManagement = () => {
     }
   };
 
-  const getStatusClass = (status) => {
-    // API might not return status yet, keeping this for future use or mock
-    switch (status) {
-      case 'ACTIVE': return 'status-active';
-      case 'PENDING': return 'status-pending';
-      case 'DISABLED': return 'status-disabled';
-      default: return '';
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  };
+
+  // Helper to render pagination pages
+  // Delete Modal State
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedTourId, setSelectedTourId] = useState(null);
+
+  const handleDeleteClick = (id) => {
+    setSelectedTourId(id);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedTourId) return;
+    
+    try {
+      await tourApi.deleteTour(selectedTourId);
+      toast.success("Xóa tour thành công!");
+      fetchTours(pagination.currentPage);
+      setShowDeleteModal(false);
+      setSelectedTourId(null);
+    } catch (error) {
+      console.error("Delete failed:", error);
+      toast.error("Xóa thất bại! Vui lòng thử lại.");
     }
   };
 
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setSelectedTourId(null);
   };
 
   const renderPaginationButtons = () => {
@@ -99,6 +200,20 @@ const TourManagement = () => {
     }
     return pages;
   };
+
+  // Global Click Listener to close dropdown
+  useEffect(() => {
+    const closeDropdown = (e) => {
+      if (!e.target.closest('.custom-dropdown')) {
+         const dropdowns = document.getElementsByClassName('dropdown-menu-list');
+         for (let i = 0; i < dropdowns.length; i++) {
+           dropdowns[i].classList.remove('show');
+         }
+      }
+    };
+    document.addEventListener('click', closeDropdown);
+    return () => document.removeEventListener('click', closeDropdown);
+  }, []);
 
   return (
     <div className="tour-management">
@@ -130,33 +245,53 @@ const TourManagement = () => {
             placeholder="Tìm kiếm theo tên tour..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
           />
         </div>
 
-        <select className="filter-select" value={locationFilter} onChange={(e) => setLocationFilter(e.target.value)}>
-          <option value="">Địa điểm</option>
-          <option value="quangninh">Quảng Ninh</option>
-          <option value="laocai">Lào Cai</option>
-          <option value="danang">Đà Nẵng</option>
-          <option value="kiengiang">Kiên Giang</option>
-          <option value="cantho">Cần Thơ</option>
-        </select>
+        {/* Custom Location Dropdown */}
+        <div className="custom-dropdown" onClick={() => document.getElementById('tour-location-dropdown').classList.toggle('show')}>
+          <div className="selected-value">
+            {locationFilter ? locations.find(l => l.id == locationFilter)?.name : 'Địa điểm'}
+            <i className="bi bi-chevron-down"></i>
+          </div>
+          <div id="tour-location-dropdown" className="dropdown-menu-list">
+             <div className="dropdown-header">Địa điểm</div>
+             <div className="dropdown-items-container">
+                <div 
+                  className={`dropdown-item ${locationFilter === '' ? 'active' : ''}`}
+                  onClick={() => setLocationFilter('')}
+                >
+                  Tất cả
+                </div>
+                {locations.map((loc) => (
+                  <div 
+                    key={loc.id} 
+                    className={`dropdown-item ${locationFilter == loc.id ? 'active' : ''}`}
+                    onClick={() => setLocationFilter(loc.id)}
+                  >
+                    {loc.name}
+                  </div>
+                ))}
+             </div>
+          </div>
+        </div>
 
         <select className="filter-select" value={durationFilter} onChange={(e) => setDurationFilter(e.target.value)}>
           <option value="">Thời lượng</option>
-          <option value="1day">1 ngày</option>
-          <option value="2days">2 ngày 1 đêm</option>
-          <option value="3days">3 ngày 2 đêm</option>
-          <option value="4days">4 ngày 3 đêm</option>
-          <option value="5days">5+ ngày</option>
+          <option value="1 ngày">1 ngày</option>
+          <option value="2 ngày 1 đêm">2 ngày 1 đêm</option>
+          <option value="3 ngày 2 đêm">3 ngày 2 đêm</option>
+          <option value="4 ngày 3 đêm">4 ngày 3 đêm</option>
+          <option value="5 ngày 4 đêm">5 ngày 4 đêm</option>
         </select>
 
         <select className="filter-select" value={priceFilter} onChange={(e) => setPriceFilter(e.target.value)}>
           <option value="">Giá</option>
-          <option value="0-2">Dưới 2 triệu</option>
-          <option value="2-5">2-5 triệu</option>
-          <option value="5-10">5-10 triệu</option>
-          <option value="10+">Trên 10 triệu</option>
+          <option value="0-2000000">Dưới 2 triệu</option>
+          <option value="2000000-5000000">2-5 triệu</option>
+          <option value="5000000-10000000">5-10 triệu</option>
+          <option value="10000000-100000000">Trên 10 triệu</option>
         </select>
 
         <select className="filter-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
@@ -218,7 +353,7 @@ const TourManagement = () => {
                       <button className="action-btn edit-btn" title="Chỉnh sửa" onClick={() => navigate(`/admin/tours/edit/${tour.id}`)}>
                         <i className="bi bi-pencil"></i>
                       </button>
-                      <button className="action-btn delete-btn" title="Xóa">
+                      <button className="action-btn delete-btn" title="Xóa" onClick={() => handleDeleteClick(tour.id)}>
                         <i className="bi bi-trash"></i>
                       </button>
                     </div>
@@ -260,6 +395,25 @@ const TourManagement = () => {
           </button>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h3>Xác nhận xóa</h3>
+              <button className="close-btn" onClick={cancelDelete}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <p>Bạn có chắc chắn muốn xóa tour này không? Hành động này không thể hoàn tác.</p>
+            </div>
+            <div className="modal-footer">
+              <button className="btn-cancel" onClick={cancelDelete}>Hủy bỏ</button>
+              <button className="btn-confirm-delete" onClick={confirmDelete}>Xóa tour</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

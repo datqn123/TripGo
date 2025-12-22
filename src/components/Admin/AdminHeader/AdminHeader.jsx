@@ -4,11 +4,47 @@ import { toast } from 'react-toastify';
 import adminAuthApi from '../../../api/adminAuthApi';
 import { useAuth } from '../../../context/AuthContext';
 import './AdminHeader.css';
+import WebSocketService from '../../../services/WebSocketService';
+
+import notificationApi from '../../../api/notificationApi';
+// ... other imports
 
 const AdminHeader = () => {
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [notifications, setNotifications] = useState([]); // DB notifications
+  const [tempNotifications, setTempNotifications] = useState([]); // Temporary WS notifications
+  const [showNotifications, setShowNotifications] = useState(false);
+
+  // Combined unread count
+  const unreadCount = notifications.filter(n => !n.isRead).length + tempNotifications.length;
+
+  const fetchNotifications = async () => {
+      try {
+          const res = await notificationApi.getNotifications();
+          setNotifications(res.data || res || []);
+      } catch (error) {
+          console.error("Failed to fetch notifications:", error);
+      }
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  useEffect(() => {
+    // Subscribe to WebSocket notifications
+    const unsubscribe = WebSocketService.subscribe((notification) => {
+      const notifWithTime = {
+           ...notification,
+           receivedAt: notification.createdAt || new Date().toISOString()
+       };
+      // Append to TEMP list
+      setTempNotifications(prev => [notifWithTime, ...prev]);
+    });
+    return () => unsubscribe();
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -18,6 +54,49 @@ const AdminHeader = () => {
     return () => clearInterval(timer);
   }, []);
 
+  const handleOpenNotifications = async () => {
+      setShowNotifications(!showNotifications);
+
+      // Only sync if opening and have temp notifications
+      if (!showNotifications && tempNotifications.length > 0) {
+          try {
+              for (const notif of tempNotifications) {
+                  await notificationApi.saveNotification({
+                      title: notif.title,
+                      message: notif.message,
+                      link: notif.link,
+                      isRead: false
+                  });
+              }
+              setTempNotifications([]);
+              await fetchNotifications();
+          } catch (error) {
+              console.error("Error syncing notifications:", error);
+          }
+      }
+  };
+
+  const handleClickNotification = async (notif) => {
+      try {
+          if(notif.id) {
+              await notificationApi.markAsRead(notif.id);
+              // Update UI to reflect read status locally
+              setNotifications(prev => prev.map(n => n.id === notif.id ? {...n, isRead: true} : n));
+          }
+
+          if (notif.link) {
+              navigate(notif.link);
+              setShowNotifications(false);
+          }
+      } catch (error) {
+          console.error("Error marking read:", error);
+      }
+  };
+
+  // Combine for display
+  const displayNotifications = [...tempNotifications, ...notifications];
+
+  // ... (logout logic)
   const { logout } = useAuth();
   
   const handleLogout = async () => {
@@ -61,11 +140,41 @@ const AdminHeader = () => {
           </span>
         </div>
 
+
         <div className="header-notifications">
-          <button className="notification-btn">
-            <i class="fa-regular fa-bell"></i>
-            <span className="notification-badge">3</span>
+          <button 
+            className="notification-btn"
+            onClick={handleOpenNotifications}
+          >
+            <i className="fa-regular fa-bell"></i>
+            {unreadCount > 0 && <span className="notification-badge">{unreadCount}</span>}
           </button>
+
+          {showNotifications && (
+            <div className="notification-dropdown">
+              <div className="notification-header">Thông báo</div>
+              <div className="notification-list">
+                {displayNotifications.length === 0 ? (
+                  <div className="no-notification">Không có thông báo mới</div>
+                ) : (
+                  displayNotifications.map((notif, index) => (
+                    <div 
+                        key={index} 
+                        className={`notification-item ${notif.isRead ? 'read' : 'unread'}`}
+                        onClick={() => handleClickNotification(notif)}
+                        style={{ cursor: notif.link ? 'pointer' : 'default', background: notif.isRead ? '#fff' : '#f0f9ff' }}
+                    >
+                      <div className="notification-title">{notif.title || 'Thông báo hệ thống'}</div>
+                      <div className="notification-message">{notif.message}</div>
+                      <div className="notification-time">
+                        {new Date(notif.receivedAt || notif.createdAt || Date.now()).toLocaleTimeString('vi-VN')}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="header-user">

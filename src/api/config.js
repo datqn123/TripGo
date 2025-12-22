@@ -2,12 +2,12 @@
 // Change this URL to switch between local development and production
 
 // Production
-export const API_BASE_URL = "https://tripgo-api.onrender.com/api";
-export const ADMIN_API_BASE_URL = "https://tripgo-api.onrender.com/api/admin";
+// export const API_BASE_URL = "https://tripgo-api.onrender.com/api";
+// export const ADMIN_API_BASE_URL = "https://tripgo-api.onrender.com/api/admin";
 
 // Local development (uncomment to use)
-// export const API_BASE_URL = "http://localhost:8080/api";
-// export const ADMIN_API_BASE_URL = "http://localhost:8080/api/admin";
+export const API_BASE_URL = "http://localhost:8080/api";
+export const ADMIN_API_BASE_URL = "http://localhost:8080/api/admin";
 
 // Helper function to build full API URL
 export const buildApiUrl = (endpoint) => {
@@ -51,6 +51,9 @@ export const PUBLIC_API = {
     // Flights
     FLIGHT_CARDS: `${API_BASE_URL}/public/flights/cards`,
     FLIGHTS_SEARCH: `${API_BASE_URL}/public/flights/search`,
+
+    // Tours
+    TOURS_SEARCH: `${API_BASE_URL}/public/tours/search`,
 };
 
 export default API_BASE_URL;

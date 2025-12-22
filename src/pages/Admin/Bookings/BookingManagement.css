@@ -50,70 +50,35 @@
   margin: 0;
 }
 
-/* Filters Section */
-.filters-section {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  margin-bottom: 20px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+/* Status Tabs */
+.status-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.search-box {
-  flex: 1;
-  min-width: 280px;
-  position: relative;
-  display: flex;
-  align-items: center;
+.tab-btn {
+    padding: 8px 16px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 6px;
+    color: #4b5563;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
-.search-box i {
-  position: absolute;
-  left: 16px;
-  color: #9ca3af;
-  font-size: 16px;
-  pointer-events: none;
+.tab-btn:hover {
+    background: #f3f4f6;
+    color: #1f2937;
 }
 
-.search-box input {
-  width: 100%;
-  padding: 10px 16px 10px 44px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #374151;
-  transition: all 0.2s;
-}
-
-.search-box input::placeholder {
-  color: #9ca3af;
-}
-
-.search-box input:focus {
-  outline: none;
-  border-color: #0891b2;
-  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
-}
-
-.filter-select {
-  padding: 10px 16px;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  font-size: 14px;
-  color: #374151;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-  min-width: 130px;
-}
-
-.filter-select:focus {
-  outline: none;
-  border-color: #0891b2;
-  box-shadow: 0 0 0 3px rgba(8, 145, 178, 0.1);
+.tab-btn.active {
+    background: #06b6d4; /* Cyan-500 */
+    color: white;
+    border-color: #06b6d4;
 }
 
 /* Table */
@@ -160,76 +125,63 @@
 }
 
 /* Booking ID */
-.booking-id {
+.booking-code {
   font-weight: 600;
   color: #0891b2;
+}
+
+/* Customer Info */
+.customer-info {
+    display: flex;
+    flex-direction: column;
+}
+.customer-name {
+    font-weight: 500;
+    color: #111;
+}
+.customer-contact {
+    font-size: 12px;
+    color: #888;
 }
 
 /* Service Info */
 .service-info {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 10px;
 }
-
+.service-icon {
+    font-size: 18px;
+    color: #555;
+    width: 24px;
+    text-align: center;
+}
 .service-name {
   font-weight: 500;
   color: #1f2937;
 }
 
-.service-badge {
-  padding: 4px 10px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 600;
-  display: inline-block;
-  width: fit-content;
-}
-
-.service-hotel {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.service-flight {
-  background: #dcfce7;
-  color: #166534;
-}
-
-.service-tour {
-  background: #fed7aa;
-  color: #9a3412;
-}
-
-/* Total Amount */
-.total-amount {
+/* Price */
+.price {
   font-weight: 600;
   color: #0891b2;
 }
 
 /* Status Badges */
 .status-badge {
-  padding: 6px 12px;
-  border-radius: 6px;
+  padding: 4px 10px;
+  border-radius: 12px;
   font-size: 12px;
   font-weight: 600;
   display: inline-block;
+  text-transform: capitalize;
 }
 
-.status-confirmed {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.status-pending {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.status-cancelled {
-  background: #fee2e2;
-  color: #991b1b;
-}
+.status-badge.badge-success { background: #dcfce7; color: #166534; }
+.status-badge.badge-warning { background: #fef9c3; color: #854d0e; }
+.status-badge.badge-danger { background: #fee2e2; color: #991b1b; }
+.status-badge.badge-primary { background: #dbeafe; color: #1e40af; }
+.status-badge.badge-secondary { background: #f3f4f6; color: #4b5563; }
 
 /* Action Buttons */
 .action-buttons {
@@ -255,41 +207,17 @@
   transform: translateY(-2px);
 }
 
-.view-btn:hover {
-  background: #dbeafe;
-  color: #1e40af;
-}
-
-.edit-btn:hover {
-  background: #fef3c7;
-  color: #d97706;
-}
-
-.delete-btn:hover {
-  background: #fee2e2;
-  color: #dc2626;
-}
+.view-btn:hover { background: #dbeafe; color: #1e40af; }
+.confirm-btn:hover { background: #dcfce7; color: #166534; }
+.cancel-btn:hover { background: #fee2e2; color: #991b1b; }
 
 /* Pagination */
 .pagination-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end; /* Right align standard */
   align-items: center;
   margin-top: 20px;
-  padding: 20px;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.pagination-info {
-  font-size: 14px;
-  color: #6b7280;
-}
-
-.pagination-info strong {
-  color: #1f2937;
-  font-weight: 600;
+  padding: 10px;
 }
 
 .pagination-controls {
@@ -298,9 +226,9 @@
 }
 
 .page-btn {
-  min-width: 36px;
-  height: 36px;
-  padding: 0 12px;
+  min-width: 32px;
+  height: 32px;
+  padding: 0;
   border: 1px solid #e5e7eb;
   background: white;
   border-radius: 6px;
@@ -330,43 +258,8 @@
   cursor: not-allowed;
 }
 
-.page-dots {
-  padding: 0 8px;
-  color: #9ca3af;
-  display: flex;
-  align-items: center;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-  .filters-section {
-    gap: 10px;
-  }
-
-  .filter-select {
-    min-width: 110px;
-  }
-}
-
 @media (max-width: 768px) {
-  .booking-management {
-    padding: 16px;
-  }
-
-  .filters-section {
-    padding: 16px;
-  }
-
-  .table-container {
-    overflow-x: auto;
-  }
-
-  .bookings-table {
-    min-width: 900px;
-  }
-
-  .pagination-container {
-    flex-direction: column;
-    gap: 16px;
-  }
+  .booking-management { padding: 16px; }
+  .table-container { overflow-x: auto; }
+  .bookings-table { min-width: 900px; }
 }
