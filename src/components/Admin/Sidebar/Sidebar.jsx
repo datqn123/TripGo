@@ -45,7 +45,9 @@ const Sidebar = () => {
       label: 'KHÁCH HÀNG & ĐẶT CHỖ',
       items: [
         { path: '/admin/bookings', icon: 'bi-calendar-check', label: 'Đặt chỗ' },
+
         { path: '/admin/customers', icon: 'bi-people', label: 'Khách hàng' },
+        { path: '/admin/chat', icon: 'bi-chat-dots', label: 'Hỗ trợ khách hàng' },
       ]
     },
     {

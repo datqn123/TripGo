@@ -1,31 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import "./footer.css"
 import { Container } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
 
 const Footer = () => {
-  const [visible, setVisible] = useState(false);
 
-  const toggleVisible = () => {
-    const scrolled = document.documentElement.scrollTop;
-    if (scrolled > 300) {
-      setVisible(true)
-    }
-    else if (scrolled <= 300) {
-      setVisible(false)
-    }
-  }
-
-  const scrollTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth"
-    })
-  }
-
-  if (typeof window !== "undefined") {
-    window.addEventListener("scroll", toggleVisible)
-  }
 
   return (
     <>
@@ -180,11 +159,7 @@ const Footer = () => {
         </Container>
       </footer>
 
-      <div id="back-top"
-        onClick={scrollTop}
-        className={visible ? "active" : ""}>
-        <i className="bi bi-arrow-up"></i>
-      </div>
+
     </>
   );
 };

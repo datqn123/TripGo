@@ -22,6 +22,7 @@ import Setting from "./pages/User/Setting/Setting";
 import Promotion from "./pages/User/Promotion/Promotion";
 import Outstandingoffer from "./components/User/Filter/Outstandingoffer";
 import Outstandingtour from "./components/User/Filter/Outstandingtour";
+import ChatWidget from "./components/User/Chat/ChatWidget";
 
 // Admin imports
 import AdminLayout from "./pages/Admin/AdminLayout";
@@ -37,6 +38,7 @@ import FlightManagement from "./pages/Admin/Flights/FlightManagement";
 import BookingManagement from "./pages/Admin/Bookings/BookingManagement";
 import CustomerManagement from "./pages/Admin/Customers/CustomerManagement";
 import PromotionManagement from "./pages/Admin/Promotions/PromotionManagement";
+import ChatManagement from "./pages/Admin/Chat/ChatManagement";
 
 function App() {
   const location = useLocation();
@@ -71,6 +73,12 @@ function App() {
         theme="colored"
       />
       {!isHideLayout && <Header />}
+      
+      {/* Show ChatWidget only on Hotel and Tour related pages */}
+      {(location.pathname === '/hotel' || 
+        location.pathname === '/tour' || 
+        location.pathname.startsWith('/hotel-detail/') || 
+        location.pathname.startsWith('/tours/')) && <ChatWidget />}
 
       <Routes>  
         {/* Admin Login - Public */}
@@ -88,7 +96,9 @@ function App() {
           <Route path="flights" element={<FlightManagement />} />
           <Route path="bookings" element={<BookingManagement />} />
           <Route path="customers" element={<CustomerManagement />} />
+          <Route path="customers" element={<CustomerManagement />} />
           <Route path="promotions" element={<PromotionManagement />} />
+          <Route path="chat" element={<ChatManagement />} />
           {/* TODO: Add more admin routes here */}
         </Route>
 
