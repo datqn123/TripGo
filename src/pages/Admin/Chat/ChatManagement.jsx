@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './ChatManagement.css';
 import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
 import StompLib from 'stompjs/lib/stomp.js';
 import axios from 'axios';
-import API_BASE_URL from '../../../api/config';
+import API_BASE_URL, { PUBLIC_API } from '../../../api/config';
 
 const ChatManagement = () => {
   const [conversations, setConversations] = useState({});
@@ -26,13 +25,28 @@ const ChatManagement = () => {
   useEffect(() => {
     const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
     
+    if (!token) {
+        console.warn("Admin chưa đăng nhập, không thể kết nối Chat.");
+        return;
+    }
+
     // Connect WebSocket
-    const socket = new SockJS('http://localhost:8080/ws');
+    // Append token to query param for robust Spring Security auth
+    const socket = new SockJS(`http://localhost:8080/ws?access_token=${token}`);
     const StompClient = StompLib.Stomp || StompLib;
     const stompClient = StompClient.over(socket);
-    stompClient.debug = null; 
+    
+    // Enable debug logs for troubleshooting
+    stompClient.debug = (str) => {
+        console.log('[WS-ADMIN]', str);
+    }; 
 
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+    const headers = { 
+        Authorization: `Bearer ${token}`,
+        passcode: token,
+        login: 'admin',
+        'X-Authorization': `Bearer ${token}` 
+    };
 
     stompClient.connect(headers, (frame) => {
         console.log('Admin Connected: ' + frame);
@@ -40,8 +54,9 @@ const ChatManagement = () => {
         
         // Listen for incoming messages
         stompClient.subscribe('/user/queue/messages', (messageOutput) => {
-            const newMessage = JSON.parse(messageOutput.body);
-            handleIncomingMessage(newMessage);
+            const payload = JSON.parse(messageOutput.body);
+            console.log("Admin nhận tin nhắn:", payload);
+            handleIncomingMessage(payload);
         });
     }, (error) => {
         console.error('Connection error:', error);
@@ -74,7 +89,8 @@ const ChatManagement = () => {
 
       try {
           // GET /api/messages/{targetUserId}
-          const res = await axios.get(`${API_BASE_URL}/api/messages/${userId}`, {
+          // Fix double /api prefix
+          const res = await axios.get(`${API_BASE_URL}/messages/${userId}`, {
               headers: { Authorization: `Bearer ${token}` }
           });
           
@@ -84,7 +100,7 @@ const ChatManagement = () => {
           }));
 
           // Mark as read
-          await axios.put(`${API_BASE_URL}/api/messages/mark-read/${userId}`, {}, {
+          await axios.put(`${API_BASE_URL}/messages/mark-read/${userId}`, {}, {
               headers: { Authorization: `Bearer ${token}` }
           });
 
@@ -104,8 +120,12 @@ const ChatManagement = () => {
     
     setConversations(prev => {
         const currentMessages = prev[otherId] || [];
-        // Prevent duplicates if backend sends duplicates
-        // Simple check by timestamp or assume order is fine
+        
+        // Deduplicate
+        if (message.id && currentMessages.some(m => m.id === message.id)) {
+            return prev;
+        }
+
         return {
             ...prev,
             [otherId]: [...currentMessages, message]
@@ -121,13 +141,78 @@ const ChatManagement = () => {
   const markAsRead = async (userId) => {
       const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
       try {
-           await axios.put(`${API_BASE_URL}/api/messages/mark-read/${userId}`, {}, {
+           // Fix double /api prefix
+           await axios.put(`${API_BASE_URL}/messages/mark-read/${userId}`, {}, {
               headers: { Authorization: `Bearer ${token}` }
           });
       } catch (err) {
           console.error("Error marking as read", err);
       }
   }
+
+  const handleImageUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file || !selectedUser) return;
+
+        const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+        if (!token) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            // 1. Upload ảnh
+            const res = await axios.post(PUBLIC_API.CHAT_UPLOAD, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const { url, fileName } = res.data;
+
+            // 2. Gửi WebSocket
+            if (stompClientRef.current && isConnected) {
+                 const chatMessage = {
+                    receiverId: selectedUser,
+                    content: "Đã gửi một ảnh",
+                    type: "IMAGE",
+                    fileUrl: url,
+                    fileName: fileName
+                };
+
+                stompClientRef.current.send(
+                    "/app/chat", 
+                    {}, 
+                    JSON.stringify(chatMessage)
+                );
+
+                // Optimistic Update
+                const newMessage = {
+                    senderId: 1, // Me (Admin)
+                    receiverId: selectedUser,
+                    content: "Đã gửi một ảnh",
+                    type: "IMAGE",
+                    fileUrl: url,
+                    fileName: fileName,
+                    timestamp: new Date().toISOString()
+                };
+                
+                setConversations(prev => {
+                    const currentMessages = prev[selectedUser] || [];
+                    return {
+                        ...prev,
+                        [selectedUser]: [...currentMessages, newMessage]
+                    };
+                });
+            }
+
+        } catch (error) {
+            console.error("Lỗi upload ảnh:", error);
+        } finally {
+             e.target.value = null; 
+        }
+  };
 
   const handleSend = (e) => {
     e.preventDefault();
@@ -170,16 +255,6 @@ const ChatManagement = () => {
   };
 
   // Convert conversations object to array for list
-  // Note: Only users we have loaded messages for will appear here. 
-  // Ideally we should have an endpoint to get "List of conversations".
-  // For now, we rely on incoming messages or manually added simulated users if needed.
-  // Or we might need to fetch a list of users who have messaged us first.
-  // Assuming the `conversations` map populates as we discover users or from a "Recent Chats" API.
-  // If the API /api/messages/{targetUserId} is only for specific history, we might miss an initial list.
-  // Let's assume for this step we rely on incoming messages to populate the list OR 
-  // we would need a `/api/conversations` endpoint. 
-  // Since the user didn't provide `/api/conversations`, I will keep it as is. 
-  
   const conversationList = Object.keys(conversations).map(userId => ({
       userId: parseInt(userId),
       lastMessage: conversations[userId][conversations[userId].length - 1]
@@ -229,19 +304,40 @@ const ChatManagement = () => {
                 </div>
                 
                 <div className="chat-messages">
-                    {(conversations[selectedUser] || []).map((msg, idx) => (
-                        <div key={idx} className={`admin-message-item ${msg.senderId === 1 ? 'sent' : 'received'}`}>
-                            {msg.content}
-                            <span className="message-time">
-                                {new Date(msg.timestamp || Date.now()).toLocaleTimeString()}
-                            </span>
-                        </div>
-                    ))}
+                    {(conversations[selectedUser] || []).map((msg, idx) => {
+                        const isImage = msg.type === 'IMAGE';
+                        return (
+                            <div key={idx} className={`admin-message-item ${msg.senderId === 1 ? 'sent' : 'received'} ${isImage ? 'image-message' : ''}`}>
+                                {isImage ? (
+                                    <img 
+                                        src={msg.fileUrl} 
+                                        alt={msg.fileName || 'image'} 
+                                        style={{maxWidth: '200px', borderRadius: '8px', cursor: 'pointer', display: 'block'}}
+                                        onClick={() => window.open(msg.fileUrl, '_blank')}
+                                    />
+                                ) : (
+                                    msg.content
+                                )}
+                                <span className="message-time">
+                                    {new Date(msg.timestamp || Date.now()).toLocaleTimeString()}
+                                </span>
+                            </div>
+                        );
+                    })}
                     <div ref={messagesEndRef} />
                 </div>
 
                 <div className="chat-input-area">
                     <form className="input-wrapper" onSubmit={handleSend}>
+                        <label style={{cursor: 'pointer', marginRight: '10px', display: 'flex', alignItems: 'center'}}>
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                style={{display: 'none'}} 
+                                onChange={handleImageUpload} 
+                            />
+                            <i className="bi bi-image" style={{fontSize: '20px', color: '#0d6efd'}}></i>
+                        </label>
                         <input 
                             type="text" 
                             placeholder="Nhập tin nhắn..." 

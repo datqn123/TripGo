@@ -197,3 +197,23 @@
   font-size: 48px;
   margin-bottom: 15px;
 }
+
+/* Image Message Styling - Remove bubble background for Admin */
+.admin-message-item.image-message {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border: none !important;
+  max-width: 100%; /* Allow larger images if needed */
+}
+
+.admin-message-item.image-message img {
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.admin-message-item.image-message .message-time {
+    /* Optional: make time more visible or hide it if it overlays the image weirdly */
+    text-align: right; 
+    margin-right: 5px;
+}

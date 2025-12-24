@@ -165,3 +165,16 @@
     cursor: default;
     transform: none;
 }
+
+/* Image Message Styling - Remove bubble background */
+.message.image-message {
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.message.image-message img {
+  border-radius: 15px !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}

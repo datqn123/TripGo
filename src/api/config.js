@@ -54,6 +54,9 @@ export const PUBLIC_API = {
 
     // Tours
     TOURS_SEARCH: `${API_BASE_URL}/public/tours/search`,
+    
+    // Chat Upload
+    CHAT_UPLOAD: `${API_BASE_URL}/chat/upload`,
 };
 
 export default API_BASE_URL;
