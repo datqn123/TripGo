@@ -5,7 +5,7 @@ import SockJS from 'sockjs-client';
 import Stomp from 'stompjs/lib/stomp.js';
 import { jwtDecode } from "jwt-decode";
 import axios from 'axios';
-import API_BASE_URL, { PUBLIC_API } from '../../../api/config';
+import API_BASE_URL, { PUBLIC_API, WS_BASE_URL } from '../../../api/config';
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -54,7 +54,7 @@ const ChatWidget = () => {
 
         // 1. Khởi tạo kết nối SockJS
         // Append token to query param for robust Spring Security auth
-        const socket = new SockJS(`http://localhost:8080/ws?access_token=${token}`);
+        const socket = new SockJS(`${WS_BASE_URL}?access_token=${token}`);
         const StompClient = Stomp.Stomp || Stomp;
         const stompClient = StompClient.over(socket);
         

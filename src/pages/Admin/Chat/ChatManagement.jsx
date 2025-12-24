@@ -3,7 +3,7 @@ import './ChatManagement.css';
 import SockJS from 'sockjs-client';
 import StompLib from 'stompjs/lib/stomp.js';
 import axios from 'axios';
-import API_BASE_URL, { PUBLIC_API } from '../../../api/config';
+import API_BASE_URL, { PUBLIC_API, WS_BASE_URL } from '../../../api/config';
 
 const ChatManagement = () => {
   const [conversations, setConversations] = useState({});
@@ -32,7 +32,7 @@ const ChatManagement = () => {
 
     // Connect WebSocket
     // Append token to query param for robust Spring Security auth
-    const socket = new SockJS(`http://localhost:8080/ws?access_token=${token}`);
+    const socket = new SockJS(`${WS_BASE_URL}?access_token=${token}`);
     const StompClient = StompLib.Stomp || StompLib;
     const stompClient = StompClient.over(socket);
     
