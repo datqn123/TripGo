@@ -14,6 +14,7 @@ import { PUBLIC_API } from '../../../api/config';
 import reviewApi from '../../../api/reviewApi';
 import ReviewList from '../../../components/User/Review/ReviewList';
 import ReviewForm from '../../../components/User/Review/ReviewForm';
+import recommenderApi from '../../../api/recommenderApi';
 
 const Hotel_Detail = () => {
     const { id } = useParams();
@@ -49,9 +50,22 @@ const Hotel_Detail = () => {
                 setCheckOutDate(tomorrow.toISOString().split('T')[0]);
 
                 // Similar hotels
-                // const similarRes = await hotelApi.searchHotels({ page: 0, size: 4 });
-                // const filtered = similarRes.data.content.filter(h => h.id !== parseInt(id));
-                // setSimilarHotels(filtered.slice(0, 4));
+                try {
+                    const similarRes = await recommenderApi.getSimilarHotels(id);
+                    // The recommender API directly returns a list of hotels, or { similar_hotels: [...] }
+                    // Based on Hotel.jsx logic, it might return { recommendations: [...] } or just an array.
+                    // Let's assume the new endpoint follows standard pattern: data.result or data directly.
+                    // Adjusting based on recommenderApi definition: axiosClient.get returns response.
+                    
+                    const similarData = similarRes.data?.similar_hotels || similarRes.data?.recommendations || similarRes.data || [];
+                    
+                    // Filter out current hotel just in case
+                    const filtered = Array.isArray(similarData) ? similarData.filter(h => h.id !== parseInt(id)) : [];
+                    setSimilarHotels(filtered.slice(0, 4));
+                } catch (recError) {
+                    console.error("Failed to fetch similar hotels", recError);
+                    // Fail silently for recommendations, don't break the page
+                }
 
             } catch (error) {
                 console.error("Failed to fetch hotel details", error);

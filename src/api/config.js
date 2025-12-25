@@ -10,6 +10,7 @@
 export const API_BASE_URL = "http://localhost:8080/api";
 export const ADMIN_API_BASE_URL = "http://localhost:8080/api/admin";
 export const WS_BASE_URL = "http://localhost:8080/ws";
+export const RECOMMENDER_API_URL = "https://recommender-trip-go-api.onrender.com/api/recommend";
 
 // Helper function to build full API URL
 export const buildApiUrl = (endpoint) => {
