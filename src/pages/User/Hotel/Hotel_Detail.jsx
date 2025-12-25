@@ -154,21 +154,40 @@ const Hotel_Detail = () => {
             return;
         }
 
-        // Navigate to booking/payment page or open modal
-        // For now, let's navigate to a payment page placeholder or use existing flow
-        // Assuming there's a payment page receiving state
-        navigate('/payment', { 
-            state: { 
-                hotelId: id,
-                roomId: selectedRoom.id,
-                roomName: selectedRoom.name,
+        // Create booking data object matching Payment_Hotel expectations
+        const bookingData = {
+            hotel: {
+                id: hotel.id,
+                name: hotel.name,
+                thumbnail: hotel.images?.[0]?.imageUrl,
+                address: hotel.address,
+                starRating: hotel.starRating
+            },
+            room: {
+                id: selectedRoom.id,
+                name: selectedRoom.name,
                 price: selectedRoom.price,
-                checkIn: checkInDate,
-                checkOut: checkOutDate,
-                hotelName: hotel.name,
-                image: hotel.images?.[0]?.imageUrl
-            } 
-        });
+                area: selectedRoom.area,
+                capacity: selectedRoom.capacity
+            },
+            checkInDate: checkInDate,
+            checkOutDate: checkOutDate,
+            guestCount: guestCount,
+            totalPrice: selectedRoom.price // Simple calculation for now, logic can be expanded
+        };
+
+        // Calculate nights
+        const start = new Date(checkInDate);
+        const end = new Date(checkOutDate);
+        const nights = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        bookingData.nights = nights > 0 ? nights : 1;
+        bookingData.totalPrice = bookingData.room.price * bookingData.nights;
+
+        // Save to localStorage
+        localStorage.setItem('hotelBooking', JSON.stringify(bookingData));
+
+        // Navigate to corrected payment page route
+        navigate('/payment-hotel');
     };
 
     const handleReviewSubmit = () => {
