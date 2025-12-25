@@ -83,6 +83,53 @@ const ChatManagement = () => {
     }
   }, [selectedUser]);
 
+  // Fetch active conversations on mount
+  useEffect(() => {
+      fetchConversations();
+  }, []);
+
+  const fetchConversations = async () => {
+      const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+          const res = await axios.get(`${API_BASE_URL}/chat/admin/conversations`, {
+              headers: { Authorization: `Bearer ${token}` }
+          });
+          
+          if (Array.isArray(res.data)) {
+               setConversations(prev => {
+                   const newConvs = { ...prev };
+                   res.data.forEach(item => {
+                       // Adapt to likely response structure: { userId: 1, ... } or { id: 1, ... }
+                       // Pass the whole item as the initial "message" or structured object if it's not a list of messages.
+                       // If the API returns a list of *Users* or *Conversation Summaries*, we need to handle it.
+                       // Assuming it returns something like { userId: X, lastMessageContent: "...", ... }
+                       
+                       const uId = item.userId || item.id;
+                       if (uId) {
+                           // Only add if not already present or to update preview
+                           if (!newConvs[uId]) {
+                               // Start with an empty array or a dummy message if content is present
+                               // If `content` or `lastMessage` exists, make a fake message object for preview
+                               const previewMsg = item.content || item.lastMessage ? {
+                                   content: item.content || item.lastMessage,
+                                   timestamp: item.timestamp || new Date().toISOString(),
+                                   senderId: uId // Assume it's from user for preview purposes
+                               } : null;
+                               
+                               newConvs[uId] = previewMsg ? [previewMsg] : [];
+                           }
+                       }
+                   });
+                   return newConvs;
+               });
+          }
+      } catch (err) {
+          console.error("Error fetching conversations:", err);
+      }
+  };
+
   const fetchHistory = async (userId) => {
       const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
       if (!token) return;
@@ -94,10 +141,24 @@ const ChatManagement = () => {
               headers: { Authorization: `Bearer ${token}` }
           });
           
-          setConversations(prev => ({
-              ...prev,
-              [userId]: res.data
-          }));
+          setConversations(prev => {
+              const currentMessages = prev[userId] || [];
+              const fetchedMessages = res.data || [];
+              
+              // Merge fetched history with any new messages received via WS while fetching
+              const combined = [...fetchedMessages, ...currentMessages];
+              
+              // Deduplicate by ID
+              const uniqueMessages = Array.from(new Map(combined.map(m => [m.id, m])).values());
+              
+              // Sort by timestamp
+              uniqueMessages.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
+
+              return {
+                  ...prev,
+                  [userId]: uniqueMessages
+              };
+          });
 
           // Mark as read
           await axios.put(`${API_BASE_URL}/messages/mark-read/${userId}`, {}, {
