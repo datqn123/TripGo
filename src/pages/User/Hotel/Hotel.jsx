@@ -294,7 +294,7 @@ const Hotel = () => {
                     headers['Authorization'] = `Bearer ${token}`;
                 }
                 
-                const response = await fetch(`https://recommender-trip-go-api.onrender.com/api/recommend/smart/${userId}/`, {
+                const response = await fetch(`https://supposed-elianore-tripgp-326141f9.koyeb.app/api/recommend/smart/${userId}/`, {
                     method: 'GET',
                     headers: headers,
                 });
