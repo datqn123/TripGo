@@ -550,7 +550,7 @@ const Hotel = () => {
                                                         <div className="d-flex align-items-center gap-1 mb-2 x-small">
                                                             <i className="bi bi-star-fill text-warning"></i>
                                                             <span className="fw-bold">{item.starRating || 0}</span>
-                                                            <span className="text-muted">(0 đánh giá)</span>
+                                                            <span className="text-muted">({item.totalReviews?.toLocaleString() || 0}) Đánh giá</span>
                                                         </div>
                                                     </div>
                                                     <div className="card-price">
@@ -645,7 +645,7 @@ const Hotel = () => {
                                                         <div className="d-flex align-items-center gap-1 mb-2 x-small">
                                                             <i className="bi bi-star-fill text-warning"></i>
                                                             <span className="fw-bold">{item.starRating || 0}</span>
-                                                            <span className="text-muted">(0 đánh giá)</span>
+<span className="text-muted">({item.totalReviews?.toLocaleString() || 0} đánh giá)</span>
                                                         </div>
                                                     </div>
                                                     <div className="card-price">

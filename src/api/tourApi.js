@@ -16,6 +16,8 @@ const tourApi = {
    * @param {object} params - { title, destinationId, duration, priceRange, status, page, size }
    */
   searchTours: (params) => axiosClient.get(`${PREFIX}/tours/search`, { params }),
+  
+  searchSuggest: (search) => axiosClient.get(`${PREFIX}/tours/search-suggest`, { params: { search } }),
 
   getTour: (id) => axiosClient.get(`${PREFIX}/tours/${id}`),
 
