@@ -2,15 +2,14 @@
 // Change this URL to switch between local development and production
 
 // Production
-// export const API_BASE_URL = "https://tripgo-api.onrender.com/api";
-// export const ADMIN_API_BASE_URL = "https://tripgo-api.onrender.com/api/admin";
-// export const WS_BASE_URL = "https://tripgo-api.onrender.com/ws";
-// export const RECOMMENDER_API_URL = "https://recommender-trip-go-api.onrender.com/api/recommend";
+export const API_BASE_URL = "https://tripgo-api.onrender.com/api";
+export const ADMIN_API_BASE_URL = "https://tripgo-api.onrender.com/api/admin";
+export const WS_BASE_URL = "https://tripgo-api.onrender.com/ws";
 
 // Local development (uncomment to use)
-export const API_BASE_URL = "http://localhost:8080/api";
-export const ADMIN_API_BASE_URL = "http://localhost:8080/api/admin";
-export const WS_BASE_URL = "http://localhost:8080/ws";
+// export const API_BASE_URL = "http://localhost:8080/api";
+// export const ADMIN_API_BASE_URL = "http://localhost:8080/api/admin";
+// export const WS_BASE_URL = "http://localhost:8080/ws";
 export const RECOMMENDER_API_URL = "https://supposed-elianore-tripgp-326141f9.koyeb.app/api/recommend";
 
 // Helper function to build full API URL
