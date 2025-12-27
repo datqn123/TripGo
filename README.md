@@ -36,12 +36,17 @@ Access the Swagger UI to test the API endpoints directly:
 - **Containerization**: Docker
 - **Deployment**: Render
 
-## 💻 Getting Started (Local Dev)
+## � Project Repositories
+
+- **Backend Source**: [https://github.com/datqn123/DACN2.git](https://github.com/datqn123/DACN2.git)
+- **Recommender System**: [https://github.com/datqn123/recommender-trip-go-api.git](https://github.com/datqn123/recommender-trip-go-api.git)
+
+## �💻 Getting Started (Local Dev)
 
 1.  **Clone the repo**:
 
     ```bash
-    git clone <your-repo-url>
+    git clone https://github.com/datqn123/DACN2.git
     cd dacn2
     ```
 
