@@ -5,6 +5,8 @@ Welcome to the **TripGo** repository, a comprehensive travel booking platform bu
 ![Java](https://img.shields.io/badge/Java-17-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.0-green)
 ![React](https://img.shields.io/badge/React-18-blue)
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![Django](https://img.shields.io/badge/Django-5.0-green)
 ![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8.11-yellow)
 ![Redis](https://img.shields.io/badge/Redis-Latest-red)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
@@ -15,6 +17,7 @@ Welcome to the **TripGo** repository, a comprehensive travel booking platform bu
 
 - 🏨 **Hotel & Tour Booking**: Full reservation flow for users.
 - 🔍 **Advanced Search**: High-performance search powered by Elasticsearch.
+- 🤖 **Smart Recommendation**: Personalized hotel suggestions using Hybrid AI (Collaborative + Content-Based).
 - 💬 **Real-time Chat**: WebSocket-based support chat between Users and Admins.
 - 💳 **Payments**: Secure integration with PayOS.
 - 📊 **Admin Dashboard**: Comprehensive management of bookings, users, and services.
@@ -52,6 +55,23 @@ Robust RESTful API built with Java and Spring Boot.
 - **Containerization**: Docker
 - **Deployment**: Render
 
+### 🧠 Recommender System (AI Service)
+
+A dedicated microservice for personalized hotel recommendations.
+
+- **Core**: Python 3.10, Django 5 (DRF)
+- **Algorithms**:
+  - **Hybrid Filtering**: Combines Content-Based and Collaborative Filtering for optimal accuracy.
+  - **Content-Based**: TF-IDF & Cosine Similarity based on hotel amenities, location, and description.
+  - **Collaborative Filtering**:
+    - **User-Based & Item-Based**: optimized with Sparse Matrices (CSR).
+    - **Matrix Factorization**: Efficiently handles large user-item datasets.
+- **Smart Features**:
+  - **Time Decay**: Recent interactions (views, bookings) possess higher weight.
+  - **Implicit Feedback**: Scores generated from View Duration, Clicks, Favorites, and Bookings.
+  - **Cold Start Handling**: Fallback mechanisms for new users.
+- **Libraries**: Pandas, NumPy, Scikit-learn, SciPy.
+
 ## 📂 Project Structure
 
 The repository is organized to house the React frontend within the `src` directory, standard for Create React App projects.
@@ -77,6 +97,7 @@ The repository is organized to house the React frontend within the `src` directo
 - JDK 17+
 - Maven
 - Docker (optional but recommended for DBs)
+- Python 3.10+ (for Recommender Service)
 
 ### 1. Clone the Repo
 
@@ -107,6 +128,22 @@ npm start
 ```
 
 The app will open at `http://localhost:3000`.
+
+### 4. Recommender Service Setup (Optional)
+
+If you want to run the Recommendation engine locally:
+
+```bash
+git clone https://github.com/datqn123/recommender-trip-go-api.git
+cd recommender-trip-go-api
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Run migrations and start server
+python manage.py migrate
+python manage.py runserver 8001
+```
 
 ## 📬 Contact & Support
 
