@@ -6,6 +6,7 @@ Welcome to the backend repository of **TripGo**, a comprehensive travel booking 
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.0-green)
 ![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8.11-yellow)
 ![Redis](https://img.shields.io/badge/Redis-Latest-red)
+![Kafka](https://img.shields.io/badge/Apache_Kafka-Enabled-black)
 ![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
 
 ## 📖 About The Project
@@ -33,10 +34,11 @@ Access the Swagger UI to test the API endpoints directly:
 - **Core**: Java 17, Spring Boot
 - **Database**: MySQL (Main), Redis (Caching)
 - **Search Engine**: Elasticsearch
+- **Message Broker**: Apache Kafka
 - **Containerization**: Docker
 - **Deployment**: Render
 
-## � Project Repositories
+## Project Repositories
 
 - **Backend Source**: [https://github.com/datqn123/DACN2.git](https://github.com/datqn123/DACN2.git)
 - **Recommender System**: [https://github.com/datqn123/recommender-trip-go-api.git](https://github.com/datqn123/recommender-trip-go-api.git)
