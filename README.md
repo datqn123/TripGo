@@ -1,25 +1,64 @@
-- 👋 # Welcome to Web Crafters! 🎨
+# ✈️ TripGo - Travel Booking API
 
-Hi there! I'm **Lucky Rawat**, a passionate software developer with over 4 years of experience in the field. Welcome to my GitHub repository, where I share code and resources related to the content on my YouTube channel, **Web Crafters**.
+Welcome to the backend repository of **TripGo**, a comprehensive travel booking platform built for **Đồ án Chuyên ngành 2**.
 
-## About the Channel
+![Java](https://img.shields.io/badge/Java-17-orange)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-3.0-green)
+![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8.11-yellow)
+![Redis](https://img.shields.io/badge/Redis-Latest-red)
+![Docker](https://img.shields.io/badge/Docker-Enabled-blue)
 
-On **Web Crafters**, I share daily content focused on creating responsive UIs using Angular, React, and other modern web development technologies. Whether you're a beginner or an experienced developer, you'll find tutorials, tips, and tricks to enhance your skills and build amazing web applications.
+## 📖 About The Project
 
-### What You'll Find Here
+**TripGo** is a robust backend system designed to handle:
 
-- **Source Code**: Access to the code demonstrated in my YouTube tutorials.
-- **Snippets**: Handy code snippets for various UI components.
-- **Projects**: Full-fledged projects to help you practice and improve your skills.
+- 🏨 **Hotel & Tour Booking**: Full reservation flow.
+- 🔍 **Advanced Search**: Powered by Elasticsearch.
+- 💬 **Real-time Chat**: WebSocket support for customer support.
+- 💳 **Payments**: Integrated with PayOS.
 
-## Support & Subscribe
+## 🚀 Live Demo & API Documentation
 
-If you find my content helpful, please consider supporting the channel by subscribing and sharing the videos. Your support helps me continue creating valuable content for the community.
+Access the Swagger UI to test the API endpoints directly:
 
-- **YouTube**: [@Web.Crafters](https://www.youtube.com/@Web.Crafters)
-- **Instagram**: [web.crafters2024](https://www.instagram.com/web.crafters2024)
-- **Facebook**: [Web-Crafters/61564137717276](https://www.facebook.com/people/Web-Crafters/61564137717276/)
+👉 **[Swagger UI - Render Deployment](https://tripgo-api.onrender.com/swagger-ui/index.html)**
 
-Join our community, and let's code beautiful UIs together!
+> [!WARNING] > **Important Note for Free Tier**:
+> The server is hosted on Render's Free Tier. It will spin down (sleep) after **15 minutes** of inactivity.
+>
+> - If the first request takes a long time or fails, please **wait 1-2 minutes** for the server to wake up and try again.
 
-Happy coding! 🚀
+## 🛠️ Tech Stack
+
+- **Core**: Java 17, Spring Boot
+- **Database**: MySQL (Main), Redis (Caching)
+- **Search Engine**: Elasticsearch
+- **Containerization**: Docker
+- **Deployment**: Render
+
+## 💻 Getting Started (Local Dev)
+
+1.  **Clone the repo**:
+
+    ```bash
+    git clone <your-repo-url>
+    cd dacn2
+    ```
+
+2.  **Configuration**:
+
+    - Update `src/main/resources/application.properties` with your local database credentials or use the `docker-compose.yml` provided.
+
+3.  **Run with Docker** (Recommended for dependencies):
+    ```bash
+    docker-compose up -d
+    # Then run the Spring Boot app
+    ```
+
+## 📬 Contact & Support
+
+If you have any questions about this project/capstone, feel free to reach out!
+
+---
+
+_Happy Coding!_ 🚀
