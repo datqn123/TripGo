@@ -4,13 +4,37 @@ import AdvanceSearch from "../../../components/User/AdvanceSearch/AdvanceSearch"
 import { Container, Row, Col, Card, Badge, Button } from 'react-bootstrap';
 import './tour.css';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import tourApi from "../../../api/tourApi";
+
+// Skeleton for voucher cards
+const VoucherSkeleton = () => {
+    const skeletonStyle = {
+        background: 'linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%)',
+        backgroundSize: '200% 100%',
+        animation: 'shimmer 1.5s infinite',
+        borderRadius: '8px',
+    };
+
+    return (
+        <div className="voucher-card p-3 bg-white rounded-3 shadow-sm d-flex gap-3 align-items-center h-100">
+            <div style={{ ...skeletonStyle, width: '50px', height: '50px', borderRadius: '8px' }}></div>
+            <div className="flex-grow-1">
+                <div style={{ ...skeletonStyle, height: '16px', width: '80%', marginBottom: '8px' }}></div>
+                <div style={{ ...skeletonStyle, height: '12px', width: '100%', marginBottom: '8px' }}></div>
+                <div style={{ ...skeletonStyle, height: '20px', width: '40%' }}></div>
+            </div>
+        </div>
+    );
+};
 
 const Tour = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [tours, setTours] = useState([]);
-    const [loading, setLoading] = useState(true);
+    const [loadingTours, setLoadingTours] = useState(true);
+    const [loadingVouchers, setLoadingVouchers] = useState(true);
+    const [vouchers, setVouchers] = useState([]);
     const [filters, setFilters] = useState({
         page: 0,
         size: 12,
@@ -23,26 +47,41 @@ const Tour = () => {
 
     useEffect(() => {
         const fetchTours = async () => {
-            setLoading(true);
+            setLoadingTours(true);
             try {
                 const response = await tourApi.searchTours(filters);
-                // Check struct: response.data.result.content if paged, or response.data.result
                 if (response && response.data && response.data.result) {
                     setTours(response.data.result.content || response.data.result.tours || response.data.result || []);
                 }
             } catch (error) {
                 console.error("Failed to fetch tours:", error);
             } finally {
-                setLoading(false);
+                setLoadingTours(false);
             }
         };
         fetchTours();
     }, [filters]);
 
+    useEffect(() => {
+        const fetchVouchers = async () => {
+            setLoadingVouchers(true);
+            try {
+                const response = await tourApi.getVouchersTour();
+                if (response && response.data && response.data.result) {
+                    setVouchers(response.data.result.content || response.data.result.vouchers || response.data.result || []);
+                }
+            } catch (error) {
+                console.error("Failed to fetch vouchers:", error);
+            } finally {
+                setLoadingVouchers(false);
+            }
+        };
+        fetchVouchers();
+    }, []);
+
     const formatPrice = (price) => {
         return price ? price.toLocaleString('vi-VN') + ' VND' : 'Liên hệ';
     };
-    // Mock Data
     const categories = [
         { icon: "bi-grid-fill", label: "Tất cả" },
         { icon: "bi-briefcase-fill", label: "Tour" },
@@ -51,65 +90,8 @@ const Tour = () => {
         { icon: "bi-cup-hot-fill", label: "Ẩm thực và trải nghiệm" },
     ];
 
-    const vouchers = [
-        { code: "TOURSALE102", discount: "Giảm đến 200.000đ Tour Trải nghiệm", sub: "Giảm 10% tối đa 200.000đ. Đặt tối thiểu 1tr. Áp dụng cho tour trong ngày.", icon: "bi-gift-fill" },
-        { code: "VETHAMQUAN20", discount: "Giảm 20% Vé tham quan", sub: "Giảm 20% tối đa 100.000đ. Áp dụng cho tất cả vé tham quan trong nước.", icon: "bi-ticket-fill" },
-        { code: "SPARELAX15", discount: "Giảm 15% Spa và Thư giãn", sub: "Giảm 15% tối đa 200.000đ. Đặt tối thiểu 500.000đ. Áp dụng cho dịch vụ spa.", icon: "bi-flower3" },
-    ];
-
     const vietnamPlaces = ["Đà Nẵng", "Tp Hồ Chí Minh", "Hà Nội", "Đà Lạt", "Nha Trang", "Phú Quốc", "Huế"];
-    const worldPlaces = ["Bangkok", "Seoul", "Tokyo", "Singapore", "Osaka", "HongKong"];
-
-    const tourData = [
-        {
-            image: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2600&auto=format&fit=crop",
-            location: "Quảng Ninh, Việt Nam",
-            title: "Tour Vịnh Hạ Long 2N1D",
-            duration: "2N1Đ",
-            guests: "4-6 người",
-            rating: 4.9,
-            reviews: 1259,
-            oldPrice: "6.000.000 VND",
-            price: "4.800.000 VND",
-            discount: "-25%"
-        },
-        {
-            image: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2600&auto=format&fit=crop",
-            location: "North Atoll, Maldives",
-            title: "Thiên đường biển xanh Maldives",
-            duration: "5N4Đ",
-            guests: "2 người",
-            rating: 4.8,
-            reviews: 1163,
-            oldPrice: "60.000.000 VND",
-            price: "48.000.000 VND",
-            discount: "-20%"
-        },
-        {
-            image: "https://images.unsplash.com/photo-1538485399081-7191377e8241?q=80&w=2574&auto=format&fit=crop",
-            location: "Hàn Quốc",
-            title: "Khám phá văn hoá và ẩm thực Seoul",
-            duration: "4N3Đ",
-            guests: "4 người",
-            rating: 4.8,
-            reviews: 3574,
-            oldPrice: "48.000.000 VND",
-            price: "36.000.000 VND",
-            discount: "-25%"
-        },
-        {
-            image: "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?q=80&w=2600&auto=format&fit=crop",
-            location: "Hội An, Việt Nam",
-            title: "Hành trình trải nghiệm Hội An",
-            duration: "3N2Đ",
-            guests: "2 người",
-            rating: 5.0,
-            reviews: 3572,
-            oldPrice: "10.000.000 VND",
-            price: "7.500.000 VND",
-            discount: "-25%"
-        }
-    ];
+    const worldPlaces = ["Bangkok","Seoul", "Tokyo", "Singapore", "Osaka", "HongKong"];
 
     const [activeVN, setActiveVN] = useState("Đà Nẵng");
     const [activeWorld, setActiveWorld] = useState("Bangkok");
@@ -142,23 +124,69 @@ const Tour = () => {
                             <i className="bi bi-gift-fill"></i> Ưu đãi và mã giảm giá
                         </h4>
                         <Row className="g-3">
-                            {vouchers.map((v, idx) => (
-                                <Col md={4} key={idx}>
-                                    <div className="voucher-card p-3 bg-white rounded-3 shadow-sm d-flex gap-3 align-items-center h-100">
-                                        <div className="voucher-icon-box rounded-3 d-flex align-items-center justify-content-center bg-light text-primary">
-                                            <i className={`bi ${v.icon} fs-4`}></i>
-                                        </div>
-                                        <div className="flex-grow-1">
-                                            <h6 className="fw-bold mb-1 small">{v.discount}</h6>
-                                            <p className="text-muted x-small mb-2">{v.sub}</p>
-                                            <div className="d-flex justify-content-between align-items-center">
-                                                <span className="code-badge fw-bold small text-dark px-2 py-1 rounded bg-light border">{v.code}</span>
-                                                <a href="#" className="small text-primary fw-bold text-decoration-none">Sao chép</a>
+                            {loadingVouchers ? (
+                                // Skeleton Loading for vouchers
+                                [1, 2, 3].map((_, idx) => (
+                                    <Col md={4} key={idx}>
+                                        <VoucherSkeleton />
+                                    </Col>
+                                ))
+                            ) : vouchers.length > 0 ? (
+                                vouchers.slice(0, 3).map((v, idx) => (
+                                    <Col md={4} key={v.id || idx}>
+                                        <div className="voucher-card bg-white rounded-4 shadow-sm h-100 d-flex flex-column" style={{ border: '1px solid #e0e0e0' }}>
+                                            {/* Top section with icon and content */}
+                                            <div className="d-flex gap-3 p-3 flex-grow-1">
+                                                <div className="voucher-icon-box rounded-3 d-flex align-items-center justify-content-center flex-shrink-0" style={{ width: '48px', height: '48px', backgroundColor: '#e3f2fd' }}>
+                                                    <i className="bi bi-file-earmark-text fs-4" style={{ color: '#42a5f5' }}></i>
+                                                </div>
+                                                <div className="flex-grow-1">
+                                                    <h6 className="fw-bold mb-1" style={{ fontSize: '14px', color: '#1976d2' }}>{v.voucherName || v.name || v.discount}</h6>
+                                                    <p className="text-muted mb-0" style={{ 
+                                                        display: '-webkit-box', 
+                                                        WebkitLineClamp: 2, 
+                                                        WebkitBoxOrient: 'vertical', 
+                                                        overflow: 'hidden',
+                                                        fontSize: '12px',
+                                                        lineHeight: '1.5',
+                                                        color: '#757575'
+                                                    }}>
+                                                        {v.description || v.sub}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            {/* Bottom section with code and copy button */}
+                                            <div className="border-top d-flex justify-content-between align-items-center px-3 py-2" style={{ backgroundColor: '#fafafa' }}>
+                                                <span className="fw-bold px-2 py-1 rounded" style={{ 
+                                                    fontSize: '12px', 
+                                                    color: '#424242',
+                                                    backgroundColor: '#fff',
+                                                    border: '1px dashed #bdbdbd'
+                                                }}>
+                                                    {v.voucherCode || v.code}
+                                                </span>
+                                                <button 
+                                                    className="btn btn-link p-0 text-decoration-none fw-bold"
+                                                    style={{ fontSize: '13px', color: '#1976d2' }}
+                                                    onClick={() => {
+                                                        const code = v.voucherCode || v.code;
+                                                        if (code) {
+                                                            navigator.clipboard.writeText(code);
+                                                            toast.success('Đã sao chép mã: ' + code);
+                                                        }
+                                                    }}
+                                                >
+                                                    Sao chép
+                                                </button>
                                             </div>
                                         </div>
-                                    </div>
+                                    </Col>
+                                ))
+                            ) : (
+                                <Col>
+                                    <p className="text-muted">Không có voucher nào.</p>
                                 </Col>
-                            ))}
+                            )}
                         </Row>
                     </div>
 
@@ -206,7 +234,7 @@ const Tour = () => {
                         </div>
 
                         <Row className="g-4">
-                            {loading ? (
+                            {loadingTours ? (
                                 <div className="text-center py-5">Đang tải danh sách tour...</div>
                             ) : (
                                 tours.length > 0 ? (
@@ -218,7 +246,7 @@ const Tour = () => {
                                                         <Card.Img variant="top" src={item.image || item.thumbnail || "https://images.unsplash.com/photo-1559592413-7cec4d0cae2b"} height="200" className="object-fit-cover" />
                                                         {item.discount && (
                                                             <Badge bg="danger" className="position-absolute top-0 end-0 m-3 py-2 px-3 rounded-pill">
-                                                                <span style={{ color: "white" }}>{item.discount}</span>
+                                                                <span style={{ color: "black" }}>{item.discountValue}</span>
                                                             </Badge>
                                                         )}
                                                         <div className="card-heart-icon position-absolute top-0 start-0 m-3 text-white">

@@ -138,7 +138,7 @@ const Outstandingoffer = () => {
                                                 <div className="airline-section">
                                                     <div className="airline-logo-new">
                                                         {flight.airlineLogo ? (
-                                                            <img src={flight.airlineLogo} alt={flight.airlineName} style={{ width: '24px', height: '24px' }} />
+                                                            <img src={flight.airlineLogo} alt={flight.airlineName} />
                                                         ) : (
                                                             '✈️'
                                                         )}

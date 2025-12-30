@@ -85,7 +85,11 @@ const PlaneSearch = () => {
               <div className="field-col">
                 <label className="item-search-label"> Điểm khởi hành </label>
                 <div className="pill-input">
-                  <span className="icon">✈️</span>
+                  <span className="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-500">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
+                    </svg>
+                  </span>
                   <div className="content">
                     <CustomDropdown
                       label={departureLocation ? departureLocation.name : "Nơi đi"}
@@ -99,7 +103,12 @@ const PlaneSearch = () => {
               <div className="field-col">
                 <label className="item-search-label"> Điểm đến </label>
                 <div className="pill-input">
-                  <span className="icon">🧭</span>
+                  <span className="icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-gray-500">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1 1 15 0Z" />
+                    </svg>
+                  </span>
                   <div className="content">
                     <CustomDropdown
                       label={arrivalLocation ? arrivalLocation.name : "Nơi đến"}
