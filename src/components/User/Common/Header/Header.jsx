@@ -172,7 +172,7 @@ const Header = () => {
             {[
               { to: "/", label: "Trang chủ" },
               { to: "/hotel", label: "Khách sạn" },
-              { to: "/plane", label: "Chuyến bay" },
+              { to: "/filter-plane", label: "Chuyến bay" },
               { to: "/tour", label: "Tour" }
             ].map((link) => (
               <NavLink 

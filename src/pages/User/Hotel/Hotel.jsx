@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import './hotel.css';
 import Banner from '../../../components/User/Banner/Banner';
 import AdvanceSearch from '../../../components/User/AdvanceSearch/AdvanceSearch';
+import HotelNameSearch from '../../../components/User/Hotel/HotelNameSearch';
 import homeApi from '../../../api/homeApi';
 import { PUBLIC_API } from '../../../api/config';
 
@@ -321,6 +322,12 @@ const Hotel = () => {
             <AdvanceSearch />
             <div className="hotel-page py-4 bg-light">
                 <Container>
+                    {/* Hotel Name Search */}
+                    <div className="d-flex justify-content-center mb-5" style={{ position: 'relative', zIndex: 10 }}>
+                        <div style={{ width: '100%', maxWidth: '700px' }}>
+                            <HotelNameSearch />
+                        </div>
+                    </div>
 
                     {/* Vouchers section */}
                     <div className="mb-5">

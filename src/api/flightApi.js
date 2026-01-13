@@ -15,20 +15,8 @@ const flightApi = {
    */
   getFlightById: (id) => axiosClient.get(`${PREFIX}/${id}`),
 
-  /**
-   * Get flight cards for display
-   * GET /api/public/flights/cards
-   * @param {object} params - Optional query parameters (page, size)
-   * @returns {Promise} Flight cards list
-   */
   getFlightCards: (params) => axiosClient.get(`${PREFIX}/cards`, { params }),
 
-  /**
-   * Search flights with filters
-   * GET /api/public/flights/search
-   * @param {object} params - Search parameters (departureLocationId, arrivalLocationId, departureDate, minPrice, maxPrice, airlineIds, page, size)
-   * @returns {Promise} Search results
-   */
   searchFlights: (params) => axiosClient.get(`${PREFIX}/search`, { params }),
 };
 
