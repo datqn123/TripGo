@@ -8,10 +8,10 @@
 // export const RECOMMENDER_API_URL = "https://recommender-trip-go-api.onrender.com/api/recommend";
 
 // Local development (uncomment to use)
-export const API_BASE_URL = "https://yields-folding-mounts-diversity.trycloudflare.com/api";
-export const ADMIN_API_BASE_URL = "https://yields-folding-mounts-diversity.trycloudflare.com/api/admin";
-export const WS_BASE_URL = "https://yields-folding-mounts-diversity.trycloudflare.com/ws";
-export const RECOMMENDER_API_URL = "https://supposed-elianore-tripgp-326141f9.koyeb.app/api/recommend";
+export const API_BASE_URL = "https://ave-reminder-episode-charlotte.trycloudflare.com/api";
+export const ADMIN_API_BASE_URL = "https://ave-reminder-episode-charlotte.trycloudflare.com/api/admin";
+export const WS_BASE_URL = "https://ave-reminder-episode-charlotte.trycloudflare.com/ws";
+export const RECOMMENDER_API_URL = "https://ave-reminder-episode-charlotte.trycloudflare.com/api/recommend";
 
 // Helper function to build full API URL
 export const buildApiUrl = (endpoint) => {
